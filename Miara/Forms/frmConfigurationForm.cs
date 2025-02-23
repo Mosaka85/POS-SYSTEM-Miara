@@ -9,7 +9,8 @@ namespace Miara
 {
     public partial class frmConfigurationForm : Form
     {
-        private const string configFile = @"C:\Users\TSHEP\source\repos\Miara\Miara\Config.xml";
+        // Use a relative path or dynamically resolve the file location
+        private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
 
         public frmConfigurationForm()
         {
@@ -26,9 +27,6 @@ namespace Miara
                 {
                     connection.Open();
                     PopulateDatabaseComboBox(connection);
-
-
-
                     MessageBox.Show("Connection successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -49,10 +47,7 @@ namespace Miara
             }
         }
 
-        private void btnSQLSAVE_Click(object sender, EventArgs e)
-        {
-            SaveLoginInfo();
-        }
+
 
         private string GetConnectionString()
         {
@@ -70,8 +65,6 @@ namespace Miara
 
             return builder.ConnectionString;
         }
-
-
 
         private void SaveLoginInfo()
         {
@@ -106,60 +99,64 @@ namespace Miara
 
         private void LoadLoginInfo()
         {
-            if (File.Exists(configFile))
+            if (!File.Exists(configFile))
             {
-                try
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
-                    using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
-                    {
-                        LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
+                // Create a default Config.xml file if it doesn't exist
+                CreateDefaultConfigFile();
+                MessageBox.Show("No saved login information found. A default configuration file has been created.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
-                        txtSQLDataSource.Text = loginInfo.DataSource;
-                        txtSQLusername.Text = loginInfo.Username;
-                        txtPassword.Text = loginInfo.Password;
-                        comboDatabase.Text = loginInfo.SelectedDatabase;
-                    }
-                }
-                catch (Exception ex)
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
+                using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
                 {
-                    MessageBox.Show($"Failed to load connection information. Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
+
+                    txtSQLDataSource.Text = loginInfo.DataSource;
+                    txtSQLusername.Text = loginInfo.Username;
+                    txtPassword.Text = loginInfo.Password;
+                    comboDatabase.Text = loginInfo.SelectedDatabase;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("No saved login information found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Failed to load connection information. Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void btnSQLSAVE_Click_1(object sender, EventArgs e)
+        private void CreateDefaultConfigFile()
         {
-            SaveLoginInfo();
-        }
+            LoginInfo defaultLoginInfo = new LoginInfo
+            {
+                DataSource = "YourDefaultDataSource",
+                Username = "YourDefaultUsername",
+                Password = "YourDefaultPassword",
+                SelectedDatabase = "YourDefaultDatabase"
+            };
 
-        private void frmConfigurationForm_Load_1(object sender, EventArgs e)
-        {
-            LoadLoginInfo();
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
+                using (FileStream fileStream = new FileStream(configFile, FileMode.Create))
+                {
+                    serializer.Serialize(fileStream, defaultLoginInfo);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to create default configuration file. Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnCloseSQLfrm_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
+
+        private void btnSQLSAVE_Click(object sender, EventArgs e)
+        {
+            SaveLoginInfo();
+        }
     }
 }
-
-    [Serializable]
-    public class LoginInfo
-    {
-        public string DataSource { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string SelectedDatabase { get; set; }
-    }
-

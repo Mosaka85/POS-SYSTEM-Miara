@@ -1,145 +1,165 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Data.SqlClient;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace Miara
 {
-    public partial class frmLogInPage : Form
+    public partial class frmResetPassword : Form
     {
-        private const string configFile = @"C:\Users\TSHEP\source\repos\Miara\Miara\Config.xml"; // Adjust path as needed
-        private string SQLservername;
-        private string SQLDatabase;
-        private string SQLUsername;
-        private string SQLPassword;
+        private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
+        private string connectionString;
+        private string generatedOTP;
+        private string userEmail;
 
-
-        public frmLogInPage()
+        public frmResetPassword()
         {
             InitializeComponent();
-            LoadSQLConnectionInfo(); // Load connection info when the form loads
-            this.ContextMenuStrip = contextMenuStrip1;
-            this.MouseUp += new MouseEventHandler(frmLogInPage_MouseUp);
+            LoadSQLConnectionInfo();
         }
 
-        
         private void LoadSQLConnectionInfo()
         {
-            if (File.Exists(configFile))
-            {
-                try
-                {
-                    // Deserialize the XML file to get the connection information
-                    XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
-                    using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
-                    {
-                        LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
-                        SQLservername = loginInfo.DataSource;
-                        SQLDatabase = loginInfo.SelectedDatabase;
-                        SQLUsername = loginInfo.Username;
-                        SQLPassword = loginInfo.Password;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to load connection information: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
+            if (!File.Exists(configFile))
             {
                 MessageBox.Show("Connection configuration file not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
+                using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
+                {
+                    LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
+                    connectionString = $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load connection information: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-
-        private void button1_Click(object sender, EventArgs e)
+        public string GetUserEmail(string username)
         {
-            string employeePassword = txtEmployeePassword.Text;
-            string employeeUsername = txtEmployeeUsername.Text;
+            string query = "SELECT TOP 1 Email FROM Employees WHERE Username = @username";
 
-            if (AuthenticateUser(employeeUsername, employeePassword))
-                
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                Hide();
-                new frmMainForm().Show();
+                cmd.Parameters.AddWithValue("@username", username);
+                conn.Open();
+                object result = cmd.ExecuteScalar();
+                return result?.ToString();
+            }
+        }
+
+        public void SendPasswordResetOTP(string username)
+        {
+            string email = GetUserEmail(username);
+            userEmail = email;
+            if (string.IsNullOrEmpty(email))
+            {
+                MessageBox.Show("User not found or no email available.");
+                return;
+            }
+
+            generatedOTP = GenerateOTP();
+            string subject = "Password Reset OTP";
+            string receiptContent = $"Your OTP for password reset is: {generatedOTP}";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand("SendEmailtoUser", conn))
+            {
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@receiptContent", receiptContent);
+                cmd.Parameters.AddWithValue("@toEmail", email);
+                cmd.Parameters.AddWithValue("@Subject", subject);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private string GenerateOTP()
+        {
+            Random rand = new Random();
+            return rand.Next(100000000, 199999999).ToString();
+        }
+
+        private void btnSendOtp_Click(object sender, EventArgs e)
+        {
+            SendPasswordResetOTP(txtUsername.Text);
+            MessageBox.Show("Reset Password email sent Email  Sent");
+            lblEmailsent.Text = $"Email sent to {userEmail}";
+            btnSendOtp.Enabled = false;
+            flowLayoutPanel1.Visible = true;
+
+        }
+
+        private void btnSaveupdate_Click(object sender, EventArgs e)
+        {
+            if (txtOTPEmail.Text == generatedOTP)
+            {
+                if (txtPassword.Text == txtConfirmPassword.Text && !string.IsNullOrEmpty(txtPassword.Text))
+                {
+                    string hashedPassword = HashPassword(txtPassword.Text);
+                    string query = "UPDATE Employees SET PasswordHash = @password WHERE Username = @username";
+
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@password", hashedPassword);
+                        cmd.Parameters.AddWithValue("@username", txtUsername.Text);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Password successfully changed.");
+                    flowLayoutPanel1.Visible = false;
+                }
+                else
+                {
+                    MessageBox.Show("Passwords do not match or are empty.");
+                }
             }
             else
             {
-                MessageBox.Show("Invalid username or password. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid OTP. Please try again.");
             }
         }
-        private bool AuthenticateUser(string username, string password)
+
+        private string HashPassword(string password)
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-            builder.DataSource = SQLservername;
-            builder.InitialCatalog = SQLDatabase;
-            builder.UserID = SQLUsername;
-            builder.Password = SQLPassword;
-
-            using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
-            using (SqlCommand command = new SqlCommand("SELECT Active FROM Employees WHERE LogInName = @Username", connection))
+            using (SHA256 sha256 = SHA256.Create())
             {
-                command.Parameters.AddWithValue("@Username", username);
-
-                try
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+                StringBuilder hashBuilder = new StringBuilder();
+                foreach (byte b in hashBytes)
                 {
-                    connection.Open();
-                    object result = command.ExecuteScalar(); // Get the Active column value (should be an integer)
-
-                    if (result == null || result == DBNull.Value) // Check for null or DBNull
-                    {
-                        MessageBox.Show("Invalid username.", "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return false;
-                    }
-                    else
-                    {
-                        // Convert the result to an integer before casting to a boolean
-                        bool isActive = Convert.ToInt32(result) == 1;
-
-                        if (!isActive)
-                        {
-                            MessageBox.Show("Your account is deactivated. Please contact the administrator.", "Account Deactivated", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-
-                        return isActive; // Return true only if the user is active
-                    }
+                    hashBuilder.Append(b.ToString("x2"));
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("An error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false; // Always return false in case of an error
-                }
+                return hashBuilder.ToString();
             }
         }
 
+        private void txtUsername_TextChanged(object sender, EventArgs e)
+        {
+            btnSendOtp.Enabled = true;
+        }
 
+        private void frmResetPassword_Load(object sender, EventArgs e)
+        {
+            flowLayoutPanel1.Visible = false;
+        }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Application.Exit();
-        }
-
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
-        {
-
-        }
-
-        private void configurationToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            new frmConfigPassword().Show();
-        }
-        private void frmLogInPage_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                contextMenuStrip1.Show(this, e.Location);
-            }
+            Application.Restart();
         }
     }
 }
-
-
-

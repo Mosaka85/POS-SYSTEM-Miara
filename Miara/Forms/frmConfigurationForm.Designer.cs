@@ -112,7 +112,8 @@ namespace Miara
             this.btnSQLSAVE.TabIndex = 5;
             this.btnSQLSAVE.Text = "Save";
             this.btnSQLSAVE.UseVisualStyleBackColor = false;
-            this.btnSQLSAVE.Click += new System.EventHandler(this.btnSQLSAVE_Click_1);
+
+            this.btnSQLSAVE.Click += new System.EventHandler(this.btnSQLSAVE_Click);
             // 
             // label1
             // 
@@ -161,7 +162,6 @@ namespace Miara
             this.label4.Size = new System.Drawing.Size(99, 23);
             this.label4.TabIndex = 9;
             this.label4.Text = "Password";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // btnCloseSQLfrm
             // 
@@ -196,7 +196,6 @@ namespace Miara
             this.Name = "frmConfigurationForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SQL Connection";
-            this.Load += new System.EventHandler(this.frmConfigurationForm_Load_1);
             this.ResumeLayout(false);
             this.PerformLayout();
 

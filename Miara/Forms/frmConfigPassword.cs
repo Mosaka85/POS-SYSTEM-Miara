@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Miara
@@ -42,12 +35,12 @@ namespace Miara
         private void btnEnterConfig_Click(object sender, EventArgs e)
         {
             string password = txtPassword.Text;
-            if (password == "6304")
+            if (password == "9304")
             {
                 // Password is correct
                 Hide();
                 // Open the new form
-                new frmConfigurationForm().Show();
+                new frmConfigurationForm().ShowDialog();
             }
             else
             {

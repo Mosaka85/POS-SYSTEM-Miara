@@ -1,0 +1,311 @@
+﻿<Tables>
+	<Table Name="Categories" Schema="dbo">
+		<Columns>
+			<Column Name="CategoryID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="CategoryName" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="Description" DataType="varchar" Length="500" Nullable="true" />
+			<Column Name="IsActive" DataType="bit" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="CategoryID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+
+	<Table Name="Customers" Schema="dbo">
+		<Columns>
+			<Column Name="CustomerID" DataType="bigint" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="CustomerName" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="Phone" DataType="varchar" Length="20" Nullable="true" />
+			<Column Name="Email" DataType="varchar" Length="255" Nullable="true" />
+			<Column Name="Address" DataType="varchar" Length="500" Nullable="true" />
+			<Column Name="LoyaltyPoints" DataType="int" Nullable="false" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="CustomerID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+	<Table Name="Discounts" Schema="dbo">
+		<Columns>
+			<Column Name="DiscountID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="SaleID" DataType="int" Nullable="false" />
+			<Column Name="DiscountPercentage" DataType="decimal" Precision="5" Scale="2" Nullable="false" />
+			<Column Name="DiscountValue" DataType="decimal" Precision="10" Scale="2" Nullable="false" />
+			<Column Name="DiscountDate" DataType="datetime" Nullable="false" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="DiscountID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+	<Table Name="EmployeeDepartments" Schema="dbo">
+		<Columns>
+			<Column Name="DepartmentID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="DepartmentName" DataType="nvarchar" Length="100" Nullable="false" />
+			<Column Name="ManagerID" DataType="int" Nullable="true" />
+			<Column Name="Location" DataType="nvarchar" Length="100" Nullable="true" />
+			<Column Name="Budget" DataType="decimal" Precision="18" Scale="2" Nullable="true" />
+			<Column Name="CreatedDate" DataType="datetime" Nullable="true" Default="getdate()" />
+			<Column Name="LastUpdatedDate" DataType="datetime" Nullable="true" Default="getdate()" />
+			<Column Name="IsActive" DataType="bit" Nullable="true" Default="1" />
+			<Column Name="Description" DataType="nvarchar" MaxLength="max" Nullable="true" />
+			<Column Name="ParentDepartmentID" DataType="int" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="DepartmentID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+		<TextImageFileGroup>PRIMARY</TextImageFileGroup>
+	</Table>
+	<Table Name="EmployeeRoles" Schema="dbo">
+		<Columns>
+			<Column Name="RoleID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="RoleName" DataType="nvarchar" Length="100" Nullable="false" />
+			<Column Name="DepartmentID" DataType="int" Nullable="true" />
+			<Column Name="Description" DataType="nvarchar" Length="255" Nullable="true" />
+			<Column Name="CreatedDate" DataType="datetime" Nullable="true" Default="getdate()" />
+			<Column Name="LastUpdatedDate" DataType="datetime" Nullable="true" Default="getdate()" />
+			<Column Name="IsActive" DataType="bit" Nullable="true" Default="1" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="RoleID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+		<Constraints>
+			<ForeignKey Name="FK_EmployeeRoles_DepartmentID" ReferenceTable="EmployeeDepartments" ReferenceColumn="DepartmentID">
+				<Column Name="DepartmentID" />
+			</ForeignKey>
+		</Constraints>
+	</Table>
+	<Table Name="Employees" Schema="dbo">
+		<Columns>
+			<Column Name="EmployeeID" DataType="bigint" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="EmployeeFirstName" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="EmployeeSurname" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="Department" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="Role" DataType="varchar" Length="100" Nullable="false" />
+			<Column Name="Username" DataType="varchar" Length="100" Nullable="false" />
+			<Column Name="PasswordHash" DataType="varchar" Length="1000" Nullable="false" />
+			<Column Name="HireDate" DataType="date" Nullable="false" />
+			<Column Name="Email" DataType="varchar" Length="255" Nullable="true" />
+			<Column Name="IsActive" DataType="bit" Nullable="true" />
+			<Column Name="PHONE" DataType="varchar" Length="50" Nullable="true" />
+		</Columns>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+	<Table Name="LoginAudit" Schema="dbo">
+		<Columns>
+			<Column Name="AuditID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="Username" DataType="nvarchar" Length="50" Nullable="false" />
+			<Column Name="AttemptTimestamp" DataType="datetime" Nullable="false" />
+			<Column Name="IsSuccess" DataType="bit" Nullable="false" />
+			<Column Name="EmployeeID" DataType="int" Nullable="true" />
+			<Column Name="Details" DataType="nvarchar" Length="255" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="AuditID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+	<Table Name="Payments" Schema="dbo">
+		<Columns>
+			<Column Name="PaymentID" DataType="bigint" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="SaleID" DataType="bigint" Nullable="false" />
+			<Column Name="AmountPaid" DataType="decimal" Precision="15" Scale="2" Nullable="false" />
+			<Column Name="PaymentDate" DataType="datetime" Nullable="false" />
+			<Column Name="PaymentMethod" DataType="varchar" Length="255" Nullable="false" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="PaymentID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+		<Constraints>
+			<ForeignKey Name="fk_payments_saleid" ReferenceTable="Sale" ReferenceColumn="SaleID">
+				<Column Name="SaleID" />
+			</ForeignKey>
+		</Constraints>
+	</Table>
+	<Table Name="Products" Schema="dbo">
+		<Columns>
+			<Column Name="ProductID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="ProductName" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="CategoryID" DataType="int" Nullable="false" />
+			<Column Name="Price" DataType="decimal" Precision="15" Scale="2" Nullable="false" />
+			<Column Name="StockQuantity" DataType="int" Nullable="false" />
+			<Column Name="Description" DataType="varchar" Length="500" Nullable="true" />
+			<Column Name="IsActive" DataType="bit" Nullable="false" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="ProductID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+		<Constraints>
+			<ForeignKey Name="fk_products_categoryid" ReferenceTable="Categories" ReferenceColumn="CategoryID">
+				<Column Name="CategoryID" />
+			</ForeignKey>
+		</Constraints>
+	</Table>
+	<Table Name="Receipts" Schema="dbo">
+		<Columns>
+			<Column Name="ReceiptID" DataType="int" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="ReceiptNumber" DataType="nvarchar" Length="50" Nullable="false" />
+			<Column Name="Date" DataType="datetime" Nullable="false" />
+			<Column Name="EmployeeName" DataType="nvarchar" Length="100" Nullable="false" />
+			<Column Name="PaymentMethod" DataType="nvarchar" Length="50" Nullable="false" />
+			<Column Name="Subtotal" DataType="decimal" Precision="18" Scale="2" Nullable="false" />
+			<Column Name="Discount" DataType="decimal" Precision="18" Scale="2" Nullable="false" />
+			<Column Name="Tax" DataType="decimal" Precision="18" Scale="2" Nullable="false" />
+			<Column Name="Total" DataType="decimal" Precision="18" Scale="2" Nullable="false" />
+			<Column Name="AmountRendered" DataType="decimal" Precision="18" Scale="2" Nullable="true" />
+			<Column Name="Change" DataType="decimal" Precision="18" Scale="2" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="ReceiptID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+	<Table Name="Sale" Schema="dbo">
+		<Columns>
+			<Column Name="SaleID" DataType="bigint" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="SaleDate" DataType="datetime" Nullable="false" />
+			<Column Name="CustomerID" DataType="bigint" Nullable="true" />
+			<Column Name="TotalAmount" DataType="decimal" Precision="15" Scale="2" Nullable="false" />
+			<Column Name="PaymentMethod" DataType="varchar" Length="255" Nullable="true" />
+			<Column Name="EmployeeID" DataType="bigint" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true" Name="PK__Sale__1EE3C41F65EDDD04">
+			<Column Name="SaleID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+		<Constraints>
+			<ForeignKey Name="fk_sale_customerid" ReferenceTable="Customers" ReferenceColumn="CustomerID">
+				<Column Name="CustomerID" />
+			</ForeignKey>
+		</Constraints>
+	</Table>
+	<Table Name="SalesDetails" Schema="dbo">
+		<Columns>
+			<Column Name="SaleDetailID" DataType="bigint" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="SaleID" DataType="bigint" Nullable="false" />
+			<Column Name="ProductID" DataType="int" Nullable="false" />
+			<Column Name="Quantity" DataType="int" Nullable="false" />
+			<Column Name="UnitPrice" DataType="decimal" Precision="15" Scale="2" Nullable="false" />
+			<Column Name="Subtotal" DataType="decimal" Precision="15" Scale="2" Nullable="false" />
+			<Column Name="TAX" DataType="decimal" Precision="15" Scale="2" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true" Name="PK__SalesDet__70DB141E8E909FC7">
+			<Column Name="SaleDetailID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+	<Table Name="Suppliers" Schema="dbo">
+		<Columns>
+			<Column Name="SupplierID" DataType="bigint" Identity="true" Seed="1" Increment="1" Nullable="false" />
+			<Column Name="SupplierName" DataType="varchar" Length="255" Nullable="false" />
+			<Column Name="ContactNumber" DataType="varchar" Length="20" Nullable="true" />
+			<Column Name="Email" DataType="varchar" Length="255" Nullable="true" />
+			<Column Name="Address" DataType="varchar" Length="500" Nullable="true" />
+		</Columns>
+		<PrimaryKey Clustered="true">
+			<Column Name="SupplierID" Order="ASC" />
+		</PrimaryKey>
+		<IndexOptions>
+			<PadIndex>OFF</PadIndex>
+			<StatisticsNoRecompute>OFF</StatisticsNoRecompute>
+			<IgnoreDupKey>OFF</IgnoreDupKey>
+			<AllowRowLocks>ON</AllowRowLocks>
+			<AllowPageLocks>ON</AllowPageLocks>
+			<OptimizeForSequentialKey>OFF</OptimizeForSequentialKey>
+		</IndexOptions>
+		<FileGroup>PRIMARY</FileGroup>
+	</Table>
+</Tables>
