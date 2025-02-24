@@ -41,52 +41,68 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.btnUpdateProduct = new System.Windows.Forms.Button();
+            this.btnEditproduct = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // txtProductName
             // 
-            this.txtProductName.Location = new System.Drawing.Point(135, 30);
+            this.txtProductName.BackColor = System.Drawing.Color.White;
+            this.txtProductName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtProductName.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.txtProductName.Location = new System.Drawing.Point(155, 53);
             this.txtProductName.Name = "txtProductName";
-            this.txtProductName.Size = new System.Drawing.Size(200, 22);
+            this.txtProductName.Size = new System.Drawing.Size(324, 28);
             this.txtProductName.TabIndex = 0;
             // 
             // txtPrice
             // 
-            this.txtPrice.Location = new System.Drawing.Point(135, 90);
+            this.txtPrice.BackColor = System.Drawing.Color.White;
+            this.txtPrice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtPrice.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.txtPrice.Location = new System.Drawing.Point(155, 122);
             this.txtPrice.Name = "txtPrice";
-            this.txtPrice.Size = new System.Drawing.Size(200, 22);
+            this.txtPrice.Size = new System.Drawing.Size(324, 28);
             this.txtPrice.TabIndex = 2;
             // 
             // txtStockQuantity
             // 
-            this.txtStockQuantity.Location = new System.Drawing.Point(135, 120);
+            this.txtStockQuantity.BackColor = System.Drawing.Color.White;
+            this.txtStockQuantity.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtStockQuantity.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.txtStockQuantity.Location = new System.Drawing.Point(155, 157);
             this.txtStockQuantity.Name = "txtStockQuantity";
-            this.txtStockQuantity.Size = new System.Drawing.Size(200, 22);
+            this.txtStockQuantity.Size = new System.Drawing.Size(324, 28);
             this.txtStockQuantity.TabIndex = 3;
             // 
             // txtDescription
             // 
-            this.txtDescription.Location = new System.Drawing.Point(135, 150);
+            this.txtDescription.Location = new System.Drawing.Point(597, 53);
+            this.txtDescription.Multiline = true;
             this.txtDescription.Name = "txtDescription";
-            this.txtDescription.Size = new System.Drawing.Size(200, 22);
+            this.txtDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtDescription.Size = new System.Drawing.Size(436, 195);
             this.txtDescription.TabIndex = 4;
             // 
             // chkIsActive
             // 
             this.chkIsActive.AutoSize = true;
-            this.chkIsActive.Location = new System.Drawing.Point(135, 180);
+            this.chkIsActive.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.chkIsActive.Location = new System.Drawing.Point(485, 163);
             this.chkIsActive.Name = "chkIsActive";
-            this.chkIsActive.Size = new System.Drawing.Size(68, 21);
+            this.chkIsActive.Size = new System.Drawing.Size(84, 26);
             this.chkIsActive.TabIndex = 5;
             this.chkIsActive.Text = "Active";
             this.chkIsActive.UseVisualStyleBackColor = true;
             // 
             // btnAddProduct
             // 
-            this.btnAddProduct.Location = new System.Drawing.Point(21, 217);
+            this.btnAddProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddProduct.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.btnAddProduct.Location = new System.Drawing.Point(12, 203);
             this.btnAddProduct.Name = "btnAddProduct";
-            this.btnAddProduct.Size = new System.Drawing.Size(142, 31);
+            this.btnAddProduct.Size = new System.Drawing.Size(151, 45);
             this.btnAddProduct.TabIndex = 6;
             this.btnAddProduct.Text = "Add Product";
             this.btnAddProduct.UseVisualStyleBackColor = true;
@@ -95,69 +111,103 @@
             // ProductName
             // 
             this.ProductName.AutoSize = true;
-            this.ProductName.Location = new System.Drawing.Point(31, 33);
+            this.ProductName.Font = new System.Drawing.Font("Arial", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ProductName.Location = new System.Drawing.Point(17, 59);
             this.ProductName.Name = "ProductName";
-            this.ProductName.Size = new System.Drawing.Size(98, 17);
+            this.ProductName.Size = new System.Drawing.Size(131, 22);
             this.ProductName.TabIndex = 7;
             this.ProductName.Text = "Product Name";
             // 
             // ComboCategoryID
             // 
+            this.ComboCategoryID.Font = new System.Drawing.Font("Arial", 10.8F);
             this.ComboCategoryID.FormattingEnabled = true;
-            this.ComboCategoryID.Location = new System.Drawing.Point(135, 60);
+            this.ComboCategoryID.Location = new System.Drawing.Point(155, 86);
             this.ComboCategoryID.Name = "ComboCategoryID";
-            this.ComboCategoryID.Size = new System.Drawing.Size(200, 24);
+            this.ComboCategoryID.Size = new System.Drawing.Size(324, 29);
             this.ComboCategoryID.TabIndex = 8;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(31, 63);
+            this.label1.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.label1.Location = new System.Drawing.Point(18, 92);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 17);
+            this.label1.Size = new System.Drawing.Size(87, 22);
             this.label1.TabIndex = 9;
             this.label1.Text = "Category";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(31, 93);
+            this.label2.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.label2.Location = new System.Drawing.Point(18, 128);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(40, 17);
+            this.label2.Size = new System.Drawing.Size(54, 22);
             this.label2.TabIndex = 10;
             this.label2.Text = "Price";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 124);
+            this.label3.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.label3.Location = new System.Drawing.Point(18, 163);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(100, 17);
+            this.label3.Size = new System.Drawing.Size(131, 22);
             this.label3.TabIndex = 11;
             this.label3.Text = "Stock Quantity";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(34, 154);
+            this.label4.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.label4.Location = new System.Drawing.Point(485, 59);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(79, 17);
+            this.label4.Size = new System.Drawing.Size(106, 22);
             this.label4.TabIndex = 12;
             this.label4.Text = "Description";
             // 
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(21, 263);
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 254);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
+            this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(458, 296);
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(1076, 317);
             this.dataGridView1.TabIndex = 13;
+            // 
+            // btnUpdateProduct
+            // 
+            this.btnUpdateProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUpdateProduct.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.btnUpdateProduct.Location = new System.Drawing.Point(328, 203);
+            this.btnUpdateProduct.Name = "btnUpdateProduct";
+            this.btnUpdateProduct.Size = new System.Drawing.Size(151, 45);
+            this.btnUpdateProduct.TabIndex = 14;
+            this.btnUpdateProduct.Text = "Update";
+            this.btnUpdateProduct.UseVisualStyleBackColor = true;
+            this.btnUpdateProduct.Click += new System.EventHandler(this.btnUpdateProduct_Click);
+            // 
+            // btnEditproduct
+            // 
+            this.btnEditproduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEditproduct.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.btnEditproduct.Location = new System.Drawing.Point(169, 203);
+            this.btnEditproduct.Name = "btnEditproduct";
+            this.btnEditproduct.Size = new System.Drawing.Size(153, 45);
+            this.btnEditproduct.TabIndex = 15;
+            this.btnEditproduct.Text = "Edit Product";
+            this.btnEditproduct.UseVisualStyleBackColor = true;
+            this.btnEditproduct.Click += new System.EventHandler(this.btnEditproduct_Click);
             // 
             // frmProducts
             // 
             this.ClientSize = new System.Drawing.Size(1076, 571);
+            this.Controls.Add(this.btnEditproduct);
+            this.Controls.Add(this.btnUpdateProduct);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -195,5 +245,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button btnUpdateProduct;
+        private System.Windows.Forms.Button btnEditproduct;
     }
 }

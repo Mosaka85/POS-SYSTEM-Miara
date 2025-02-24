@@ -122,11 +122,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="Forms\frmChangePassowrd.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Forms\frmChangePassowrd.Designer.cs">
+      <DependentUpon>frmChangePassowrd.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\AboutBox1.cs">
       <SubType>Form</SubType>
@@ -183,15 +183,15 @@
       <DependentUpon>frmConfigPassword.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\Program.cs" />
-    <Compile Include="frmCategory.cs">
+    <Compile Include="Forms\frmCategory.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmCategory.Designer.cs">
+    <Compile Include="Forms\frmCategory.Designer.cs">
       <DependentUpon>frmCategory.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\frmChangePassowrd.resx">
+      <DependentUpon>frmChangePassowrd.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
@@ -220,7 +220,7 @@
     <EmbeddedResource Include="Forms\frmConfigurationForm.resx">
       <DependentUpon>frmConfigurationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmCategory.resx">
+    <EmbeddedResource Include="Forms\frmCategory.resx">
       <DependentUpon>frmCategory.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -252,8 +252,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\Untitled-design.ico" />
-    <Content Include="DiscountData.sql" />
-    <Content Include="DatabaseDesign.xml" />
+    <Content Include="Scripts\DiscountData.sql" />
+    <Content Include="Scripts\DatabaseDesign.xml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -278,8 +278,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

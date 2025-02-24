@@ -38,6 +38,7 @@ namespace Miara
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.btnCategoryCatalog = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -101,7 +102,7 @@ namespace Miara
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(1147, 571);
+            this.button7.Location = new System.Drawing.Point(1147, 741);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(359, 84);
             this.button7.TabIndex = 6;
@@ -127,11 +128,22 @@ namespace Miara
             this.label1.TabIndex = 8;
             this.label1.Text = "label1";
             // 
+            // btnCategoryCatalog
+            // 
+            this.btnCategoryCatalog.Location = new System.Drawing.Point(1147, 545);
+            this.btnCategoryCatalog.Name = "btnCategoryCatalog";
+            this.btnCategoryCatalog.Size = new System.Drawing.Size(359, 79);
+            this.btnCategoryCatalog.TabIndex = 9;
+            this.btnCategoryCatalog.Text = "Category Catalog";
+            this.btnCategoryCatalog.UseVisualStyleBackColor = true;
+            this.btnCategoryCatalog.Click += new System.EventHandler(this.btnCategoryCatalog_Click);
+            // 
             // frmMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1559, 872);
+            this.Controls.Add(this.btnCategoryCatalog);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
@@ -160,5 +172,6 @@ namespace Miara
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button8;
         public System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnCategoryCatalog;
     }
 }

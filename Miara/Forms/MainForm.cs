@@ -71,5 +71,11 @@ namespace Miara
             Hide();
             new frmReports().ShowDialog();
         }
+
+        private void btnCategoryCatalog_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            new frmCategory().ShowDialog();
+        }
     }
 }
