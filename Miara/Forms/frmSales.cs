@@ -556,8 +556,6 @@ namespace Miara
         private string GenerateReceiptContent()
         {
             StringBuilder receiptContent = new StringBuilder();
-
-            // HTML Header
             receiptContent.AppendLine("<!DOCTYPE html>");
             receiptContent.AppendLine("<html lang='en'>");
             receiptContent.AppendLine("<head>");
@@ -565,47 +563,42 @@ namespace Miara
             receiptContent.AppendLine("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
             receiptContent.AppendLine("<title>Receipt</title>");
             receiptContent.AppendLine("<style>");
-            receiptContent.AppendLine("body { font-family: Arial, sans-serif; margin: 20px; }");
-            receiptContent.AppendLine(".receipt { width: 300px; margin: 0 auto; border: 1px solid #ccc; padding: 10px; }");
-            receiptContent.AppendLine(".header { text-align: center; font-weight: bold; margin-bottom: 10px; }");
-            receiptContent.AppendLine(".divider { border-top: 1px dashed #000; margin: 10px 0; }");
+            receiptContent.AppendLine("body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; }");
+            receiptContent.AppendLine(".receipt { max-width: 350px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); padding: 20px; }");
+            receiptContent.AppendLine(".header { text-align: center; margin-bottom: 20px; }");
+            receiptContent.AppendLine(".header h2 { margin: 0; font-size: 1.5em; color: #333; }");
+            receiptContent.AppendLine(".header p { margin: 5px 0; font-size: 0.9em; color: #666; }");
+            receiptContent.AppendLine(".divider { border-top: 1px dashed #ddd; margin: 15px 0; }");
             receiptContent.AppendLine(".text-right { text-align: right; }");
             receiptContent.AppendLine(".text-center { text-align: center; }");
+            receiptContent.AppendLine(".receipt-info p { margin: 5px 0; font-size: 0.9em; color: #444; }");
+            receiptContent.AppendLine(".items-header { font-weight: bold; margin-bottom: 10px; font-size: 0.9em; color: #333; }");
+            receiptContent.AppendLine(".items-list p { margin: 5px 0; font-size: 0.9em; color: #555; }");
+            receiptContent.AppendLine(".totals p { margin: 5px 0; font-size: 0.9em; color: #333; }");
+            receiptContent.AppendLine(".footer { margin-top: 20px; font-size: 0.9em; color: #666; }");
             receiptContent.AppendLine("</style>");
             receiptContent.AppendLine("</head>");
             receiptContent.AppendLine("<body>");
 
-            // Receipt Container
+ 
             receiptContent.AppendLine("<div class='receipt'>");
-
-            // Header
             receiptContent.AppendLine("<div class='header'>");
             receiptContent.AppendLine("<h2>MIARA TRADING PTY LTD</h2>");
-            receiptContent.AppendLine("<p>Address: 123 Mosaka St.</p>");
+            receiptContent.AppendLine("<p>123 Mosaka St.</p>");
             receiptContent.AppendLine("<p>Phone: 012-345-6789 | Email: info@miaratrading.com</p>");
             receiptContent.AppendLine("</div>");
-
-            // Divider
             receiptContent.AppendLine("<div class='divider'></div>");
-
-            // Receipt Info
+            receiptContent.AppendLine("<div class='receipt-info'>");
             receiptContent.AppendLine($"<p><strong>Receipt No:</strong> {nextSaleIdn}</p>");
             receiptContent.AppendLine($"<p><strong>Date:</strong> {DateTime.Now:dd/MM/yyyy HH:mm:ss}</p>");
-
-            // Employee Name
             receiptContent.AppendLine($"<p><strong>Employee:</strong> {employeeFirstName} {employeeSurname}</p>");
-
-            // Payment Method
             string paymentMethod = combopaymentmentod.SelectedItem?.ToString() ?? "N/A";
             receiptContent.AppendLine($"<p><strong>Payment Method:</strong> {paymentMethod}</p>");
-
-            // Divider
+            receiptContent.AppendLine("</div>");
             receiptContent.AppendLine("<div class='divider'></div>");
-
-            // Items Header
+            receiptContent.AppendLine("<div class='items-header'>");
             receiptContent.AppendLine("<p><strong>Item              Qty   Price     Total</strong></p>");
-
-            // Divider
+            receiptContent.AppendLine("</div>");
             receiptContent.AppendLine("<div class='divider'></div>");
 
             // Items List
@@ -626,35 +619,22 @@ namespace Miara
                     }
                 }
             }
-
-            // Calculate discount
             decimal discountValue = 0;
             decimal discountPercentage = 0;
 
             if (checkdiscount.Checked && !string.IsNullOrWhiteSpace(txtdiscount.Text) &&
                 decimal.TryParse(txtdiscount.Text, out decimal parsedDiscount) && parsedDiscount >= 0 && parsedDiscount <= 100)
             {
-                discountPercentage = parsedDiscount / 100; // Convert discount to percentage
-                discountValue = total * discountPercentage; // Calculate discount value
+                discountPercentage = parsedDiscount / 100;
+                discountValue = total * discountPercentage;
             }
-
-            // Subtotal after applying discount
             decimal subtotalAfterDiscount = total - discountValue;
-
-            // Ensure subtotalAfterDiscount is not negative
             if (subtotalAfterDiscount < 0)
                 subtotalAfterDiscount = 0;
-
-            // Calculate tax (15% of subtotal after discount)
             decimal tax = subtotalAfterDiscount * 0.15m;
-
-            // Final total: Subtotal after discount (total from grid minus discount)
             decimal finalTotal = subtotalAfterDiscount;
-
-            // Divider
             receiptContent.AppendLine("<div class='divider'></div>");
-
-            // Print totals and discount
+            receiptContent.AppendLine("<div class='totals'>");
             receiptContent.AppendLine($"<p class='text-right'><strong>Subtotal:</strong> {total,25:C}</p>");
             if (checkdiscount.Checked)
             {
@@ -663,49 +643,35 @@ namespace Miara
             receiptContent.AppendLine($"<p class='text-right'><strong>Subtotal After Discount:</strong> {subtotalAfterDiscount,12:C}</p>");
             receiptContent.AppendLine($"<p class='text-right'><strong>Tax (15%):</strong> {tax,26:C}</p>");
             receiptContent.AppendLine($"<p class='text-right'><strong>Total:</strong> {finalTotal,29:C}</p>");
+            receiptContent.AppendLine("</div>");
 
             if (paymentMethod == "CASH")
             {
-                // Payment Details for CASH
                 decimal renderedAmount = decimal.Parse(txtrenderedamount.Text);
                 decimal change = renderedAmount - finalTotal;
 
                 receiptContent.AppendLine("<div class='divider'></div>");
+                receiptContent.AppendLine("<div class='totals'>");
                 receiptContent.AppendLine($"<p class='text-right'><strong>Amount Rendered:</strong> {renderedAmount,19:C}</p>");
                 receiptContent.AppendLine($"<p class='text-right'><strong>Change:</strong> {change,30:C}</p>");
+                receiptContent.AppendLine("</div>");
             }
-
-            // Divider
             receiptContent.AppendLine("<div class='divider'></div>");
-
-            // Footer
-            receiptContent.AppendLine("<div class='text-center'>");
+            receiptContent.AppendLine("<div class='footer text-center'>");
             receiptContent.AppendLine("<p>Thank you for shopping with us!</p>");
             receiptContent.AppendLine("<p>Visit us again!</p>");
-            receiptContent.AppendLine("</div>");
-
-            receiptContent.AppendLine("<div class='divider'></div>");
-            receiptContent.AppendLine("<div class='text-center'>");
             receiptContent.AppendLine("<p>---------- MOSAKA SYSTEM ----------</p>");
             receiptContent.AppendLine("</div>");
-
-            // Close Receipt Container
             receiptContent.AppendLine("</div>");
-
-            // Close HTML
             receiptContent.AppendLine("</body>");
             receiptContent.AppendLine("</html>");
-
-            // Return the receipt content as an HTML string
             return receiptContent.ToString();
         }
 
 
         private void SendReceiptEmail(string receiptContent)
         {
-            string toEmail = txtRecipientEmail.Text; // Replace with the actual recipient email
-
-            // Assuming you have a SQL connection setup
+            string toEmail = txtRecipientEmail.Text; 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand("SendReceiptEmail", conn);
@@ -721,7 +687,6 @@ namespace Miara
 
         private bool EnsureRequiredColumns()
         {
-            // Check if required columns exist in the DataGridView
             string[] requiredColumns = { "ProductID", "ProductName", "Quantity", "Price", "Subtotal" };
             foreach (string column in requiredColumns)
             {
@@ -746,8 +711,6 @@ namespace Miara
                     {
                         connection.Open();
                         var result = command.ExecuteScalar();
-
-                        // Check if result is not null and cast it to an int
                         if (result != DBNull.Value)
                         {
                             nextSaleId = Convert.ToInt32(result);
@@ -785,7 +748,6 @@ namespace Miara
         {
             try
             {
-                // Calculate totals and other values
                 decimal total = 0;
                 foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
                 {
@@ -853,14 +815,7 @@ namespace Miara
                 MessageBox.Show($"An error occurred while logging receipt data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
-
-
-
-
         private TextBox activeTextBox;
-
         private void TextBox_Enter(object sender, EventArgs e)
         {
             activeTextBox = sender as TextBox;
@@ -872,7 +827,6 @@ namespace Miara
                 Button button = sender as Button;
                 if (button != null)
                 {
-                    // Append the button's text to the active TextBox
                     activeTextBox.Text += button.Text;
                 }
             }
@@ -882,7 +836,6 @@ namespace Miara
         {
             if (activeTextBox != null && !string.IsNullOrEmpty(activeTextBox.Text))
             {
-                // Remove the last character from the active TextBox
                 activeTextBox.Text = activeTextBox.Text.Substring(0, activeTextBox.Text.Length - 1);
             }
         }
@@ -903,7 +856,6 @@ namespace Miara
         }
         private void btnClear_Click(object sender, EventArgs e)
         {
-            // Prompt user for credentials
             string username = Interaction.InputBox("Enter your username:", "User Validation", "");
             string password = Interaction.InputBox("Enter your password:", "User Validation", "");
             string hashedPassword = HashPassword(password);
@@ -925,9 +877,8 @@ namespace Miara
                 connection.Open();
                 object result = command.ExecuteScalar();
 
-                if (result != null) // If user is found
+                if (result != null)
                 {
-                    // Proceed to clear sales details
                     dataGridViewSaleDetails.Rows.Clear();
                     UpdateTotalAmount();
                     txtQuantity.Clear();
@@ -943,7 +894,6 @@ namespace Miara
 
         private void btnCalculatechange_Click(object sender, EventArgs e)
         {
-            // Ensure the payment method is set to "CASH"
             if (combopaymentmentod.SelectedItem?.ToString() == "CASH")
             {
                 try
@@ -1015,23 +965,18 @@ namespace Miara
 
         private void comboProductCategory_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Check if a category is selected
+
             if (comboProductCategory.SelectedValue != null)
             {
                 int selectedCategoryID = (int)comboProductCategory.SelectedValue;
-
-                // Load products into the comboBoxProducts based on the selected category
                 LoadProductsByCategory(selectedCategoryID);
             }
         }
 
         private void LoadProductsByCategory(int categoryID)
         {
-            // Clear existing items in the ComboBox
             comboBoxProducts.DataSource = null;
             comboBoxProducts.Items.Clear();
-
-            // SQL query to fetch ProductID and ProductName
             string query = "SELECT ProductID, ProductName, Price, StockQuantity FROM Products WHERE IsActive = 1 AND CategoryID = @CategoryID "; ;
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -1046,9 +991,8 @@ namespace Miara
 
                     if (products.Rows.Count > 0)
                     {
-                        // Set DisplayMember and ValueMember
-                        comboBoxProducts.DisplayMember = "ProductName"; // Show product names
-                        comboBoxProducts.ValueMember = "ProductID";     // Store product IDs
+                        comboBoxProducts.DisplayMember = "ProductName"; 
+                        comboBoxProducts.ValueMember = "ProductID";     
                         comboBoxProducts.DataSource = products;
                     }
                     else
@@ -1062,7 +1006,6 @@ namespace Miara
 
         private DataTable GetDataWithParameters(string query, params SqlParameter[] parameters)
         {
-            // Implement your database connection and data retrieval logic here
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -1088,21 +1031,18 @@ namespace Miara
 
                 bool productExists = false;
 
-                // Check if the ProductID already exists in the DataGridView
                 foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
                 {
                     if (row.Cells["ProductID"].Value != null && (int)row.Cells["ProductID"].Value == productId)
                     {
-                        // Product already exists, update the quantity and subtotal
                         int existingQuantity = (int)row.Cells["Quantity"].Value;
-                        row.Cells["Quantity"].Value = existingQuantity + quantity;  // Update quantity
-                        row.Cells["Subtotal"].Value = (existingQuantity + quantity) * price;  // Update subtotal
+                        row.Cells["Quantity"].Value = existingQuantity + quantity; 
+                        row.Cells["Subtotal"].Value = (existingQuantity + quantity) * price; 
                         productExists = true;
                         break;
                     }
                 }
 
-                // If the product does not exist, add a new row
                 if (!productExists)
                 {
                     dataGridViewSaleDetails.Rows.Add(productId, productName, quantity, price, subtotal);
@@ -1120,7 +1060,6 @@ namespace Miara
         {
             try
             {
-                // Prompt the user to enter the receipt number
                 string receiptNumber = Interaction.InputBox("Enter Receipt Number:", "Reprint Receipt", "");
 
                 if (string.IsNullOrEmpty(receiptNumber))
@@ -1129,7 +1068,6 @@ namespace Miara
                     return;
                 }
 
-                // Fetch receipt data from the database
                 DataTable receiptData = GetReceiptData(receiptNumber);
 
                 if (receiptData == null || receiptData.Rows.Count == 0)
@@ -1138,7 +1076,6 @@ namespace Miara
                     return;
                 }
 
-                // Fetch sale details for the receipt
                 DataTable saleDetails = GetSaleDetails(receiptData.Rows[0]["ReceiptID"].ToString());
 
                 if (saleDetails == null || saleDetails.Rows.Count == 0)
@@ -1147,10 +1084,8 @@ namespace Miara
                     return;
                 }
 
-                // Populate the receipt data into the UI or temporary data structure
                 PopulateReceiptData(receiptData, saleDetails);
 
-                // Reprint the receipt
                 PrintReceipt();
             }
             catch (Exception ex)
@@ -1286,10 +1221,8 @@ namespace Miara
         {
             try
             {
-                // Check if the cash drawer is connected
                 if (IsCashDrawerConnected())
                 {
-                    // Open the cash drawer
                     OpenCashDrawer();
                 }
                 else

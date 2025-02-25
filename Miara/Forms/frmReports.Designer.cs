@@ -32,14 +32,15 @@ namespace Miara
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmReports));
             this.dataGridViewHeader = new System.Windows.Forms.DataGridView();
             this.button1 = new System.Windows.Forms.Button();
             this.btnViewDetails = new System.Windows.Forms.Button();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnViewPayments = new System.Windows.Forms.Button();
             this.btnDiscount = new System.Windows.Forms.Button();
-            this.lblDatalabel = new System.Windows.Forms.Label();
             this.btnReceipts = new System.Windows.Forms.Button();
+            this.lblDatalabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHeader)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -136,16 +137,6 @@ namespace Miara
             this.btnDiscount.UseVisualStyleBackColor = true;
             this.btnDiscount.Click += new System.EventHandler(this.btnDiscount_Click);
             // 
-            // lblDatalabel
-            // 
-            this.lblDatalabel.AutoSize = true;
-            this.lblDatalabel.Font = new System.Drawing.Font("Bahnschrift Condensed", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDatalabel.Location = new System.Drawing.Point(432, 44);
-            this.lblDatalabel.Name = "lblDatalabel";
-            this.lblDatalabel.Size = new System.Drawing.Size(377, 72);
-            this.lblDatalabel.TabIndex = 7;
-            this.lblDatalabel.Text = "DATA GRID VIEW :  ";
-            // 
             // btnReceipts
             // 
             this.btnReceipts.Location = new System.Drawing.Point(3, 272);
@@ -156,6 +147,16 @@ namespace Miara
             this.btnReceipts.UseVisualStyleBackColor = true;
             this.btnReceipts.Click += new System.EventHandler(this.btnReceipts_Click);
             // 
+            // lblDatalabel
+            // 
+            this.lblDatalabel.AutoSize = true;
+            this.lblDatalabel.Font = new System.Drawing.Font("Bahnschrift Condensed", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDatalabel.Location = new System.Drawing.Point(432, 44);
+            this.lblDatalabel.Name = "lblDatalabel";
+            this.lblDatalabel.Size = new System.Drawing.Size(377, 72);
+            this.lblDatalabel.TabIndex = 7;
+            this.lblDatalabel.Text = "DATA GRID VIEW :  ";
+            // 
             // frmReports
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -165,6 +166,7 @@ namespace Miara
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dataGridViewHeader);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmReports";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHeader)).EndInit();

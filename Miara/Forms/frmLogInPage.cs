@@ -25,19 +25,15 @@ namespace Miara
             InitializeComponent();
             LoadSQLConnectionInfo();
             this.ContextMenuStrip = contextMenuStrip1;
-            this.MouseUp += new MouseEventHandler(frmLogInPage_MouseUp);
-
-            // Attach KeyDown event handlers to the textboxes
-            txtEmployeeUsername.KeyDown += new KeyEventHandler(Textbox_KeyDown);
-            txtEmployeePassword.KeyDown += new KeyEventHandler(Textbox_KeyDown);
+            this.MouseUp += frmLogInPage_MouseUp;
+            txtEmployeeUsername.KeyDown += Textbox_KeyDown;
+            txtEmployeePassword.KeyDown += Textbox_KeyDown;
         }
 
         private void Textbox_KeyDown(object sender, KeyEventArgs e)
         {
-            // Check if the "Enter" key was pressed
             if (e.KeyCode == Keys.Enter)
             {
-                // Trigger the login button click event
                 button1_Click(sender, e);
             }
         }
@@ -55,9 +51,7 @@ namespace Miara
                 using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
-                    LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
-
-                    if (loginInfo != null)
+                    if (serializer.Deserialize(fileStream) is LoginInfo loginInfo)
                     {
                         SQLservername = loginInfo.DataSource;
                         SQLDatabase = loginInfo.SelectedDatabase;
@@ -125,39 +119,33 @@ namespace Miara
                     {
                         if (reader.Read())
                         {
-                            int employeeID = Convert.ToInt32(reader["EmployeeID"]);
-                            string firstName = reader["EmployeeFirstName"].ToString();
-                            string surname = reader["EmployeeSurname"].ToString();
+                            EMID = Convert.ToInt32(reader["EmployeeID"]);
+                            employeeFirstName = reader["EmployeeFirstName"].ToString();
+                            employeeSurname = reader["EmployeeSurname"].ToString();
                             string role = reader["Role"].ToString();
-                            employeeFirstName = firstName;
-                            employeeSurname = surname;
 
-                            MessageBox.Show($"Login successful.\nEmployee: {firstName} {surname}\nRole: {role}",
+                            MessageBox.Show($"Login successful.\nEmployee: {employeeFirstName} {employeeSurname}\nRole: {role}",
                                             "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                            LogLoginAttempt(username, true, employeeID, "Login successful");
+                            LogLoginAttempt(username, true, EMID, "Login successful");
 
-                            DialogResult posDisclaimerResult = MessageBox.Show(
+                            if (MessageBox.Show(
                                 "POS Disclaimer: By using this system, you agree to comply with all company policies and procedures related to the Point of Sale system. Any unauthorized use or misuse of this system may result in disciplinary action.",
                                 "POS Disclaimer",
                                 MessageBoxButtons.OKCancel,
-                                MessageBoxIcon.Warning);
-
-                            if (posDisclaimerResult == DialogResult.Cancel)
+                                MessageBoxIcon.Warning) == DialogResult.Cancel)
                             {
-                                LogLoginAttempt(username, false, employeeID, "User canceled POS disclaimer");
+                                LogLoginAttempt(username, false, EMID, "User canceled POS disclaimer");
                                 return false;
                             }
 
-                            DialogResult honestyDisclaimerResult = MessageBox.Show(
+                            if (MessageBox.Show(
                                 "Honesty Disclaimer: You are required to be honest and truthful in all transactions and interactions within this system. Any form of dishonesty or fraud will be dealt with severely and may result in termination of employment and legal action.",
                                 "Honesty Disclaimer",
                                 MessageBoxButtons.OKCancel,
-                                MessageBoxIcon.Warning);
-
-                            if (honestyDisclaimerResult == DialogResult.Cancel)
+                                MessageBoxIcon.Warning) == DialogResult.Cancel)
                             {
-                                LogLoginAttempt(username, false, employeeID, "User canceled Honesty disclaimer");
+                                LogLoginAttempt(username, false, EMID, "User canceled Honesty disclaimer");
                                 return false;
                             }
 
@@ -220,8 +208,7 @@ namespace Miara
         {
             using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 StringBuilder hashBuilder = new StringBuilder();
 
                 foreach (byte b in hashBytes)
@@ -266,19 +253,13 @@ namespace Miara
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutBox1 aboutForm = new AboutBox1();
-            aboutForm.ShowDialog();
-        }
-
-        private void pictureBox2_Click(object sender, EventArgs e)
-        {
+            new AboutBox1().ShowDialog();
         }
 
         private void btnFogortPassword_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            frmResetPassword newForm = new frmResetPassword();
-            newForm.ShowDialog();
+            Hide();
+            new frmResetPassword().ShowDialog();
         }
     }
 

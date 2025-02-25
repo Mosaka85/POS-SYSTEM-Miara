@@ -30,6 +30,7 @@ namespace Miara
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmEmployeeDetails));
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.dataGridEmployeeList = new System.Windows.Forms.DataGridView();
             this.txtEmployeeName = new System.Windows.Forms.TextBox();
@@ -463,6 +464,7 @@ namespace Miara
             this.Controls.Add(this.txtEmployeeName);
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.pictureBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmEmployeeDetails";
             this.Text = "Form2";
             this.Load += new System.EventHandler(this.frmEmployeeDetails_Load);

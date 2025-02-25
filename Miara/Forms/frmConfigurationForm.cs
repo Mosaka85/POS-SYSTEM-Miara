@@ -158,5 +158,10 @@ namespace Miara
         {
             SaveLoginInfo();
         }
+
+        private void frmConfigurationForm_Load_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

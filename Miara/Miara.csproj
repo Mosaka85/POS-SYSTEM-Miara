@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Config\Untitled-design.ico</ApplicationIcon>
+    <ApplicationIcon>miara_pos_2PE_1.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>
@@ -158,11 +158,11 @@
     <Compile Include="Forms\frmSales.Designer.cs">
       <DependentUpon>frmSales.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MainForm.cs">
+    <Compile Include="Forms\frmMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <Compile Include="Forms\frmMainForm.Designer.cs">
+      <DependentUpon>frmMainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmEmployeeDetails.cs">
       <SubType>Form</SubType>
@@ -208,8 +208,8 @@
     <EmbeddedResource Include="Forms\frmSales.resx">
       <DependentUpon>frmSales.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\frmMainForm.resx">
+      <DependentUpon>frmMainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmEmployeeDetails.resx">
       <DependentUpon>frmEmployeeDetails.cs</DependentUpon>
@@ -252,6 +252,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\Untitled-design.ico" />
+    <Content Include="miara_pos_2PE_1.ico" />
     <Content Include="Scripts\DiscountData.sql" />
     <Content Include="Scripts\DatabaseDesign.xml" />
   </ItemGroup>

@@ -29,6 +29,7 @@ namespace Miara
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmResetPassword));
             this.label1 = new System.Windows.Forms.Label();
             this.btnSendOtp = new System.Windows.Forms.Button();
             this.lblEmailsent = new System.Windows.Forms.Label();
@@ -191,6 +192,7 @@ namespace Miara
             this.Controls.Add(this.lblEmailsent);
             this.Controls.Add(this.btnSendOtp);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmResetPassword";
             this.Text = "Reset Password";
             this.Load += new System.EventHandler(this.frmResetPassword_Load);

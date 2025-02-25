@@ -31,6 +31,7 @@ namespace Miara
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmConfigurationForm));
             this.txtSQLDataSource = new System.Windows.Forms.TextBox();
             this.txtSQLusername = new System.Windows.Forms.TextBox();
             this.txtPassword = new System.Windows.Forms.TextBox();
@@ -112,7 +113,6 @@ namespace Miara
             this.btnSQLSAVE.TabIndex = 5;
             this.btnSQLSAVE.Text = "Save";
             this.btnSQLSAVE.UseVisualStyleBackColor = false;
-
             this.btnSQLSAVE.Click += new System.EventHandler(this.btnSQLSAVE_Click);
             // 
             // label1
@@ -193,9 +193,11 @@ namespace Miara
             this.Controls.Add(this.txtSQLusername);
             this.Controls.Add(this.txtSQLDataSource);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmConfigurationForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SQL Connection";
+            this.Load += new System.EventHandler(this.frmConfigurationForm_Load_1);
             this.ResumeLayout(false);
             this.PerformLayout();
 
