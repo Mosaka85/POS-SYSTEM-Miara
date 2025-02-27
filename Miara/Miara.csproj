@@ -255,6 +255,7 @@
     <Content Include="miara_pos_2PE_1.ico" />
     <Content Include="Scripts\DiscountData.sql" />
     <Content Include="Scripts\DatabaseDesign.xml" />
+    <Content Include="Scripts\CompleteSale.sql" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

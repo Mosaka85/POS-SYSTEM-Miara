@@ -70,7 +70,48 @@ namespace Miara
 
             generatedOTP = GenerateOTP();
             string subject = "Password Reset OTP";
-            string receiptContent = $"Your OTP for password reset is: {generatedOTP}";
+
+            // HTML content for the email
+            string receiptContent = $@"
+    <html>
+    <head>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                color: #333;
+                padding: 20px;
+            }}
+            .container {{
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }}
+            .otp {{
+                font-size: 24px;
+                font-weight: bold;
+                color: #007bff;
+            }}
+            .disclaimer {{
+                font-size: 12px;
+                color: #777;
+                margin-top: 20px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <h2>Password Reset OTP</h2>
+            <p>Your One-Time Password (OTP) for resetting your password is:</p>
+            <p class='otp'>{generatedOTP}</p>
+            <p>Please use this OTP to reset your password. This OTP is valid for a limited time only.</p>
+            <div class='disclaimer'>
+                <p><strong>Disclaimer:</strong> Do not share this OTP with anyone. If you did not request this OTP, please contact our support team immediately.</p>
+            </div>
+        </div>
+    </body>
+    </html>";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand("SendEmailtoUser", conn))
