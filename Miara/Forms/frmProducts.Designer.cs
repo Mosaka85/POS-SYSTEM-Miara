@@ -44,6 +44,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.btnUpdateProduct = new System.Windows.Forms.Button();
             this.btnEditproduct = new System.Windows.Forms.Button();
+            this.btnExit = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -204,9 +205,20 @@
             this.btnEditproduct.UseVisualStyleBackColor = true;
             this.btnEditproduct.Click += new System.EventHandler(this.btnEditproduct_Click);
             // 
+            // btnExit
+            // 
+            this.btnExit.Location = new System.Drawing.Point(900, 12);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(109, 35);
+            this.btnExit.TabIndex = 16;
+            this.btnExit.Text = "Back";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
             // frmProducts
             // 
             this.ClientSize = new System.Drawing.Size(1076, 571);
+            this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnEditproduct);
             this.Controls.Add(this.btnUpdateProduct);
             this.Controls.Add(this.dataGridView1);
@@ -249,5 +261,6 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Button btnUpdateProduct;
         private System.Windows.Forms.Button btnEditproduct;
+        private System.Windows.Forms.Button btnExit;
     }
 }

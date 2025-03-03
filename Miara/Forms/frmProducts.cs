@@ -279,5 +279,10 @@ namespace Miara
             chkIsActive.Enabled = true;
             ComboCategoryID.Enabled = true;
         }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
     }
 }

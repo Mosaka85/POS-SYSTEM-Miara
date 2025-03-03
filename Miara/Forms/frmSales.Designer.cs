@@ -580,18 +580,20 @@ namespace Miara
             // 
             this.checkEmail.AutoSize = true;
             this.checkEmail.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkEmail.Location = new System.Drawing.Point(570, 951);
+            this.checkEmail.Location = new System.Drawing.Point(498, 944);
             this.checkEmail.Name = "checkEmail";
             this.checkEmail.Size = new System.Drawing.Size(160, 28);
             this.checkEmail.TabIndex = 37;
             this.checkEmail.Text = "Email Receipt";
             this.checkEmail.UseVisualStyleBackColor = true;
+            this.checkEmail.CheckedChanged += new System.EventHandler(this.checkEmail_CheckedChanged);
             // 
             // txtRecipientEmail
             // 
-            this.txtRecipientEmail.Location = new System.Drawing.Point(570, 974);
+            this.txtRecipientEmail.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtRecipientEmail.Location = new System.Drawing.Point(487, 978);
             this.txtRecipientEmail.Name = "txtRecipientEmail";
-            this.txtRecipientEmail.Size = new System.Drawing.Size(254, 22);
+            this.txtRecipientEmail.Size = new System.Drawing.Size(348, 25);
             this.txtRecipientEmail.TabIndex = 38;
             // 
             // btnVoidLine

@@ -32,7 +32,7 @@ namespace Miara
             int nextSaleId = GetNextSaleId();
             EnsureRequiredColumns();
             this.KeyPreview = true;
-
+            txtRecipientEmail.Visible = checkEmail.Checked;
             nextSaleIdn = nextSaleId;
             lblNextSalesNumber.Text = $"SALES ORDER NO: {nextSaleId}";
             btn1.Click += NumberButton_Click;
@@ -46,6 +46,8 @@ namespace Miara
             btn9.Click += NumberButton_Click;
             btn0.Click += NumberButton_Click;
             btn00.Click += NumberButton_Click;
+            txtQuantity.KeyDown += Control_KeyDown;
+            comboBoxProducts.KeyDown += Control_KeyDown;
             timer1.Start();
             this.FormClosed += (sender, e) => Application.Exit();
             label2.Text = $"WELCOME {firstName} {surname} ";
@@ -641,7 +643,7 @@ namespace Miara
                 receiptContent.AppendLine($"<p class='text-right'><strong>Discount ({discountPercentage * 100:F0}%):</strong> {discountValue,17:C}</p>");
             }
             receiptContent.AppendLine($"<p class='text-right'><strong>Subtotal After Discount:</strong> {subtotalAfterDiscount,12:C}</p>");
-            receiptContent.AppendLine($"<p class='text-right'><strong>Tax (15%):</strong> {tax,26:C}</p>");
+            receiptContent.AppendLine($"<p class='text-right'><strong>VAT (15%):</strong> {tax,26:C}</p>");
             receiptContent.AppendLine($"<p class='text-right'><strong>Total:</strong> {finalTotal,29:C}</p>");
             receiptContent.AppendLine("</div>");
 
@@ -1056,6 +1058,15 @@ namespace Miara
             }
         }
 
+        private void Control_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                // Call the btnAddProduct_Click method
+                btnAddProduct_Click(sender, e);
+            }
+        }
+
         private void btnReprint_Click(object sender, EventArgs e)
         {
             try
@@ -1260,6 +1271,11 @@ namespace Miara
             {
                 MessageBox.Show("Failed to open cash drawer: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void checkEmail_CheckedChanged(object sender, EventArgs e)
+        {
+            txtRecipientEmail.Visible = checkEmail.Checked;
         }
     }
 }

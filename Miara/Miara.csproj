@@ -256,6 +256,7 @@
     <Content Include="Scripts\DiscountData.sql" />
     <Content Include="Scripts\DatabaseDesign.xml" />
     <Content Include="Scripts\CompleteSale.sql" />
+    <Content Include="Scripts\Report.sql" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
