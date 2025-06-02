@@ -261,6 +261,11 @@ namespace Miara
             Hide();
             new frmResetPassword().ShowDialog();
         }
+
+        private void frmLogInPage_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 
     [Serializable]

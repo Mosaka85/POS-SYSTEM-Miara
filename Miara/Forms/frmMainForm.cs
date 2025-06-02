@@ -40,7 +40,7 @@ namespace Miara
         private void button4_Click(object sender, EventArgs e)
         {
             this.Hide();
-            frmProducts newForm = new frmProducts();
+            frmProducts newForm = new frmProducts(employeeFirstName, employeeSurname, EmployeeNumber);
             newForm.ShowDialog();
         }
 
@@ -69,13 +69,13 @@ namespace Miara
         private void button2_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmReports().ShowDialog();
+            new frmReports(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
         }
 
         private void btnCategoryCatalog_Click(object sender, EventArgs e)
         {
             this.Hide();
-            new frmCategory().ShowDialog();
+            new frmCategory(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
         }
     }
 }

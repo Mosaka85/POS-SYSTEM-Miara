@@ -13,12 +13,18 @@ namespace Miara
     {
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
+        string employeeFirstName;
+        string employeeSurname;
+        int EMployeeNumber;
 
-        public frmReports()
+        public frmReports(string firstName, string surname, int EMID)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
             this.FormClosed += (sender, e) => Application.Exit();
+            employeeFirstName = firstName;
+            employeeSurname = surname;
+            EMployeeNumber = EMID;
         }
 
         private void LoadSQLConnectionInfo()
@@ -269,6 +275,51 @@ namespace Miara
         private void btnReceipts_Click(object sender, EventArgs e)
         {
             ReceiptData();
+        }
+
+        private void btnUserActivity_Click(object sender, EventArgs e)
+        {
+            UserActivityLogIN();
+        }
+
+
+        private void UserActivityLogIN()
+        {
+            ClearDataGrid();
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                MessageBox.Show("Database connection is not set.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string query = @"
+             SELECT 
+                Employee,
+                FORMAT(MAX(b.AttemptTimestamp), 'yyyy-MM-dd HH:mm:ss') AS Last_logIn
+            FROM (
+                SELECT 
+                    a.EmployeeID,
+                    CONCAT_WS(' ', a.EmployeeFirstName, a.EmployeeSurname) AS Employee
+                FROM Employees a
+            ) EmployeeData
+            LEFT JOIN LoginAudit b ON EmployeeData.EmployeeID = b.EmployeeID AND b.IsSuccess = 1
+            GROUP BY Employee
+
+            ORDER BY FORMAT(MAX(b.AttemptTimestamp), 'yyyy-MM-dd HH:mm:ss')  DESC";
+            LoadDataIntoGrid(query, dataGridViewHeader);
+            lblDatalabel.Text = "DATA GRID VIEW : User Activity login Data";
+        }
+
+        private void frmReports_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Hide();
+            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber).ShowDialog();
         }
     }
 }

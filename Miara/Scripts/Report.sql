@@ -41,5 +41,6 @@ FROM (
 ) EmployeeData
 LEFT JOIN LoginAudit b ON EmployeeData.EmployeeID = b.EmployeeID AND b.IsSuccess = 1
 GROUP BY Employee
+
 ORDER BY FORMAT(MAX(b.AttemptTimestamp), 'yyyy-MM-dd HH:mm:ss')  DESC;
 GO

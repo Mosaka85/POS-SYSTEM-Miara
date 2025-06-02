@@ -12,17 +12,34 @@ namespace Miara
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
 
-        public frmProducts()
+        public frmProducts(string firstName, string surname, int EMID)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
+            ActiveUser = $"User: {firstName} {surname} ,  EMID: {EMID} ";
+            NameUser = firstName;
+            SurnameUSer = surname;
+            EmployeeID = EMID;
+            this.FormClosed += (sender, e) => Application.Exit();
+
         }
+
+        public string ActiveUser = "";
+        public string NameUser = "";
+        public string SurnameUSer = "";
+        public int EmployeeID = 0;
 
         private void frmProducts_Load(object sender, EventArgs e)
         {
+            
+            
+            
             LoadCategories(); // Ensure category names are loaded first
             LoadProducts();
             dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
+            lblUserActive.Text = ActiveUser;
+
+
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
@@ -36,6 +53,7 @@ namespace Miara
                 txtStockQuantity.Text = row.Cells["StockQuantity"].Value?.ToString() ?? "";
                 txtDescription.Text = row.Cells["Description"].Value?.ToString() ?? "";
                 chkIsActive.Checked = row.Cells["IsActive"].Value != DBNull.Value && Convert.ToBoolean(row.Cells["IsActive"].Value);
+                txtBarcodeLabel.Text = row.Cells["BARCODE"].Value?.ToString() ?? "";
 
                 // Select the correct category in ComboCategoryID
                 if (row.Cells["CategoryName"].Value != null)
@@ -49,6 +67,7 @@ namespace Miara
                 txtDescription.Enabled = false;
                 chkIsActive.Enabled = false;
                 ComboCategoryID.Enabled = false;
+                txtBarcodeLabel.Enabled = false;
             }
         }
 
@@ -57,7 +76,7 @@ namespace Miara
         {
             string query = @"
                 SELECT p.ProductID, p.ProductName, c.CategoryName, p.Price, 
-                       p.StockQuantity, p.Description, p.IsActive 
+                       p.StockQuantity, p.Description, p.IsActive , [BARCODE]
                 FROM Products p
                 INNER JOIN Categories c ON p.CategoryID = c.CategoryID"; // Join to get CategoryName
 
@@ -120,15 +139,41 @@ namespace Miara
                 int stockQuantity = int.Parse(txtStockQuantity.Text.Trim());
                 string description = txtDescription.Text.Trim();
                 bool isActive = chkIsActive.Checked;
+                string barcode = txtBarcodeLabel.Text.Trim();
 
-                string query = @"INSERT INTO [Products] 
-                                ([ProductName], [CategoryID], [Price], [StockQuantity], [Description], [IsActive]) 
-                                VALUES (@ProductName, @CategoryID, @Price, @StockQuantity, @Description, @IsActive)";
+                string checkQuery = @"
+            SELECT COUNT(*) 
+            FROM [Products] 
+            WHERE [ProductName] = @ProductName 
+            AND [Description] = @Description 
+            AND [Price] = @Price";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+
+                    // First, check for duplicates
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@ProductName", productName);
+                        checkCmd.Parameters.AddWithValue("@Description", description);
+                        checkCmd.Parameters.AddWithValue("@Price", price);
+
+                        int existingCount = (int)checkCmd.ExecuteScalar();
+
+                        if (existingCount > 0)
+                        {
+                            MessageBox.Show("This product already exists!", "Duplicate Product", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+
+                    string insertQuery = @"
+                INSERT INTO [Products] 
+                ([ProductName], [CategoryID], [Price], [StockQuantity], [Description], [IsActive], [BARCODE]) 
+                VALUES (@ProductName, @CategoryID, @Price, @StockQuantity, @Description, @IsActive , @BARCODE)";
+
+                    using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@ProductName", productName);
                         cmd.Parameters.AddWithValue("@CategoryID", categoryId);
@@ -136,6 +181,7 @@ namespace Miara
                         cmd.Parameters.AddWithValue("@StockQuantity", stockQuantity);
                         cmd.Parameters.AddWithValue("@Description", description);
                         cmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@BARCODE", barcode);
 
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Product added successfully!");
@@ -282,7 +328,91 @@ namespace Miara
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Application.Restart();
+            Hide();
+            new frmMainForm(NameUser, SurnameUSer, EmployeeID).ShowDialog();
+        }
+
+        private void btnDeactivate_Click(object sender, EventArgs e)
+        {
+
+            if (dataGridView1.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select a product to deactivate.", "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+
+                int productId = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["ProductID"].Value);
+
+                // Confirm deactivation
+                DialogResult result = MessageBox.Show(
+                    "Are you sure you want to deactivate this product?",
+                    "Confirm Deactivation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    string query = @"
+                UPDATE [Products] 
+                SET [IsActive] = 0 
+                WHERE [ProductID] = @ProductID";
+
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@ProductID", productId);
+                            int rowsAffected = cmd.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                            {
+                                MessageBox.Show("Product deactivated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                LoadProducts();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Product not found or already deactivated.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deactivating product: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnNewProduct_Click(object sender, EventArgs e)
+        {
+            // Enable all controls (if needed)
+            txtProductName.Enabled = true;
+            txtPrice.Enabled = true;
+            txtStockQuantity.Enabled = true;
+            txtDescription.Enabled = true;
+            chkIsActive.Enabled = true;
+            ComboCategoryID.Enabled = true;
+            txtBarcodeLabel.Enabled = true;
+
+            // Clear all input fields
+            txtProductName.Clear();
+            txtPrice.Clear();
+            txtStockQuantity.Clear();
+            txtDescription.Clear();
+            chkIsActive.Checked = true; // Default to "Active" (or false if preferred)
+            ComboCategoryID.SelectedIndex = -1; // Reset dropdown (no selection)
+            txtBarcodeLabel.Clear();
+            // Optional: Set focus to the first field for quick typing
+            txtProductName.Focus();
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

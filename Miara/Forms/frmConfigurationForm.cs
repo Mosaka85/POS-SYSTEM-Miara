@@ -151,7 +151,7 @@ namespace Miara
 
         private void btnCloseSQLfrm_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            Application.Restart();
         }
 
         private void btnSQLSAVE_Click(object sender, EventArgs e)

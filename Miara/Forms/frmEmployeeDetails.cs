@@ -485,11 +485,11 @@ namespace Miara
 
                     if (dt.Rows.Count > 0)
                     {
-                        return dt.Rows[0]; 
+                        return dt.Rows[0];
                     }
                 }
             }
-            return null; 
+            return null;
         }
 
         private void button1_Click(object sender, EventArgs e)

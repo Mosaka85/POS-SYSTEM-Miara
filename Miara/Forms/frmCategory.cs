@@ -12,16 +12,27 @@ namespace Miara
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
 
-        public frmCategory()
+        public frmCategory(string firstName, string surname, int EMID)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
+            ActiveUser = $"User: {firstName} {surname} ,  EMID: {EMID} ";
+            NameUser = firstName;
+            SurnameUSer = surname;
+            EmployeeID = EMID;
         }
+
+
+        public string ActiveUser = "";
+        public string NameUser = "";
+        public string SurnameUSer = "";
+        public int EmployeeID = 0;
 
         private async void frmCategory_Load(object sender, EventArgs e)
         {
             await LoadCategoriesAsync(); // Load categories asynchronously
             dataGridView2.SelectionChanged += dataGridView2_SelectionChanged;
+            lblUserActive.Text = ActiveUser;
         }
 
         private void LoadSQLConnectionInfo()

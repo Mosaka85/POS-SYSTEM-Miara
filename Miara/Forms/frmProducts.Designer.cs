@@ -45,6 +45,12 @@
             this.btnUpdateProduct = new System.Windows.Forms.Button();
             this.btnEditproduct = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
+            this.lblUserActive = new System.Windows.Forms.Label();
+            this.btnDeactivate = new System.Windows.Forms.Button();
+            this.btnNewProduct = new System.Windows.Forms.Button();
+            this.txtBarcodeLabel = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -91,7 +97,7 @@
             // 
             this.chkIsActive.AutoSize = true;
             this.chkIsActive.Font = new System.Drawing.Font("Arial", 10.8F);
-            this.chkIsActive.Location = new System.Drawing.Point(485, 163);
+            this.chkIsActive.Location = new System.Drawing.Point(485, 203);
             this.chkIsActive.Name = "chkIsActive";
             this.chkIsActive.Size = new System.Drawing.Size(84, 26);
             this.chkIsActive.TabIndex = 5;
@@ -102,7 +108,7 @@
             // 
             this.btnAddProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddProduct.Font = new System.Drawing.Font("Arial", 10.8F);
-            this.btnAddProduct.Location = new System.Drawing.Point(12, 203);
+            this.btnAddProduct.Location = new System.Drawing.Point(856, 350);
             this.btnAddProduct.Name = "btnAddProduct";
             this.btnAddProduct.Size = new System.Drawing.Size(151, 45);
             this.btnAddProduct.TabIndex = 6;
@@ -171,21 +177,22 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 254);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 299);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(1076, 317);
+            this.dataGridView1.Size = new System.Drawing.Size(824, 326);
             this.dataGridView1.TabIndex = 13;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // btnUpdateProduct
             // 
             this.btnUpdateProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpdateProduct.Font = new System.Drawing.Font("Arial", 10.8F);
-            this.btnUpdateProduct.Location = new System.Drawing.Point(328, 203);
+            this.btnUpdateProduct.Location = new System.Drawing.Point(406, 248);
             this.btnUpdateProduct.Name = "btnUpdateProduct";
             this.btnUpdateProduct.Size = new System.Drawing.Size(151, 45);
             this.btnUpdateProduct.TabIndex = 14;
@@ -197,7 +204,7 @@
             // 
             this.btnEditproduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEditproduct.Font = new System.Drawing.Font("Arial", 10.8F);
-            this.btnEditproduct.Location = new System.Drawing.Point(169, 203);
+            this.btnEditproduct.Location = new System.Drawing.Point(197, 248);
             this.btnEditproduct.Name = "btnEditproduct";
             this.btnEditproduct.Size = new System.Drawing.Size(153, 45);
             this.btnEditproduct.TabIndex = 15;
@@ -207,7 +214,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(900, 12);
+            this.btnExit.Location = new System.Drawing.Point(924, 12);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(109, 35);
             this.btnExit.TabIndex = 16;
@@ -215,9 +222,80 @@
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // lblUserActive
+            // 
+            this.lblUserActive.AutoSize = true;
+            this.lblUserActive.Location = new System.Drawing.Point(-3, 628);
+            this.lblUserActive.Name = "lblUserActive";
+            this.lblUserActive.Size = new System.Drawing.Size(379, 17);
+            this.lblUserActive.TabIndex = 17;
+            this.lblUserActive.Text = "employeeFirstName, employeeSurname, EmployeeNumber";
+            // 
+            // btnDeactivate
+            // 
+            this.btnDeactivate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDeactivate.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.btnDeactivate.Location = new System.Drawing.Point(856, 299);
+            this.btnDeactivate.Name = "btnDeactivate";
+            this.btnDeactivate.Size = new System.Drawing.Size(151, 45);
+            this.btnDeactivate.TabIndex = 18;
+            this.btnDeactivate.Text = "Deactivate";
+            this.btnDeactivate.UseVisualStyleBackColor = true;
+            this.btnDeactivate.Click += new System.EventHandler(this.btnDeactivate_Click);
+            // 
+            // btnNewProduct
+            // 
+            this.btnNewProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNewProduct.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.btnNewProduct.Location = new System.Drawing.Point(12, 248);
+            this.btnNewProduct.Name = "btnNewProduct";
+            this.btnNewProduct.Size = new System.Drawing.Size(151, 45);
+            this.btnNewProduct.TabIndex = 19;
+            this.btnNewProduct.Text = "New";
+            this.btnNewProduct.UseVisualStyleBackColor = true;
+            this.btnNewProduct.Click += new System.EventHandler(this.btnNewProduct_Click);
+            // 
+            // txtBarcodeLabel
+            // 
+            this.txtBarcodeLabel.BackColor = System.Drawing.Color.White;
+            this.txtBarcodeLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtBarcodeLabel.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.txtBarcodeLabel.Location = new System.Drawing.Point(155, 201);
+            this.txtBarcodeLabel.Name = "txtBarcodeLabel";
+            this.txtBarcodeLabel.Size = new System.Drawing.Size(324, 28);
+            this.txtBarcodeLabel.TabIndex = 20;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Arial", 10.8F);
+            this.label5.Location = new System.Drawing.Point(18, 201);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(82, 22);
+            this.label5.TabIndex = 21;
+            this.label5.Text = "Barcode";
+            // 
+            // button1
+            // 
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(856, 401);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(151, 45);
+            this.button1.TabIndex = 22;
+            this.button1.Text = "Print Product Label";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // frmProducts
             // 
-            this.ClientSize = new System.Drawing.Size(1076, 571);
+            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ClientSize = new System.Drawing.Size(1119, 648);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.txtBarcodeLabel);
+            this.Controls.Add(this.btnNewProduct);
+            this.Controls.Add(this.btnDeactivate);
+            this.Controls.Add(this.lblUserActive);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnEditproduct);
             this.Controls.Add(this.btnUpdateProduct);
@@ -262,5 +340,11 @@
         private System.Windows.Forms.Button btnUpdateProduct;
         private System.Windows.Forms.Button btnEditproduct;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Label lblUserActive;
+        private System.Windows.Forms.Button btnDeactivate;
+        private System.Windows.Forms.Button btnNewProduct;
+        private System.Windows.Forms.TextBox txtBarcodeLabel;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button button1;
     }
 }

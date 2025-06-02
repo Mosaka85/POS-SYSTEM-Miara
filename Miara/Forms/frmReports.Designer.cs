@@ -40,6 +40,7 @@ namespace Miara
             this.btnViewPayments = new System.Windows.Forms.Button();
             this.btnDiscount = new System.Windows.Forms.Button();
             this.btnReceipts = new System.Windows.Forms.Button();
+            this.btnUserActivity = new System.Windows.Forms.Button();
             this.lblDatalabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHeader)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -90,10 +91,11 @@ namespace Miara
             // 
             this.button1.Location = new System.Drawing.Point(1552, 44);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(109, 51);
             this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
+            this.button1.Text = "Back";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // btnViewDetails
             // 
@@ -112,6 +114,7 @@ namespace Miara
             this.flowLayoutPanel1.Controls.Add(this.btnViewPayments);
             this.flowLayoutPanel1.Controls.Add(this.btnDiscount);
             this.flowLayoutPanel1.Controls.Add(this.btnReceipts);
+            this.flowLayoutPanel1.Controls.Add(this.btnUserActivity);
             this.flowLayoutPanel1.Location = new System.Drawing.Point(-4, -1);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(255, 1054);
@@ -147,6 +150,16 @@ namespace Miara
             this.btnReceipts.UseVisualStyleBackColor = true;
             this.btnReceipts.Click += new System.EventHandler(this.btnReceipts_Click);
             // 
+            // btnUserActivity
+            // 
+            this.btnUserActivity.Location = new System.Drawing.Point(3, 357);
+            this.btnUserActivity.Name = "btnUserActivity";
+            this.btnUserActivity.Size = new System.Drawing.Size(252, 79);
+            this.btnUserActivity.TabIndex = 6;
+            this.btnUserActivity.Text = "User Activity";
+            this.btnUserActivity.UseVisualStyleBackColor = true;
+            this.btnUserActivity.Click += new System.EventHandler(this.btnUserActivity_Click);
+            // 
             // lblDatalabel
             // 
             this.lblDatalabel.AutoSize = true;
@@ -169,6 +182,7 @@ namespace Miara
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmReports";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.frmReports_Load_1);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewHeader)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -186,5 +200,6 @@ namespace Miara
         private System.Windows.Forms.Label lblDatalabel;
         private System.Windows.Forms.Button btnDiscount;
         private System.Windows.Forms.Button btnReceipts;
+        private System.Windows.Forms.Button btnUserActivity;
     }
 }
