@@ -30,9 +30,9 @@ namespace Miara
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSales));
             this.lblNextSalesNumber = new System.Windows.Forms.Label();
             this.lblTotalAmount = new System.Windows.Forms.Label();
@@ -80,13 +80,17 @@ namespace Miara
             this.dataGridViewSaleDetails = new System.Windows.Forms.DataGridView();
             this.txtBarcodeLabel = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.lblScan = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.btnReportSales = new System.Windows.Forms.Button();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSaleDetails)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // lblNextSalesNumber
@@ -118,7 +122,7 @@ namespace Miara
             this.btnCompleteSale.Name = "btnCompleteSale";
             this.btnCompleteSale.Size = new System.Drawing.Size(142, 87);
             this.btnCompleteSale.TabIndex = 8;
-            this.btnCompleteSale.Text = "Complete Sale";
+            this.btnCompleteSale.Text = "Complete Sale\r\n(F2)";
             this.btnCompleteSale.UseVisualStyleBackColor = false;
             this.btnCompleteSale.Click += new System.EventHandler(this.btnCompleteSale_Click);
             // 
@@ -245,7 +249,7 @@ namespace Miara
             this.lblBusineess.BackColor = System.Drawing.Color.Transparent;
             this.lblBusineess.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.lblBusineess.Font = new System.Drawing.Font("Segoe Print", 28.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBusineess.Location = new System.Drawing.Point(161, -20);
+            this.lblBusineess.Location = new System.Drawing.Point(478, 9);
             this.lblBusineess.Name = "lblBusineess";
             this.lblBusineess.Size = new System.Drawing.Size(349, 84);
             this.lblBusineess.TabIndex = 34;
@@ -256,7 +260,7 @@ namespace Miara
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Segoe Print", 12.2F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(178, 48);
+            this.label2.Location = new System.Drawing.Point(171, 77);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 37);
             this.label2.TabIndex = 35;
@@ -455,6 +459,7 @@ namespace Miara
             this.comboProductCategory.Size = new System.Drawing.Size(431, 49);
             this.comboProductCategory.StartIndex = 0;
             this.comboProductCategory.TabIndex = 57;
+            this.comboProductCategory.SelectedIndexChanged += new System.EventHandler(this.comboProductCategory_SelectedIndexChanged);
             // 
             // comboBoxProducts
             // 
@@ -478,6 +483,7 @@ namespace Miara
             this.comboBoxProducts.Size = new System.Drawing.Size(434, 49);
             this.comboBoxProducts.StartIndex = 0;
             this.comboBoxProducts.TabIndex = 58;
+            this.comboBoxProducts.SelectedIndexChanged += new System.EventHandler(this.comboBoxProducts_SelectedIndexChanged);
             // 
             // combopaymentmentod
             // 
@@ -579,14 +585,14 @@ namespace Miara
             this.dataGridViewSaleDetails.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewSaleDetails.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewSaleDetails.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewSaleDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewSaleDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridViewSaleDetails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewSaleDetails.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ProductID,
@@ -594,26 +600,26 @@ namespace Miara
             this.Quantity,
             this.Price,
             this.Subtotal});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewSaleDetails.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewSaleDetails.DefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridViewSaleDetails.GridColor = System.Drawing.SystemColors.Control;
             this.dataGridViewSaleDetails.Location = new System.Drawing.Point(648, 159);
             this.dataGridViewSaleDetails.Name = "dataGridViewSaleDetails";
             this.dataGridViewSaleDetails.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewSaleDetails.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewSaleDetails.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridViewSaleDetails.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGridViewSaleDetails.RowTemplate.Height = 24;
             this.dataGridViewSaleDetails.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -624,29 +630,30 @@ namespace Miara
             // 
             this.txtBarcodeLabel.AcceptsReturn = true;
             this.txtBarcodeLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtBarcodeLabel.Location = new System.Drawing.Point(67, 3);
+            this.txtBarcodeLabel.Location = new System.Drawing.Point(95, 3);
             this.txtBarcodeLabel.Name = "txtBarcodeLabel";
-            this.txtBarcodeLabel.Size = new System.Drawing.Size(374, 34);
+            this.txtBarcodeLabel.Size = new System.Drawing.Size(331, 34);
             this.txtBarcodeLabel.TabIndex = 62;
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.Controls.Add(this.pictureBox1);
+            this.flowLayoutPanel1.Controls.Add(this.pictureBox3);
             this.flowLayoutPanel1.Controls.Add(this.txtBarcodeLabel);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(10, 684);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 679);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(450, 45);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(450, 50);
             this.flowLayoutPanel1.TabIndex = 63;
             // 
-            // pictureBox1
+            // pictureBox3
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(58, 42);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 64;
-            this.pictureBox1.TabStop = false;
+            this.pictureBox3.Image = global::Miara.Properties.Resources.barcode_scan;
+            this.pictureBox3.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(86, 46);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox3.TabIndex = 65;
+            this.pictureBox3.TabStop = false;
+            this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
             // 
             // pictureBox2
             // 
@@ -658,6 +665,40 @@ namespace Miara
             this.pictureBox2.TabIndex = 64;
             this.pictureBox2.TabStop = false;
             // 
+            // lblScan
+            // 
+            this.lblScan.AutoSize = true;
+            this.lblScan.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblScan.Location = new System.Drawing.Point(9, 661);
+            this.lblScan.Name = "lblScan";
+            this.lblScan.Size = new System.Drawing.Size(89, 16);
+            this.lblScan.TabIndex = 66;
+            this.lblScan.Text = "Scan Barcode";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(178, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(139, 74);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 67;
+            this.pictureBox1.TabStop = false;
+            // 
+            // btnReportSales
+            // 
+            this.btnReportSales.BackColor = System.Drawing.Color.IndianRed;
+            this.btnReportSales.FlatAppearance.BorderColor = System.Drawing.Color.IndianRed;
+            this.btnReportSales.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReportSales.ForeColor = System.Drawing.Color.Black;
+            this.btnReportSales.Location = new System.Drawing.Point(501, 908);
+            this.btnReportSales.Name = "btnReportSales";
+            this.btnReportSales.Size = new System.Drawing.Size(142, 86);
+            this.btnReportSales.TabIndex = 68;
+            this.btnReportSales.Text = "Report";
+            this.btnReportSales.UseVisualStyleBackColor = false;
+            this.btnReportSales.Click += new System.EventHandler(this.btnReportSales_Click);
+            // 
             // frmSales
             // 
             this.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
@@ -666,6 +707,9 @@ namespace Miara
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1871, 1084);
             this.ControlBox = false;
+            this.Controls.Add(this.btnReportSales);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.lblScan);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.txtQuantity);
@@ -712,8 +756,9 @@ namespace Miara
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSaleDetails)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -766,7 +811,10 @@ namespace Miara
         private System.Windows.Forms.DataGridView dataGridViewSaleDetails;
         private System.Windows.Forms.TextBox txtBarcodeLabel;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.Label lblScan;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button btnReportSales;
     }
 }

@@ -63,6 +63,16 @@ namespace Miara.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap barcode_scan {
+            get {
+                object obj = ResourceManager.GetObject("barcode-scan", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MIARA_POS {
             get {
                 object obj = ResourceManager.GetObject("MIARA POS", resourceCulture);

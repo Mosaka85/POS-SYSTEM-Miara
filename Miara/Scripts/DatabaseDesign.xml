@@ -308,4 +308,14 @@
 		</IndexOptions>
 		<FileGroup>PRIMARY</FileGroup>
 	</Table>
+	<Table name="Discounts" schema="dbo">
+		<Column name="DiscountID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="SaleID" type="int" isNullable="false" />
+		<Column name="DiscountPercentage" type="decimal" precision="5" scale="2" isNullable="false" />
+		<Column name="DiscountValue" type="decimal" precision="10" scale="2" isNullable="false" />
+		<Column name="DiscountDate" type="datetime" isNullable="false" />
+		<PrimaryKey>
+			<Column name="DiscountID" order="ASC" />
+		</PrimaryKey>
+	</Table>
 </Tables>

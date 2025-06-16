@@ -1,0 +1,368 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Tables>
+	<Table name="Employees" schema="dbo">
+		<Column name="EmployeeID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="EmployeeFirstName" type="varchar" length="255" isNullable="false" />
+		<Column name="EmployeeSurname" type="varchar" length="255" isNullable="false" />
+		<Column name="Department" type="varchar" length="255" isNullable="false" />
+		<Column name="Role" type="varchar" length="100" isNullable="false" />
+		<Column name="Username" type="varchar" length="100" isNullable="false" />
+		<Column name="PasswordHash" type="varchar" length="1000" isNullable="false" />
+		<Column name="HireDate" type="date" isNullable="false" />
+		<Column name="Email" type="varchar" length="255" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="true" />
+		<Column name="PHONE" type="varchar" length="50" isNullable="true" />
+	</Table>
+	<Table name="LoginAudit" schema="dbo">
+		<Column name="AuditID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="Username" type="nvarchar" length="50" isNullable="false" />
+		<Column name="AttemptTimestamp" type="datetime" isNullable="false" />
+		<Column name="IsSuccess" type="bit" isNullable="false" />
+		<Column name="EmployeeID" type="int" isNullable="true" />
+		<Column name="Details" type="nvarchar" length="255" isNullable="true" />
+		<PrimaryKey>
+			<Column name="AuditID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="CashbackTransactions" schema="dbo">
+		<Column name="TransactionID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="SaleID" type="int" isNullable="false" />
+		<Column name="EmployeeName" type="nvarchar" length="500" isNullable="false" />
+		<Column name="Surname" type="nvarchar" length="500" isNullable="false" />
+		<Column name="EmployeeID" type="int" isNullable="false" />
+		<Column name="Amount" type="decimal" length="10,2" isNullable="false" />
+		<Column name="LocationIP" type="nvarchar" length="50" isNullable="false" />
+		<Column name="Status" type="nvarchar" length="500" isNullable="true" />
+		<Column name="Notes" type="nvarchar" length="255" isNullable="true" />
+		<Column name="TransactionDate" type="datetime" isNullable="true" />
+		<PrimaryKey>
+			<Column name="TransactionID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Categories" schema="dbo">
+		<Column name="CategoryID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="CategoryName" type="varchar" length="255" isNullable="false" />
+		<Column name="Description" type="varchar" length="500" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="true" />
+		<PrimaryKey>
+			<Column name="CategoryID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="CouponRedemptions" schema="dbo">
+		<Column name="RedemptionID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="CouponCode" type="nvarchar" length="50" isNullable="true" />
+		<Column name="SaleID" type="int" isNullable="true" />
+		<Column name="DiscountApplied" type="decimal" length="10,2" isNullable="true" />
+		<Column name="RedemptionDate" type="datetime" isNullable="true" />
+		<PrimaryKey>
+			<Column name="RedemptionID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Coupons" schema="dbo">
+		<Column name="CouponCode" type="nvarchar" length="50" isNullable="false" />
+		<Column name="DiscountAmount" type="decimal" length="10,2" isNullable="true" />
+		<Column name="IsPercentage" type="bit" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="true" />
+		<Column name="ExpiryDate" type="date" isNullable="true" />
+		<Column name="Type" type="nvarchar" length="20" isNullable="true" />
+		<PrimaryKey>
+			<Column name="CouponCode" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Customers" schema="dbo">
+		<Column name="CustomerID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="CustomerName" type="varchar" length="255" isNullable="false" />
+		<Column name="Phone" type="varchar" length="20" isNullable="true" />
+		<Column name="Email" type="varchar" length="255" isNullable="true" />
+		<Column name="Address" type="varchar" length="500" isNullable="true" />
+		<Column name="LoyaltyPoints" type="int" isNullable="false" />
+		<PrimaryKey>
+			<Column name="CustomerID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Discounts" schema="dbo">
+		<Column name="DiscountID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="SaleID" type="int" isNullable="false" />
+		<Column name="DiscountPercentage" type="decimal" precision="5" scale="2" isNullable="false" />
+		<Column name="DiscountValue" type="decimal" precision="10" scale="2" isNullable="false" />
+		<Column name="DiscountDate" type="datetime" isNullable="false" />
+		<PrimaryKey>
+			<Column name="DiscountID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="EmployeeDepartments" schema="dbo">
+		<Column name="DepartmentID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="DepartmentName" type="nvarchar" length="100" isNullable="false" />
+		<Column name="ManagerID" type="int" isNullable="true" />
+		<Column name="Location" type="nvarchar" length="100" isNullable="true" />
+		<Column name="Budget" type="decimal" precision="18" scale="2" isNullable="true" />
+		<Column name="CreatedDate" type="datetime" isNullable="true" />
+		<Column name="LastUpdatedDate" type="datetime" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="true" />
+		<Column name="Description" type="nvarchar" isMax="true" isNullable="true" />
+		<Column name="ParentDepartmentID" type="int" isNullable="true" />
+		<PrimaryKey>
+			<Column name="DepartmentID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="EmployeeRoles" schema="dbo">
+		<Column name="RoleID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="RoleName" type="nvarchar" length="100" isNullable="false" />
+		<Column name="DepartmentID" type="int" isNullable="true" />
+		<Column name="Description" type="nvarchar" length="255" isNullable="true" />
+		<Column name="CreatedDate" type="datetime" isNullable="true" />
+		<Column name="LastUpdatedDate" type="datetime" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="true" />
+		<PrimaryKey>
+			<Column name="RoleID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Payments" schema="dbo">
+		<Column name="PaymentID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="SaleID" type="bigint" isNullable="false" />
+		<Column name="AmountPaid" type="decimal" precision="15" scale="2" isNullable="false" />
+		<Column name="PaymentDate" type="datetime" isNullable="false" />
+		<Column name="PaymentMethod" type="varchar" length="255" isNullable="false" />
+		<Column name="CashBack" type="varchar" length="100" isNullable="true" />
+		<PrimaryKey>
+			<Column name="PaymentID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Receipts" schema="dbo">
+		<Column name="ReceiptID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="ReceiptNumber" type="nvarchar" length="50" isNullable="false" />
+		<Column name="Date" type="datetime" isNullable="false" />
+		<Column name="EmployeeName" type="nvarchar" length="100" isNullable="false" />
+		<Column name="PaymentMethod" type="nvarchar" length="50" isNullable="false" />
+		<Column name="Subtotal" type="decimal" precision="18" scale="2" isNullable="false" />
+		<Column name="Discount" type="decimal" precision="18" scale="2" isNullable="false" />
+		<Column name="Tax" type="decimal" precision="18" scale="2" isNullable="false" />
+		<Column name="Total" type="decimal" precision="18" scale="2" isNullable="false" />
+		<Column name="AmountRendered" type="decimal" precision="18" scale="2" isNullable="true" />
+		<Column name="Change" type="decimal" precision="18" scale="2" isNullable="true" />
+		<PrimaryKey>
+			<Column name="ReceiptID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Suppliers" schema="dbo">
+		<Column name="SupplierID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="SupplierName" type="varchar" length="255" isNullable="false" />
+		<Column name="ContactNumber" type="varchar" length="20" isNullable="true" />
+		<Column name="Email" type="varchar" length="255" isNullable="true" />
+		<Column name="Address" type="varchar" length="500" isNullable="true" />
+		<PrimaryKey>
+			<Column name="SupplierID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="VoidAuditLog" schema="dbo">
+		<Column name="VoidID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="SaleID" type="int" isNullable="true" />
+		<Column name="ProductID" type="int" isNullable="false" />
+		<Column name="ProductName" type="nvarchar" length="100" isNullable="false" />
+		<Column name="Quantity" type="int" isNullable="false" />
+		<Column name="Price" type="decimal" precision="18" scale="2" isNullable="false" />
+		<Column name="Subtotal" type="decimal" precision="18" scale="2" isNullable="false" />
+		<Column name="VoidType" type="nvarchar" length="20" isNullable="false" />
+		<Column name="VoidReason" type="nvarchar" length="255" isNullable="true" />
+		<Column name="VoidedBy" type="nvarchar" length="50" isNullable="false" />
+		<Column name="VoidDate" type="datetime" isNullable="false" />
+		<Column name="OriginalSaleDate" type="datetime" isNullable="true" />
+		<Column name="Workstation" type="nvarchar" length="50" isNullable="true" />
+		<PrimaryKey>
+			<Column name="VoidID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="Sale" schema="dbo">
+		<Column name="SaleID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="SaleDate" type="datetime" isNullable="false" />
+		<Column name="CustomerID" type="bigint" isNullable="true" />
+		<Column name="TotalAmount" type="decimal" precision="15" scale="2" isNullable="false" />
+		<Column name="PaymentMethod" type="varchar" length="255" isNullable="true" />
+		<Column name="EmployeeID" type="bigint" isNullable="true" />
+
+		<PrimaryKey name="PK__Sale__1EE3C41F65EDDD04">
+			<Column name="SaleID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+
+	<Table name="PaymentMethods" schema="dbo">
+		<Column name="PaymentMethodID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="MethodName" type="nvarchar" length="50" isNullable="false" />
+		<Column name="Description" type="nvarchar" length="255" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="false" />
+		<Column name="CreatedAt" type="datetime" isNullable="true" />
+
+		<PrimaryKey>
+			<Column name="PaymentMethodID" order="ASC" />
+		</PrimaryKey>
+
+		<UniqueConstraint>
+			<Column name="MethodName" order="ASC" />
+		</UniqueConstraint>
+	</Table>
+	<Table name="Products" schema="dbo">
+		<Column name="ProductID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="ProductName" type="varchar" length="255" isNullable="false" />
+		<Column name="CategoryID" type="int" isNullable="false" />
+		<Column name="Price" type="decimal" precision="15" scale="2" isNullable="false" />
+		<Column name="StockQuantity" type="int" isNullable="false" />
+		<Column name="Description" type="varchar" length="max" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="false" />
+		<Column name="BARCODE" type="varchar" length="250" isNullable="true" />
+
+		<PrimaryKey name="PK__Products__B40CC6ED55BBBF50">
+			<Column name="ProductID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+	<Table name="SalesDetails" schema="dbo">
+		<Column name="SaleDetailID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="SaleID" type="bigint" isNullable="false" />
+		<Column name="ProductID" type="int" isNullable="false" />
+		<Column name="Quantity" type="int" isNullable="false" />
+		<Column name="UnitPrice" type="decimal" precision="15" scale="2" isNullable="false" />
+		<Column name="Subtotal" type="decimal" precision="15" scale="2" isNullable="false" />
+		<Column name="TAX" type="decimal" precision="15" scale="2" isNullable="true" />
+
+		<PrimaryKey name="PK__SalesDet__70DB141E8E909FC7">
+			<Column name="SaleDetailID" order="ASC" />
+		</PrimaryKey>
+	</Table>
+
+
+	<AlterTable name="CashbackTransactions" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="TransactionDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+	<AlterTable name="CouponRedemptions" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="RedemptionDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="CouponRedemptions" schema="dbo">
+		<AddForeignKeyConstraint check="true">
+			<Column name="CouponCode" />
+			<References table="Coupons" schema="dbo">
+				<Column name="CouponCode" />
+			</References>
+		</AddForeignKeyConstraint>
+	</AlterTable>
+	<AlterTable name="Customers" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="LoyaltyPoints" />
+			<DefaultValue>(0)</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+	<AlterTable name="EmployeeDepartments" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="CreatedDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="EmployeeDepartments" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="LastUpdatedDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="EmployeeDepartments" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="IsActive" />
+			<DefaultValue>(1)</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+	<AlterTable name="EmployeeRoles" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="CreatedDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="EmployeeRoles" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="LastUpdatedDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="EmployeeRoles" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="IsActive" />
+			<DefaultValue>(1)</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="EmployeeRoles" schema="dbo">
+		<AddForeignKeyConstraint name="FK_EmployeeRoles_DepartmentID" check="true">
+			<Column name="DepartmentID" />
+			<References table="EmployeeDepartments" schema="dbo">
+				<Column name="DepartmentID" />
+			</References>
+		</AddForeignKeyConstraint>
+	</AlterTable>
+
+	<AlterTable name="EmployeeRoles" schema="dbo">
+		<CheckConstraint name="FK_EmployeeRoles_DepartmentID" />
+	</AlterTable>
+	<AlterTable name="PaymentMethods" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="IsActive" />
+			<DefaultValue>(1)</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+
+	<AlterTable name="PaymentMethods" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="CreatedAt" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+	<AlterTable name="Payments" schema="dbo">
+		<AddForeignKeyConstraint name="fk_payments_saleid" check="true">
+			<Column name="SaleID" />
+			<References table="Sale" schema="dbo">
+				<Column name="SaleID" />
+			</References>
+		</AddForeignKeyConstraint>
+	</AlterTable>
+
+	<AlterTable name="Payments" schema="dbo">
+		<CheckConstraint name="fk_payments_saleid" />
+	</AlterTable>
+	<AlterTable name="Products" schema="dbo">
+		<AddForeignKeyConstraint name="fk_products_categoryid" check="true">
+			<Column name="CategoryID" />
+			<References table="Categories" schema="dbo">
+				<Column name="CategoryID" />
+			</References>
+		</AddForeignKeyConstraint>
+	</AlterTable>
+
+	<AlterTable name="Products" schema="dbo">
+		<CheckConstraint name="fk_products_categoryid" />
+	</AlterTable>
+	<AlterTable name="Sale" schema="dbo">
+		<AddForeignKeyConstraint name="fk_sale_customerid" check="true">
+			<Column name="CustomerID" />
+			<References table="Customers" schema="dbo">
+				<Column name="CustomerID" />
+			</References>
+		</AddForeignKeyConstraint>
+	</AlterTable>
+
+	<AlterTable name="Sale" schema="dbo">
+		<CheckConstraint name="fk_sale_customerid" />
+	</AlterTable>
+	<AlterTable name="VoidAuditLog" schema="dbo">
+		<AddDefaultConstraint>
+			<Column name="VoidDate" />
+			<DefaultValue>getdate()</DefaultValue>
+		</AddDefaultConstraint>
+	</AlterTable>
+	
+</Tables>

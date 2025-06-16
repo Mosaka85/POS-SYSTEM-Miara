@@ -49,17 +49,21 @@ namespace Miara
             // chkCategoryIsActive
             // 
             this.chkCategoryIsActive.AutoSize = true;
+            this.chkCategoryIsActive.Checked = true;
+            this.chkCategoryIsActive.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkCategoryIsActive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkCategoryIsActive.Font = new System.Drawing.Font("Arial", 10.8F);
             this.chkCategoryIsActive.Location = new System.Drawing.Point(489, 21);
             this.chkCategoryIsActive.Name = "chkCategoryIsActive";
-            this.chkCategoryIsActive.Size = new System.Drawing.Size(80, 26);
+            this.chkCategoryIsActive.Size = new System.Drawing.Size(76, 25);
             this.chkCategoryIsActive.TabIndex = 28;
             this.chkCategoryIsActive.Text = "Active";
             this.chkCategoryIsActive.UseVisualStyleBackColor = true;
             // 
             // dataGridView2
             // 
+            this.dataGridView2.AllowUserToAddRows = false;
+            this.dataGridView2.AllowUserToDeleteRows = false;
             this.dataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView2.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView2.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -84,6 +88,7 @@ namespace Miara
             this.dataGridView2.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView2.GridColor = System.Drawing.Color.White;
             this.dataGridView2.Location = new System.Drawing.Point(12, 247);
+            this.dataGridView2.MultiSelect = false;
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -125,7 +130,7 @@ namespace Miara
             this.label5.Font = new System.Drawing.Font("Arial", 10.8F);
             this.label5.Location = new System.Drawing.Point(29, 21);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(142, 22);
+            this.label5.Size = new System.Drawing.Size(135, 21);
             this.label5.TabIndex = 25;
             this.label5.Text = "Category Name";
             // 
@@ -178,7 +183,7 @@ namespace Miara
             this.label1.Font = new System.Drawing.Font("Arial", 10.8F);
             this.label1.Location = new System.Drawing.Point(29, 62);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(106, 22);
+            this.label1.Size = new System.Drawing.Size(100, 21);
             this.label1.TabIndex = 33;
             this.label1.Text = "Description";
             // 
@@ -188,7 +193,7 @@ namespace Miara
             this.lblUserActive.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblUserActive.Location = new System.Drawing.Point(9, 601);
             this.lblUserActive.Name = "lblUserActive";
-            this.lblUserActive.Size = new System.Drawing.Size(373, 19);
+            this.lblUserActive.Size = new System.Drawing.Size(365, 17);
             this.lblUserActive.TabIndex = 34;
             this.lblUserActive.Text = "employeeFirstName, employeeSurname, EmployeeNumber";
             // 

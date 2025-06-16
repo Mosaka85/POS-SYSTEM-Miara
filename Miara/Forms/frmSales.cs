@@ -15,6 +15,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Microsoft.Reporting.WinForms;
+using Microsoft.Reporting.WebForms;
+using WECPOFLogic;
 
 namespace Miara
 {
@@ -56,6 +59,8 @@ namespace Miara
             RoundButtonCorners(btnCalculatechange, 30);
 
 
+            this.KeyPreview = true;
+            this.KeyDown += frmSales_KeyDown;
 
         }
 
@@ -68,7 +73,14 @@ namespace Miara
         }
 
 
-
+        private void frmSales_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F2 && btnCompleteSale.Enabled)
+            {
+                btnCompleteSale.PerformClick();
+                e.Handled = true; // Optional: stops further processing
+            }
+        }
 
         string employeeFirstName;
         string employeeSurname;
@@ -993,15 +1005,7 @@ namespace Miara
             new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber).ShowDialog();
         }
 
-        private void comboProductCategory_SelectedIndexChanged(object sender, EventArgs e)
-        {
 
-            if (comboProductCategory.SelectedValue != null)
-            {
-                int selectedCategoryID = (int)comboProductCategory.SelectedValue;
-                LoadProductsByCategory(selectedCategoryID);
-            }
-        }
 
         private void LoadProductsByCategory(int categoryID)
         {
@@ -1881,14 +1885,82 @@ namespace Miara
 
         }
 
-        private void comboProductCategory_SelectedIndexChanged_1(object sender, EventArgs e)
+    
+
+        private void pictureBox3_Click(object sender, EventArgs e)
         {
 
         }
+
+        private void btnReportSales_Click(object sender, EventArgs e)
+        {
+           
+        }
+
+
+
+
+        private void PrintReport(LocalReport localReport)
+        {
+            try
+            {
+   
+                PrintDocument printDocument = new PrintDocument();
+
+                printDocument.PrintPage += (sender, e) =>
+                {
+                    // Render the report to a byte array
+                    Warning[] warnings;
+                    string[] streamIds;
+                    string mimeType, encoding, extension;
+                    byte[] bytes = localReport.Render("Image", null, out mimeType, out encoding, out extension, out streamIds, out warnings);
+
+                
+                    using (MemoryStream stream = new MemoryStream(bytes))
+                    {
+                       
+                        Image image = Image.FromStream(stream);
+
+               
+                        e.Graphics.DrawImage(image, e.PageBounds);
+                    }
+                };
+
+ 
+                PrintDialog printDialog = new PrintDialog
+                {
+                    Document = printDocument
+                };
+
+                if (printDialog.ShowDialog() == DialogResult.OK)
+                {
+
+                    printDocument.Print();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred while printing the report: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void comboBoxProducts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboProductCategory_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            if (comboProductCategory.SelectedValue != null)
+            {
+                int selectedCategoryID = (int)comboProductCategory.SelectedValue;
+                LoadProductsByCategory(selectedCategoryID);
+            }
+        }
     }
-
-
 }
+
 
 
 

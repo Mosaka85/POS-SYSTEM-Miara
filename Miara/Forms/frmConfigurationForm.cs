@@ -9,12 +9,52 @@ namespace Miara
 {
     public partial class frmConfigurationForm : Form
     {
-        // Use a relative path or dynamically resolve the file location
-        private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
+
+
 
         public frmConfigurationForm()
         {
             InitializeComponent();
+        }
+
+        private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
+        private string SQLservername;
+        private string SQLDatabase;
+        private string SQLUsername;
+        private string SQLPassword;
+
+
+
+        private void LoadSQLConnectionInfo()
+        {
+            if (!File.Exists(configFile))
+            {
+                MessageBox.Show("Connection configuration file not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
+                    if (serializer.Deserialize(fileStream) is LoginInfo loginInfo)
+                    {
+                        SQLservername = loginInfo.DataSource;
+                        SQLDatabase = loginInfo.SelectedDatabase;
+                        SQLUsername = loginInfo.Username;
+                        SQLPassword = loginInfo.Password;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to load connection information. The configuration file may be corrupted.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load connection information: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnTestSQL_Click(object sender, EventArgs e)
@@ -161,7 +201,8 @@ namespace Miara
 
         private void frmConfigurationForm_Load_1(object sender, EventArgs e)
         {
-
+            LoadSQLConnectionInfo();
+            LoadLoginInfo();
         }
     }
 }

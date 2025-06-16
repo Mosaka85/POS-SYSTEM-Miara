@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Miara.Forms;
+using System;
 using System.ComponentModel;
 using System.Data.SqlClient;
 using System.IO;
@@ -265,6 +266,16 @@ namespace Miara
         private void frmLogInPage_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void sQLConnectionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new frmConfigPassword().Show();
+        }
+
+        private void databaseSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new TableDefinition().Show();
         }
     }
 
