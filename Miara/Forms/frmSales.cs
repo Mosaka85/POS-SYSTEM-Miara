@@ -1688,7 +1688,7 @@ namespace Miara
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber).ShowDialog();
+           
         }
 
         private void txtdiscount_TextChanged(object sender, EventArgs e)
@@ -1957,6 +1957,11 @@ namespace Miara
                 int selectedCategoryID = (int)comboProductCategory.SelectedValue;
                 LoadProductsByCategory(selectedCategoryID);
             }
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            Hide();
         }
     }
 }

@@ -10,8 +10,9 @@
 
 namespace Miara.Properties {
     using System;
-    
-    
+    using System.Drawing;
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,7 +24,15 @@ namespace Miara.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+        internal static Image summary_icon;
+        internal static Image reports_icon;
+        internal static Image products_icon;
+        internal static Image refund_icon;
+        internal static Image register_icon;
+        internal static Image sale_icon;
+        internal static Image employee_icon;
+        internal static Image category_icon;
+        internal static Image logout_icon;
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;

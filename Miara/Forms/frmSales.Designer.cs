@@ -1,4 +1,7 @@
 ﻿
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace Miara
 {
     partial class frmSales
@@ -30,9 +33,9 @@ namespace Miara
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSales));
             this.lblNextSalesNumber = new System.Windows.Forms.Label();
             this.lblTotalAmount = new System.Windows.Forms.Label();
@@ -85,12 +88,16 @@ namespace Miara
             this.lblScan = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnReportSales = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSaleDetails)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblNextSalesNumber
@@ -220,7 +227,7 @@ namespace Miara
             // 
             this.txtdiscount.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtdiscount.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtdiscount.Location = new System.Drawing.Point(148, 396);
+            this.txtdiscount.Location = new System.Drawing.Point(165, 389);
             this.txtdiscount.Name = "txtdiscount";
             this.txtdiscount.Size = new System.Drawing.Size(76, 30);
             this.txtdiscount.TabIndex = 32;
@@ -231,7 +238,8 @@ namespace Miara
             // 
             this.lblDateTime.AutoSize = true;
             this.lblDateTime.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold);
-            this.lblDateTime.Location = new System.Drawing.Point(1386, 544);
+            this.lblDateTime.ForeColor = System.Drawing.Color.White;
+            this.lblDateTime.Location = new System.Drawing.Point(825, 76);
             this.lblDateTime.Name = "lblDateTime";
             this.lblDateTime.Size = new System.Drawing.Size(123, 24);
             this.lblDateTime.TabIndex = 33;
@@ -249,7 +257,8 @@ namespace Miara
             this.lblBusineess.BackColor = System.Drawing.Color.Transparent;
             this.lblBusineess.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.lblBusineess.Font = new System.Drawing.Font("Segoe Print", 28.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBusineess.Location = new System.Drawing.Point(478, 9);
+            this.lblBusineess.ForeColor = System.Drawing.Color.White;
+            this.lblBusineess.Location = new System.Drawing.Point(806, -17);
             this.lblBusineess.Name = "lblBusineess";
             this.lblBusineess.Size = new System.Drawing.Size(349, 84);
             this.lblBusineess.TabIndex = 34;
@@ -260,7 +269,8 @@ namespace Miara
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Segoe Print", 12.2F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(171, 77);
+            this.label2.ForeColor = System.Drawing.Color.White;
+            this.label2.Location = new System.Drawing.Point(180, 4);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 37);
             this.label2.TabIndex = 35;
@@ -452,7 +462,7 @@ namespace Miara
             this.comboProductCategory.Hint = "Select Product Category";
             this.comboProductCategory.IntegralHeight = false;
             this.comboProductCategory.ItemHeight = 43;
-            this.comboProductCategory.Location = new System.Drawing.Point(10, 133);
+            this.comboProductCategory.Location = new System.Drawing.Point(7, 143);
             this.comboProductCategory.MaxDropDownItems = 4;
             this.comboProductCategory.MouseState = MaterialSkin.MouseState.OUT;
             this.comboProductCategory.Name = "comboProductCategory";
@@ -476,7 +486,7 @@ namespace Miara
             this.comboBoxProducts.Hint = "Select Product";
             this.comboBoxProducts.IntegralHeight = false;
             this.comboBoxProducts.ItemHeight = 43;
-            this.comboBoxProducts.Location = new System.Drawing.Point(17, 236);
+            this.comboBoxProducts.Location = new System.Drawing.Point(12, 217);
             this.comboBoxProducts.MaxDropDownItems = 4;
             this.comboBoxProducts.MouseState = MaterialSkin.MouseState.OUT;
             this.comboBoxProducts.Name = "comboBoxProducts";
@@ -500,7 +510,7 @@ namespace Miara
             this.combopaymentmentod.Hint = "Select Payment Method";
             this.combopaymentmentod.IntegralHeight = false;
             this.combopaymentmentod.ItemHeight = 43;
-            this.combopaymentmentod.Location = new System.Drawing.Point(17, 458);
+            this.combopaymentmentod.Location = new System.Drawing.Point(12, 445);
             this.combopaymentmentod.MaxDropDownItems = 4;
             this.combopaymentmentod.MouseState = MaterialSkin.MouseState.OUT;
             this.combopaymentmentod.Name = "combopaymentmentod";
@@ -517,7 +527,7 @@ namespace Miara
             this.btnAddProduct.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.btnAddProduct.HighEmphasis = true;
             this.btnAddProduct.Icon = null;
-            this.btnAddProduct.Location = new System.Drawing.Point(330, 328);
+            this.btnAddProduct.Location = new System.Drawing.Point(325, 328);
             this.btnAddProduct.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnAddProduct.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnAddProduct.Name = "btnAddProduct";
@@ -548,83 +558,110 @@ namespace Miara
             this.txtQuantity.Text = "1";
             this.txtQuantity.TrailingIcon = null;
             // 
-            // Subtotal
-            // 
-            this.Subtotal.HeaderText = "Subtotal";
-            this.Subtotal.MinimumWidth = 6;
-            this.Subtotal.Name = "Subtotal";
-            // 
-            // Price
-            // 
-            this.Price.HeaderText = "Price";
-            this.Price.MinimumWidth = 6;
-            this.Price.Name = "Price";
-            // 
-            // Quantity
-            // 
-            this.Quantity.HeaderText = "Quantity";
-            this.Quantity.MinimumWidth = 6;
-            this.Quantity.Name = "Quantity";
-            // 
-            // ProductName
-            // 
-            this.ProductName.HeaderText = "ProductName";
-            this.ProductName.MinimumWidth = 6;
-            this.ProductName.Name = "ProductName";
-            // 
-            // ProductID
-            // 
-            this.ProductID.HeaderText = "ProductID";
-            this.ProductID.MinimumWidth = 6;
-            this.ProductID.Name = "ProductID";
-            // 
             // dataGridViewSaleDetails
             // 
-            this.dataGridViewSaleDetails.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridViewSaleDetails.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridViewSaleDetails.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridViewSaleDetails.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dataGridViewSaleDetails.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewSaleDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
-            this.dataGridViewSaleDetails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewSaleDetails.AllowUserToAddRows = false;
+            this.dataGridViewSaleDetails.AllowUserToResizeRows = false;
+            this.dataGridViewSaleDetails.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridViewSaleDetails.BackgroundColor = Color.White;
+            this.dataGridViewSaleDetails.BorderStyle = BorderStyle.None;
+            this.dataGridViewSaleDetails.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            this.dataGridViewSaleDetails.EnableHeadersVisualStyles = false;
+            this.dataGridViewSaleDetails.GridColor = Color.FromArgb(224, 224, 224);
+            this.dataGridViewSaleDetails.Location = new Point(648, 159);
+            this.dataGridViewSaleDetails.Name = "dataGridViewSaleDetails";
+            this.dataGridViewSaleDetails.ReadOnly = true;
+            this.dataGridViewSaleDetails.RowHeadersVisible = false;
+            this.dataGridViewSaleDetails.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            this.dataGridViewSaleDetails.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewSaleDetails.Size = new Size(965, 373);
+
+
+            // Column Header Style
+            DataGridViewCellStyle headerStyle = new DataGridViewCellStyle()
+            {
+                BackColor = Color.FromArgb(40, 116, 166),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold),
+                Padding = new Padding(5),
+                SelectionBackColor = Color.FromArgb(40, 116, 166),
+                SelectionForeColor = Color.White,
+                Alignment = DataGridViewContentAlignment.MiddleCenter
+            };
+            this.dataGridViewSaleDetails.ColumnHeadersDefaultCellStyle = headerStyle;
+            this.dataGridViewSaleDetails.ColumnHeadersHeight = 40;
+            this.dataGridViewSaleDetails.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dataGridViewSaleDetails.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
+            // Default Cell Style
+            DataGridViewCellStyle defaultCellStyle = new DataGridViewCellStyle()
+            {
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(64, 64, 64),
+                Font = new Font("Segoe UI", 10.8F, FontStyle.Regular),
+                Padding = new Padding(5),
+                SelectionBackColor = Color.FromArgb(229, 241, 251),
+                SelectionForeColor = Color.FromArgb(64, 64, 64),
+                Alignment = DataGridViewContentAlignment.MiddleLeft
+            };
+            this.dataGridViewSaleDetails.DefaultCellStyle = defaultCellStyle;
+
+            // Alternating Row Style
+            this.dataGridViewSaleDetails.AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle()
+            {
+                BackColor = Color.FromArgb(250, 250, 250)
+            };
+
+            // Row Template
+            this.dataGridViewSaleDetails.RowTemplate.Height = 35;
+            this.dataGridViewSaleDetails.RowTemplate.DefaultCellStyle.Padding = new Padding(5);
+
+            // Configure Columns
+            this.ProductID.HeaderText = "PRODUCT ID";
+            this.ProductID.MinimumWidth = 100;
+            this.ProductID.Name = "ProductID";
+            this.ProductID.ReadOnly = true;
+
+            this.ProductName.HeaderText = "PRODUCT NAME";
+            this.ProductName.MinimumWidth = 200;
+            this.ProductName.Name = "ProductName";
+            this.ProductName.ReadOnly = true;
+
+            this.Quantity.HeaderText = "QTY";
+            this.Quantity.MinimumWidth = 80;
+            this.Quantity.Name = "Quantity";
+
+            this.Price.HeaderText = "PRICE";
+            this.Price.MinimumWidth = 100;
+            this.Price.Name = "Price";
+
+
+            this.Subtotal.HeaderText = "SUBTOTAL";
+            this.Subtotal.MinimumWidth = 120;
+            this.Subtotal.Name = "Subtotal";
+            this.Subtotal.ReadOnly = true;
+
             this.dataGridViewSaleDetails.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ProductID,
-            this.ProductName,
-            this.Quantity,
-            this.Price,
-            this.Subtotal});
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewSaleDetails.DefaultCellStyle = dataGridViewCellStyle5;
-            this.dataGridViewSaleDetails.GridColor = System.Drawing.SystemColors.Control;
+    this.ProductID,
+    this.ProductName,
+    this.Quantity,
+    this.Price,
+    this.Subtotal});
+
+            // Row Style
+            this.dataGridViewSaleDetails.RowHeadersVisible = false;
+            this.dataGridViewSaleDetails.RowTemplate.Height = 35;
+            this.dataGridViewSaleDetails.RowTemplate.DefaultCellStyle.Padding = new System.Windows.Forms.Padding(5);
+
+            // Grid Settings
             this.dataGridViewSaleDetails.Location = new System.Drawing.Point(648, 159);
             this.dataGridViewSaleDetails.Name = "dataGridViewSaleDetails";
-            this.dataGridViewSaleDetails.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewSaleDetails.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-            this.dataGridViewSaleDetails.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridViewSaleDetails.RowTemplate.Height = 24;
+            this.dataGridViewSaleDetails.ReadOnly = true;
+            this.dataGridViewSaleDetails.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.dataGridViewSaleDetails.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewSaleDetails.Size = new System.Drawing.Size(965, 373);
             this.dataGridViewSaleDetails.TabIndex = 6;
+            this.dataGridViewSaleDetails.EnableHeadersVisualStyles = false;
             // 
             // txtBarcodeLabel
             // 
@@ -658,7 +695,7 @@ namespace Miara
             // pictureBox2
             // 
             this.pictureBox2.Image = global::Miara.Properties.Resources.MIARA_POS;
-            this.pictureBox2.Location = new System.Drawing.Point(-30, 0);
+            this.pictureBox2.Location = new System.Drawing.Point(0, 916);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(202, 127);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -678,9 +715,9 @@ namespace Miara
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(178, 0);
+            this.pictureBox1.Location = new System.Drawing.Point(0, 4);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(139, 74);
+            this.pictureBox1.Size = new System.Drawing.Size(174, 104);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 67;
             this.pictureBox1.TabStop = false;
@@ -699,6 +736,44 @@ namespace Miara
             this.btnReportSales.UseVisualStyleBackColor = false;
             this.btnReportSales.Click += new System.EventHandler(this.btnReportSales_Click);
             // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.panel2.Controls.Add(this.btnBack);
+            this.panel2.Controls.Add(this.lblBusineess);
+            this.panel2.Controls.Add(this.pictureBox1);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Controls.Add(this.lblDateTime);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1871, 111);
+            this.panel2.TabIndex = 69;
+            // 
+            // btnBack
+            // 
+            this.btnBack.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.btnBack.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.btnBack.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBack.ForeColor = System.Drawing.Color.White;
+            this.btnBack.Location = new System.Drawing.Point(1793, 4);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(75, 39);
+            this.btnBack.TabIndex = 1;
+            this.btnBack.Text = "X";
+            this.btnBack.UseVisualStyleBackColor = true;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.panel1.Location = new System.Drawing.Point(0, 1039);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1871, 45);
+            this.panel1.TabIndex = 70;
+            // 
             // frmSales
             // 
             this.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
@@ -707,10 +782,11 @@ namespace Miara
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1871, 1084);
             this.ControlBox = false;
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.btnReportSales);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.lblScan);
             this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.lblScan);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.txtQuantity);
             this.Controls.Add(this.btnAddProduct);
@@ -728,9 +804,6 @@ namespace Miara
             this.Controls.Add(this.btnVoidLine);
             this.Controls.Add(this.txtRecipientEmail);
             this.Controls.Add(this.checkEmail);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.lblBusineess);
-            this.Controls.Add(this.lblDateTime);
             this.Controls.Add(this.txtdiscount);
             this.Controls.Add(this.lbldiscountvalue);
             this.Controls.Add(this.btnCalculatechange);
@@ -759,6 +832,8 @@ namespace Miara
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -816,5 +891,8 @@ namespace Miara
         private System.Windows.Forms.Label lblScan;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button btnReportSales;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnBack;
+        private System.Windows.Forms.Panel panel1;
     }
 }

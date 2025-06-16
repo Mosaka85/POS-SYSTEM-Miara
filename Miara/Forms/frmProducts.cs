@@ -414,5 +414,15 @@ namespace Miara
         {
 
         }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            Hide();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }

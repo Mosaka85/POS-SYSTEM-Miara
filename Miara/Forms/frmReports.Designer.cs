@@ -164,7 +164,7 @@ namespace Miara
             // 
             this.lblDatalabel.AutoSize = true;
             this.lblDatalabel.Font = new System.Drawing.Font("Bahnschrift Condensed", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDatalabel.Location = new System.Drawing.Point(432, 44);
+            this.lblDatalabel.Location = new System.Drawing.Point(449, -1);
             this.lblDatalabel.Name = "lblDatalabel";
             this.lblDatalabel.Size = new System.Drawing.Size(377, 72);
             this.lblDatalabel.TabIndex = 7;

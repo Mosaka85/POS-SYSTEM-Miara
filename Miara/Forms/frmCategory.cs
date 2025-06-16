@@ -82,12 +82,12 @@ namespace Miara
                 MessageBox.Show($"Error loading categories: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private async void btnaddCategory_Click(object sender, EventArgs e)
         {
             if (!ValidateCategoryInputs())
             {
-                MessageBox.Show("Please fill in all category details.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please fill in all category details.", "Validation Error",
+                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -97,33 +97,72 @@ namespace Miara
                 string description = txtCategoryDescription.Text.Trim();
                 bool isActive = chkCategoryIsActive.Checked;
 
-                string query = @"INSERT INTO [Categories] 
-                                ([CategoryName], [Description], [IsActive]) 
-                                VALUES (@CategoryName, @Description, @IsActive)";
+                // First check if category already exists
+                string checkQuery = @"SELECT COUNT(*) FROM [Categories] 
+                            WHERE [CategoryName] = @CategoryName";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     await conn.OpenAsync();
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryName", categoryName);
-                        cmd.Parameters.AddWithValue("@Description", description);
-                        cmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
 
-                        await cmd.ExecuteNonQueryAsync();
-                        MessageBox.Show("Category added successfully!");
+                    // Check for existing category
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@CategoryName", categoryName);
+                        int existingCount = (int)await checkCmd.ExecuteScalarAsync();
+
+                        if (existingCount > 0)
+                        {
+                            MessageBox.Show("Category already exists. Please use a different name.",
+                                          "Duplicate Category",
+                                          MessageBoxButtons.OK,
+                                          MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+
+                    // If we get here, category doesn't exist - proceed with insert
+                    string insertQuery = @"INSERT INTO [Categories] 
+                                 ([CategoryName], [Description], [IsActive]) 
+                                 VALUES (@CategoryName, @Description, @IsActive)";
+
+                    using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                    {
+                        insertCmd.Parameters.AddWithValue("@CategoryName", categoryName);
+                        insertCmd.Parameters.AddWithValue("@Description", description);
+                        insertCmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
+
+                        await insertCmd.ExecuteNonQueryAsync();
+                        MessageBox.Show("Category added successfully!",
+                                      "Success",
+                                      MessageBoxButtons.OK,
+                                      MessageBoxIcon.Information);
+
+                        // Clear inputs
+                        txtCategoryName.Text = "";
+                        txtCategoryDescription.Text = "";
+                        chkCategoryIsActive.Checked = true;
 
                         // Reload categories to update the grid
                         await LoadCategoriesAsync();
                     }
                 }
             }
+            catch (SqlException sqlEx)
+            {
+                MessageBox.Show($"Database error: {sqlEx.Message}",
+                              "Database Error",
+                              MessageBoxButtons.OK,
+                              MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding category: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error adding category: {ex.Message}",
+                              "Error",
+                              MessageBoxButtons.OK,
+                              MessageBoxIcon.Error);
             }
         }
-
         private async void btnCategoryUpdate_Click(object sender, EventArgs e)
         {
             if (dataGridView2.SelectedRows.Count == 0)
@@ -209,6 +248,25 @@ namespace Miara
         {
             return !string.IsNullOrEmpty(txtCategoryName.Text) &&
                    !string.IsNullOrEmpty(txtCategoryDescription.Text);
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Hide();
+
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            Hide();
+            
+        }
+
+        private void btnNewCate_Click(object sender, EventArgs e)
+        {
+            txtCategoryName.Text = "";
+            txtCategoryDescription.Text = "";
+            chkCategoryIsActive.Checked = true;
         }
     }
 }

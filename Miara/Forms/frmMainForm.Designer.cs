@@ -30,198 +30,301 @@ namespace Miara
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMainForm));
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
-            this.btnCategoryCatalog = new System.Windows.Forms.Button();
-            this.lblBusineess = new System.Windows.Forms.Label();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.flowLayoutPanel1.SuspendLayout();
-            this.flowLayoutPanel2.SuspendLayout();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.button9 = new System.Windows.Forms.Button();
+            this.lblUser = new System.Windows.Forms.Label();
+            this.lblRole = new System.Windows.Forms.Label();
+            this.button11 = new System.Windows.Forms.Button();
+            this.button12 = new System.Windows.Forms.Button();
+            this.btnSalesHistory = new System.Windows.Forms.Button();
+            this.button13 = new System.Windows.Forms.Button();
+            this.btnBrand = new System.Windows.Forms.Button();
+            this.button14 = new System.Windows.Forms.Button();
+            this.btnStock = new System.Windows.Forms.Button();
+            this.btnVendor = new System.Windows.Forms.Button();
+            this.lblName = new System.Windows.Forms.Label();
+            this.btnProduct = new System.Windows.Forms.Button();
+            this.button15 = new System.Windows.Forms.Button();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
-            // button1
+            // panel2
             // 
-            this.button1.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(3, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(391, 143);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Start New Sale";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.panel2.Controls.Add(this.pictureBox1);
+            this.panel2.Controls.Add(this.button9);
+            this.panel2.Controls.Add(this.lblUser);
+            this.panel2.Controls.Add(this.lblRole);
+            this.panel2.Controls.Add(this.button11);
+            this.panel2.Controls.Add(this.button12);
+            this.panel2.Controls.Add(this.btnSalesHistory);
+            this.panel2.Controls.Add(this.button13);
+            this.panel2.Controls.Add(this.btnBrand);
+            this.panel2.Controls.Add(this.button14);
+            this.panel2.Controls.Add(this.btnStock);
+            this.panel2.Controls.Add(this.btnVendor);
+            this.panel2.Controls.Add(this.lblName);
+            this.panel2.Controls.Add(this.btnProduct);
+            this.panel2.Controls.Add(this.button15);
+            this.panel2.Location = new System.Drawing.Point(3, 2);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(344, 1246);
+            this.panel2.TabIndex = 40;
             // 
-            // button2
+            // pictureBox1
             // 
-            this.button2.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(3, 152);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(391, 135);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "View Reports";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(65, -2);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(193, 111);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 15;
+            this.pictureBox1.TabStop = false;
             // 
-            // button3
+            // button9
             // 
-            this.button3.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(3, 293);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(391, 137);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "Sales Summary";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            this.button9.AutoSize = true;
+            this.button9.FlatAppearance.BorderSize = 0;
+            this.button9.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button9.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button9.ForeColor = System.Drawing.Color.White;
+            this.button9.Image = ((System.Drawing.Image)(resources.GetObject("button9.Image")));
+            this.button9.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button9.Location = new System.Drawing.Point(0, 902);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(344, 33);
+            this.button9.TabIndex = 11;
+            this.button9.Text = "Log Out";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
-            // button4
+            // lblUser
             // 
-            this.button4.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button4.Location = new System.Drawing.Point(3, 436);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(391, 143);
-            this.button4.TabIndex = 3;
-            this.button4.Text = "Product Catalog";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.lblUser.AutoSize = true;
+            this.lblUser.Location = new System.Drawing.Point(198, 8);
+            this.lblUser.Name = "lblUser";
+            this.lblUser.Size = new System.Drawing.Size(44, 16);
+            this.lblUser.TabIndex = 14;
+            this.lblUser.Text = "label1";
+            this.lblUser.Visible = false;
+            this.lblUser.Click += new System.EventHandler(this.lblUser_Click);
             // 
-            // button5
+            // lblRole
             // 
-            this.button5.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button5.Location = new System.Drawing.Point(3, 3);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(405, 123);
-            this.button5.TabIndex = 4;
-            this.button5.Text = "Refunds/Returns";
-            this.button5.UseVisualStyleBackColor = true;
+            this.lblRole.BackColor = System.Drawing.Color.Transparent;
+            this.lblRole.Font = new System.Drawing.Font("Franklin Gothic Medium", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblRole.ForeColor = System.Drawing.Color.White;
+            this.lblRole.Location = new System.Drawing.Point(44, 164);
+            this.lblRole.Name = "lblRole";
+            this.lblRole.Size = new System.Drawing.Size(237, 23);
+            this.lblRole.TabIndex = 2;
+            this.lblRole.Text = "Administrator";
+            this.lblRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // button6
+            // button11
             // 
-            this.button6.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button6.Location = new System.Drawing.Point(3, 251);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(405, 116);
-            this.button6.TabIndex = 5;
-            this.button6.Text = "Employee Maintenance";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
+            this.button11.FlatAppearance.BorderSize = 0;
+            this.button11.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button11.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button11.ForeColor = System.Drawing.Color.White;
+            this.button11.Image = ((System.Drawing.Image)(resources.GetObject("button11.Image")));
+            this.button11.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button11.Location = new System.Drawing.Point(6, 838);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(341, 35);
+            this.button11.TabIndex = 10;
+            this.button11.Text = "User Settings";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
-            // button7
+            // button12
             // 
-            this.button7.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button7.Location = new System.Drawing.Point(3, 487);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(405, 104);
-            this.button7.TabIndex = 6;
-            this.button7.Text = "Logout";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
+            this.button12.FlatAppearance.BorderSize = 0;
+            this.button12.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button12.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button12.ForeColor = System.Drawing.Color.White;
+            this.button12.Image = ((System.Drawing.Image)(resources.GetObject("button12.Image")));
+            this.button12.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button12.Location = new System.Drawing.Point(3, 765);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(344, 35);
+            this.button12.TabIndex = 9;
+            this.button12.Text = "Store Settings";
+            this.button12.UseVisualStyleBackColor = true;
             // 
-            // button8
+            // btnSalesHistory
             // 
-            this.button8.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button8.Location = new System.Drawing.Point(3, 132);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(405, 113);
-            this.button8.TabIndex = 7;
-            this.button8.Text = "End Of Day (Close Registrar)";
-            this.button8.UseVisualStyleBackColor = true;
+            this.btnSalesHistory.FlatAppearance.BorderSize = 0;
+            this.btnSalesHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalesHistory.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSalesHistory.ForeColor = System.Drawing.Color.White;
+            this.btnSalesHistory.Image = ((System.Drawing.Image)(resources.GetObject("btnSalesHistory.Image")));
+            this.btnSalesHistory.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSalesHistory.Location = new System.Drawing.Point(0, 702);
+            this.btnSalesHistory.Name = "btnSalesHistory";
+            this.btnSalesHistory.Size = new System.Drawing.Size(347, 35);
+            this.btnSalesHistory.TabIndex = 8;
+            this.btnSalesHistory.Text = "Sales History";
+            this.btnSalesHistory.UseVisualStyleBackColor = true;
+            this.btnSalesHistory.Click += new System.EventHandler(this.btnSalesHistory_Click);
             // 
-            // btnCategoryCatalog
+            // button13
             // 
-            this.btnCategoryCatalog.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCategoryCatalog.Location = new System.Drawing.Point(3, 373);
-            this.btnCategoryCatalog.Name = "btnCategoryCatalog";
-            this.btnCategoryCatalog.Size = new System.Drawing.Size(405, 108);
-            this.btnCategoryCatalog.TabIndex = 9;
-            this.btnCategoryCatalog.Text = "Category Catalog";
-            this.btnCategoryCatalog.UseVisualStyleBackColor = true;
-            this.btnCategoryCatalog.Click += new System.EventHandler(this.btnCategoryCatalog_Click);
+            this.button13.FlatAppearance.BorderSize = 0;
+            this.button13.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button13.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button13.ForeColor = System.Drawing.Color.White;
+            this.button13.Image = ((System.Drawing.Image)(resources.GetObject("button13.Image")));
+            this.button13.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button13.Location = new System.Drawing.Point(-3, 640);
+            this.button13.Name = "button13";
+            this.button13.Size = new System.Drawing.Size(347, 35);
+            this.button13.TabIndex = 8;
+            this.button13.Text = "Records";
+            this.button13.UseVisualStyleBackColor = true;
+            this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
-            // lblBusineess
+            // btnBrand
             // 
-            this.lblBusineess.AutoSize = true;
-            this.lblBusineess.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lblBusineess.Font = new System.Drawing.Font("Segoe UI", 72F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblBusineess.Location = new System.Drawing.Point(590, 9);
-            this.lblBusineess.Name = "lblBusineess";
-            this.lblBusineess.Size = new System.Drawing.Size(751, 161);
-            this.lblBusineess.TabIndex = 35;
-            this.lblBusineess.Text = "Point Of Sale";
+            this.btnBrand.FlatAppearance.BorderSize = 0;
+            this.btnBrand.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrand.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBrand.ForeColor = System.Drawing.Color.White;
+            this.btnBrand.Image = ((System.Drawing.Image)(resources.GetObject("btnBrand.Image")));
+            this.btnBrand.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnBrand.Location = new System.Drawing.Point(-3, 581);
+            this.btnBrand.Name = "btnBrand";
+            this.btnBrand.Size = new System.Drawing.Size(338, 35);
+            this.btnBrand.TabIndex = 7;
+            this.btnBrand.Text = "Manage Brand";
+            this.btnBrand.UseVisualStyleBackColor = true;
             // 
-            // flowLayoutPanel1
+            // button14
             // 
-            this.flowLayoutPanel1.Controls.Add(this.button1);
-            this.flowLayoutPanel1.Controls.Add(this.button2);
-            this.flowLayoutPanel1.Controls.Add(this.button3);
-            this.flowLayoutPanel1.Controls.Add(this.button4);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(618, 197);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(394, 594);
-            this.flowLayoutPanel1.TabIndex = 36;
+            this.button14.FlatAppearance.BorderSize = 0;
+            this.button14.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button14.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button14.ForeColor = System.Drawing.Color.White;
+            this.button14.Image = ((System.Drawing.Image)(resources.GetObject("button14.Image")));
+            this.button14.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button14.Location = new System.Drawing.Point(0, 515);
+            this.button14.Name = "button14";
+            this.button14.Size = new System.Drawing.Size(344, 35);
+            this.button14.TabIndex = 6;
+            this.button14.Text = "Manage Category";
+            this.button14.UseVisualStyleBackColor = true;
+            this.button14.Click += new System.EventHandler(this.button14_Click);
             // 
-            // flowLayoutPanel2
+            // btnStock
             // 
-            this.flowLayoutPanel2.Controls.Add(this.button5);
-            this.flowLayoutPanel2.Controls.Add(this.button8);
-            this.flowLayoutPanel2.Controls.Add(this.button6);
-            this.flowLayoutPanel2.Controls.Add(this.btnCategoryCatalog);
-            this.flowLayoutPanel2.Controls.Add(this.button7);
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(1484, 159);
-            this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(408, 591);
-            this.flowLayoutPanel2.TabIndex = 37;
+            this.btnStock.FlatAppearance.BorderSize = 0;
+            this.btnStock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStock.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStock.ForeColor = System.Drawing.Color.White;
+            this.btnStock.Image = ((System.Drawing.Image)(resources.GetObject("btnStock.Image")));
+            this.btnStock.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStock.Location = new System.Drawing.Point(0, 450);
+            this.btnStock.Name = "btnStock";
+            this.btnStock.Size = new System.Drawing.Size(341, 35);
+            this.btnStock.TabIndex = 12;
+            this.btnStock.Text = "Stock Entry";
+            this.btnStock.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // btnVendor
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(819, 171);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 23);
-            this.label1.TabIndex = 38;
-            this.label1.Text = "label1";
+            this.btnVendor.FlatAppearance.BorderSize = 0;
+            this.btnVendor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnVendor.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnVendor.ForeColor = System.Drawing.Color.White;
+            this.btnVendor.Image = ((System.Drawing.Image)(resources.GetObject("btnVendor.Image")));
+            this.btnVendor.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnVendor.Location = new System.Drawing.Point(3, 385);
+            this.btnVendor.Name = "btnVendor";
+            this.btnVendor.Size = new System.Drawing.Size(341, 35);
+            this.btnVendor.TabIndex = 12;
+            this.btnVendor.Text = " Vendor";
+            this.btnVendor.UseVisualStyleBackColor = true;
+            // 
+            // lblName
+            // 
+            this.lblName.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(20)))), ((int)(((byte)(158)))), ((int)(((byte)(132)))));
+            this.lblName.Location = new System.Drawing.Point(92, 121);
+            this.lblName.Name = "lblName";
+            this.lblName.Size = new System.Drawing.Size(150, 29);
+            this.lblName.TabIndex = 1;
+            this.lblName.Text = "User Name";
+            this.lblName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblName.Click += new System.EventHandler(this.lblName_Click);
+            // 
+            // btnProduct
+            // 
+            this.btnProduct.FlatAppearance.BorderSize = 0;
+            this.btnProduct.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnProduct.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnProduct.ForeColor = System.Drawing.Color.White;
+            this.btnProduct.Image = ((System.Drawing.Image)(resources.GetObject("btnProduct.Image")));
+            this.btnProduct.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnProduct.Location = new System.Drawing.Point(6, 321);
+            this.btnProduct.Name = "btnProduct";
+            this.btnProduct.Size = new System.Drawing.Size(341, 35);
+            this.btnProduct.TabIndex = 5;
+            this.btnProduct.Text = "Manage Products";
+            this.btnProduct.UseVisualStyleBackColor = true;
+            this.btnProduct.Click += new System.EventHandler(this.btnProduct_Click);
+            // 
+            // button15
+            // 
+            this.button15.FlatAppearance.BorderSize = 0;
+            this.button15.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button15.Font = new System.Drawing.Font("Bahnschrift", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button15.ForeColor = System.Drawing.Color.White;
+            this.button15.Image = ((System.Drawing.Image)(resources.GetObject("button15.Image")));
+            this.button15.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button15.Location = new System.Drawing.Point(9, 244);
+            this.button15.Name = "button15";
+            this.button15.Size = new System.Drawing.Size(341, 35);
+            this.button15.TabIndex = 3;
+            this.button15.Text = "POS";
+            this.button15.UseVisualStyleBackColor = true;
+            this.button15.Click += new System.EventHandler(this.button15_Click);
             // 
             // frmMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2013, 872);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.flowLayoutPanel2);
-            this.Controls.Add(this.flowLayoutPanel1);
-            this.Controls.Add(this.lblBusineess);
+            this.ClientSize = new System.Drawing.Size(2013, 1178);
+            this.Controls.Add(this.panel2);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmMainForm";
             this.Text = " ";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.frmMainForm_Load);
-            this.flowLayoutPanel1.ResumeLayout(false);
-            this.flowLayoutPanel2.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button btnCategoryCatalog;
-        private System.Windows.Forms.Label lblBusineess;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button button9;
+        public System.Windows.Forms.Label lblUser;
+        public System.Windows.Forms.Label lblRole;
+        private System.Windows.Forms.Button button11;
+        private System.Windows.Forms.Button button12;
+        private System.Windows.Forms.Button btnSalesHistory;
+        private System.Windows.Forms.Button button13;
+        private System.Windows.Forms.Button btnBrand;
+        private System.Windows.Forms.Button button14;
+        private System.Windows.Forms.Button btnStock;
+        private System.Windows.Forms.Button btnVendor;
+        public System.Windows.Forms.Label lblName;
+        private System.Windows.Forms.Button btnProduct;
+        private System.Windows.Forms.Button button15;
     }
 }

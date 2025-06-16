@@ -110,7 +110,7 @@ namespace Miara.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(935, 337);
+            this.ClientSize = new System.Drawing.Size(1032, 358);
             this.Controls.Add(this.txtNotes);
             this.Controls.Add(this.lblSaleID);
             this.Controls.Add(this.btnCashback);

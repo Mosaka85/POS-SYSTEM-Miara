@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
@@ -66,6 +67,7 @@ namespace Miara.Forms
             {
                 ProcessTableDefinitions();
                 InsertSampleData();
+                CreateSendReceiptEmailStoredProcedure();
             }
             catch (Exception ex)
             {
@@ -660,7 +662,7 @@ namespace Miara.Forms
                 InsertEmployee(
                     firstName: "Karabo",
                     surname: "Peteke",
-                    department: "IT",  // Fixed from "System.Data.DataRowView"
+                    department: "IT",  
                     role: "Marketing Specialist",
                     username: "1",
                     passwordHash: "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
@@ -811,7 +813,9 @@ namespace Miara.Forms
                 var xml = XElement.Load(XmlPath);
                 using (var conn = new SqlConnection(connectionString))
                 {
+                    CheckSendReceiptEmailStoredProcedure();
                     conn.Open();
+
                     foreach (var table in xml.Elements("Table"))
                     {
                         string tableName = table.Attribute("name")?.Value;
@@ -819,6 +823,7 @@ namespace Miara.Forms
                         if (!string.IsNullOrEmpty(tableName))
                         {
                             CheckTableStructure(conn, table, schema, tableName);
+                            
                         }
                     }
                 }
@@ -1078,5 +1083,95 @@ namespace Miara.Forms
                 }
             }
         }
+
+
+        public void CreateSendReceiptEmailStoredProcedure()
+        {
+            string sql = @"
+    IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'SendReceiptEmail')
+    BEGIN
+        EXEC('
+        CREATE PROCEDURE [dbo].[SendReceiptEmail]
+            @receiptContent NVARCHAR(MAX),
+            @toEmail NVARCHAR(255)
+        AS
+        BEGIN
+            SET NOCOUNT ON;
+            
+            BEGIN TRY
+                EXEC msdb.dbo.sp_send_dbmail
+                    @profile_name = ''Miara POS'',  
+                    @recipients = @toEmail,
+                    @subject = ''Receipt from MIARA TRADING PTY LTD'',
+                    @body = @receiptContent,
+                    @body_format = ''HTML'';  
+                    
+                RETURN 0; -- Success
+            END TRY
+            BEGIN CATCH
+                DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+                RAISERROR(@ErrorMessage, 16, 1);
+                RETURN -1; -- Error
+            END CATCH
+        END
+        ')
+    END";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    try
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        LogToGrid("Mail Procedure", $"✅ Mail Procedure   created successfully.");
+                    }
+                    catch (Exception ex)
+                    {
+                        LogToGrid("Mail Procedure", $"❌ Error creating Mail Procedure: {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+        }
+
+
+
+
+        public void CheckSendReceiptEmailStoredProcedure()
+        {
+            string sql = @"
+        SELECT 1 
+        FROM sys.objects 
+        WHERE type = 'P' AND name = 'SendReceiptEmail'";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    try
+                    {
+                        connection.Open();
+                        object result = command.ExecuteScalar();
+
+                        if (result != null)
+                        {
+                            LogToGrid("Mail Procedure", "✅ 'SendReceiptEmail' procedure exists.");
+                        }
+                        else
+                        {
+                            LogToGrid("Mail Procedure", "❌ 'SendReceiptEmail' procedure does not exist.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogToGrid("Mail Procedure", $"❌ Error checking Mail Procedure: {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+        }
+
     }
 }
