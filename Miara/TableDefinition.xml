@@ -184,6 +184,17 @@
 			<Column name="SaleID" order="ASC" />
 		</PrimaryKey>
 	</Table>
+	<Table name="ImageStore" schema="dbo">
+		<Column name="ImageID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="ImageName" type="nvarchar" length="100" isNullable="true" />
+		<Column name="ImageData" type="varbinary(max)" isNullable="true" />
+		<Column name="EmployeeID" type="int" isNullable="true" />
+		<Column name="IsActive" type="bit" isNullable="true" />
+		<Column name="Date" type="datetime" isNullable="true" />
+		<PrimaryKey>
+			<Column name="ImageID" order="ASC" />
+		</PrimaryKey>
+	</Table>
 
 	<Table name="PaymentMethods" schema="dbo">
 		<Column name="PaymentMethodID" type="int" isIdentity="true" isNullable="false" />

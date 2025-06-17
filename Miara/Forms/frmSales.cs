@@ -1,4 +1,6 @@
 ﻿using Miara.Forms;
+using Microsoft.Reporting.WebForms;
+using Microsoft.Reporting.WinForms;
 using Microsoft.VisualBasic;
 using System;
 using System.Data;
@@ -13,10 +15,9 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using Microsoft.Reporting.WinForms;
-using Microsoft.Reporting.WebForms;
 using WECPOFLogic;
 
 namespace Miara
@@ -791,19 +792,23 @@ namespace Miara
 
         public string ReceivedValue { get; set; }
 
-        private void frmSales_Load(object sender, EventArgs e)
+        private async void frmSales_Load(object sender, EventArgs e)
         {
             DeleteCouponRedemptionBySaleId(nextSaleIdn);
 
+       
+            await LoadEmployeeImageAsync(EMployeeNumber);
 
+          
             foreach (Control control in this.Controls)
             {
-                if (control is TextBox)
+                if (control is TextBox textBox)
                 {
-                    control.Enter += TextBox_Enter;
+                    textBox.Enter += TextBox_Enter;
                 }
             }
         }
+
         private void LogReceiptData()
         {
             try
@@ -1963,6 +1968,49 @@ namespace Miara
         {
             Hide();
         }
+
+
+        private async Task LoadEmployeeImageAsync(int employeeId)
+        {
+            pictureBox1.Image = null;
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = @"
+                SELECT TOP 1 ImageData 
+                FROM ImageStore 
+                WHERE EmployeeID = @empId AND IsActive = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@empId", employeeId);
+                        await conn.OpenAsync();
+
+                        var result = await cmd.ExecuteScalarAsync();
+
+                        if (result != null && result != DBNull.Value)
+                        {
+                            byte[] imgData = (byte[])result;
+                            using (MemoryStream ms = new MemoryStream(imgData))
+                            {
+                                pictureBox1.Image = Image.FromStream(ms);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("No active image found for this employee.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading image: " + ex.Message);
+            }
+        }
+
     }
 }
 

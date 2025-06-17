@@ -34,6 +34,7 @@ namespace Miara
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sQLConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.databaseSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.txtEmployeePassword = new System.Windows.Forms.TextBox();
@@ -44,18 +45,17 @@ namespace Miara
             this.button2 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.btnFogortPassword = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.databaseSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.contextMenuStrip1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.flowLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,7 +69,7 @@ namespace Miara
             this.aboutToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(211, 80);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(174, 52);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // configurationToolStripMenuItem
@@ -79,27 +79,37 @@ namespace Miara
             this.sQLConnectionToolStripMenuItem,
             this.databaseSetupToolStripMenuItem});
             this.configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
-            this.configurationToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.configurationToolStripMenuItem.Size = new System.Drawing.Size(173, 24);
             this.configurationToolStripMenuItem.Text = "configuration";
             this.configurationToolStripMenuItem.Click += new System.EventHandler(this.configurationToolStripMenuItem_Click);
             // 
             // sQLConnectionToolStripMenuItem
             // 
             this.sQLConnectionToolStripMenuItem.Name = "sQLConnectionToolStripMenuItem";
-            this.sQLConnectionToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.sQLConnectionToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
             this.sQLConnectionToolStripMenuItem.Text = "SQL Connection";
             this.sQLConnectionToolStripMenuItem.Click += new System.EventHandler(this.sQLConnectionToolStripMenuItem_Click);
+            // 
+            // databaseSetupToolStripMenuItem
+            // 
+            this.databaseSetupToolStripMenuItem.Name = "databaseSetupToolStripMenuItem";
+            this.databaseSetupToolStripMenuItem.Size = new System.Drawing.Size(202, 26);
+            this.databaseSetupToolStripMenuItem.Text = "Database Setup";
+            this.databaseSetupToolStripMenuItem.Click += new System.EventHandler(this.databaseSetupToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(173, 24);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // button1
             // 
-            this.button1.BackColor = System.Drawing.Color.LightCoral;
+            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.button1.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+            this.button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+            this.button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button1.Location = new System.Drawing.Point(632, 280);
             this.button1.Name = "button1";
@@ -141,7 +151,7 @@ namespace Miara
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Cambria", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Firebrick;
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
             this.label1.Location = new System.Drawing.Point(393, 120);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(107, 23);
@@ -153,7 +163,7 @@ namespace Miara
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Cambria", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.Firebrick;
+            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
             this.label2.Location = new System.Drawing.Point(393, 180);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(99, 23);
@@ -174,7 +184,10 @@ namespace Miara
             // 
             // button2
             // 
-            this.button2.BackColor = System.Drawing.Color.LightCoral;
+            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.button2.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+            this.button2.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+            this.button2.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button2.Location = new System.Drawing.Point(397, 280);
             this.button2.Name = "button2";
@@ -190,7 +203,7 @@ namespace Miara
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Transparent;
             this.label3.Font = new System.Drawing.Font("Cambria", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.Firebrick;
+            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
             this.label3.Location = new System.Drawing.Point(500, 54);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(103, 33);
@@ -207,6 +220,16 @@ namespace Miara
             this.flowLayoutPanel1.Size = new System.Drawing.Size(351, 40);
             this.flowLayoutPanel1.TabIndex = 10;
             // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pictureBox2.Location = new System.Drawing.Point(3, 3);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(39, 33);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox2.TabIndex = 0;
+            this.pictureBox2.TabStop = false;
+            // 
             // flowLayoutPanel2
             // 
             this.flowLayoutPanel2.Controls.Add(this.pictureBox3);
@@ -215,30 +238,6 @@ namespace Miara
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(351, 42);
             this.flowLayoutPanel2.TabIndex = 11;
-            // 
-            // btnFogortPassword
-            // 
-            this.btnFogortPassword.FlatAppearance.BorderColor = System.Drawing.Color.MistyRose;
-            this.btnFogortPassword.FlatAppearance.MouseDownBackColor = System.Drawing.Color.MistyRose;
-            this.btnFogortPassword.FlatAppearance.MouseOverBackColor = System.Drawing.Color.MistyRose;
-            this.btnFogortPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnFogortPassword.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnFogortPassword.ForeColor = System.Drawing.Color.Firebrick;
-            this.btnFogortPassword.Location = new System.Drawing.Point(388, 247);
-            this.btnFogortPassword.Name = "btnFogortPassword";
-            this.btnFogortPassword.Size = new System.Drawing.Size(131, 27);
-            this.btnFogortPassword.TabIndex = 12;
-            this.btnFogortPassword.Text = "Fogort Password";
-            this.toolTip1.SetToolTip(this.btnFogortPassword, "Click here to reset the password");
-            this.btnFogortPassword.UseVisualStyleBackColor = true;
-            this.btnFogortPassword.Click += new System.EventHandler(this.btnFogortPassword_Click);
-            // 
-            // databaseSetupToolStripMenuItem
-            // 
-            this.databaseSetupToolStripMenuItem.Name = "databaseSetupToolStripMenuItem";
-            this.databaseSetupToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            this.databaseSetupToolStripMenuItem.Text = "Database Setup";
-            this.databaseSetupToolStripMenuItem.Click += new System.EventHandler(this.databaseSetupToolStripMenuItem_Click);
             // 
             // pictureBox3
             // 
@@ -250,21 +249,27 @@ namespace Miara
             this.pictureBox3.TabIndex = 4;
             this.pictureBox3.TabStop = false;
             // 
-            // pictureBox2
+            // btnFogortPassword
             // 
-            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(39, 33);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox2.TabIndex = 0;
-            this.pictureBox2.TabStop = false;
+            this.btnFogortPassword.FlatAppearance.BorderColor = System.Drawing.Color.MistyRose;
+            this.btnFogortPassword.FlatAppearance.MouseDownBackColor = System.Drawing.Color.MistyRose;
+            this.btnFogortPassword.FlatAppearance.MouseOverBackColor = System.Drawing.Color.MistyRose;
+            this.btnFogortPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFogortPassword.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnFogortPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.btnFogortPassword.Location = new System.Drawing.Point(388, 247);
+            this.btnFogortPassword.Name = "btnFogortPassword";
+            this.btnFogortPassword.Size = new System.Drawing.Size(131, 27);
+            this.btnFogortPassword.TabIndex = 12;
+            this.btnFogortPassword.Text = "Fogort Password";
+            this.toolTip1.SetToolTip(this.btnFogortPassword, "Click here to reset the password");
+            this.btnFogortPassword.UseVisualStyleBackColor = true;
+            this.btnFogortPassword.Click += new System.EventHandler(this.btnFogortPassword_Click);
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.LavenderBlush;
+            this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(1, -2);
             this.pictureBox1.Name = "pictureBox1";
@@ -277,7 +282,7 @@ namespace Miara
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.MistyRose;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
             this.ClientSize = new System.Drawing.Size(774, 364);
             this.Controls.Add(this.btnFogortPassword);
             this.Controls.Add(this.flowLayoutPanel2);
@@ -298,10 +303,10 @@ namespace Miara
             this.contextMenuStrip1.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.flowLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

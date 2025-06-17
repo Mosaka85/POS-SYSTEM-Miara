@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,11 +17,16 @@ namespace Miara
         private string connectionString;
         private DataView employeeDataView;
         private DataTable employeeDataTable;
+        private string NameUser;
+        private string SurnameUSer;
+        private int EmployeeID;
 
-        public frmEmployeeDetails()
+        public frmEmployeeDetails(string firstName, string surname, int EMID)
         {
             InitializeComponent();
-
+            NameUser = firstName;
+            SurnameUSer = surname;
+            EmployeeID = EMID;
         }
 
         private void LoadSQLConnectionInfo()
@@ -495,6 +502,128 @@ namespace Miara
         private void button1_Click(object sender, EventArgs e)
         {
             Application.Restart();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            UploadImageForEmployee(EmployeeID);
+        }
+
+        private void UploadImageForEmployee(int employeeId)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    // Create thumbnail (e.g., max 300px width/height)
+                    Image originalImage = Image.FromFile(ofd.FileName);
+                    Image thumbnail = CreateThumbnail(originalImage, 300);
+
+                    // Convert thumbnail to byte array
+                    byte[] imageData;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // Save in JPEG format with 80% quality (adjust as needed)
+                        var encoderParams = new EncoderParameters(1);
+                        encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
+
+                        ImageCodecInfo jpegCodec = GetEncoderInfo("image/jpeg");
+                        thumbnail.Save(ms, jpegCodec, encoderParams);
+                        imageData = ms.ToArray();
+                    }
+
+                    string fileName = Path.GetFileName(ofd.FileName);
+
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        SqlTransaction transaction = conn.BeginTransaction();
+
+                        try
+                        {
+                            // Step 1: Deactivate old images
+                            string deactivateQuery = @"
+                        UPDATE ImageStore 
+                        SET IsActive = 0 
+                        WHERE EmployeeID = @empId AND IsActive = 1";
+
+                            SqlCommand deactivateCmd = new SqlCommand(deactivateQuery, conn, transaction);
+                            deactivateCmd.Parameters.AddWithValue("@empId", employeeId);
+                            deactivateCmd.ExecuteNonQuery();
+
+                            // Step 2: Insert new image
+                            string insertQuery = @"
+                        INSERT INTO ImageStore (ImageName, ImageData, EmployeeID, IsActive, [Date]) 
+                        VALUES (@name, @data, @empId, 1, GETDATE())";
+
+                            SqlCommand insertCmd = new SqlCommand(insertQuery, conn, transaction);
+                            insertCmd.Parameters.AddWithValue("@name", fileName);
+                            insertCmd.Parameters.AddWithValue("@data", imageData);
+                            insertCmd.Parameters.AddWithValue("@empId", employeeId);
+
+                            insertCmd.ExecuteNonQuery();
+
+                            transaction.Commit();
+                            MessageBox.Show("Image uploaded successfully as thumbnail!");
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            MessageBox.Show("Error: " + ex.Message);
+                        }
+                        finally
+                        {
+                            originalImage.Dispose();
+                            thumbnail.Dispose();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error processing image: " + ex.Message);
+                }
+            }
+        }
+
+        private Image CreateThumbnail(Image original, int maxSize)
+        {
+            // Calculate new dimensions
+            int newWidth, newHeight;
+            if (original.Width > original.Height)
+            {
+                newWidth = maxSize;
+                newHeight = (int)(original.Height * ((float)maxSize / original.Width));
+            }
+            else
+            {
+                newHeight = maxSize;
+                newWidth = (int)(original.Width * ((float)maxSize / original.Height));
+            }
+
+            // Create thumbnail
+            Bitmap thumbnail = new Bitmap(newWidth, newHeight);
+            using (Graphics g = Graphics.FromImage(thumbnail))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(original, 0, 0, newWidth, newHeight);
+            }
+
+            return thumbnail;
+        }
+
+        private ImageCodecInfo GetEncoderInfo(string mimeType)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.MimeType == mimeType)
+                    return codec;
+            }
+            return null;
         }
     }
 

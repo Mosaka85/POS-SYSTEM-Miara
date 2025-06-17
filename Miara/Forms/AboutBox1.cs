@@ -100,5 +100,10 @@ namespace Miara
         {
 
         }
+
+        private void textBoxDescription_TextChanged(object sender, System.EventArgs e)
+        {
+
+        }
     }
 }

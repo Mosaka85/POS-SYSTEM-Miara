@@ -46,6 +46,7 @@ namespace Miara
             this.lblName = new System.Windows.Forms.Label();
             this.btnProduct = new System.Windows.Forms.Button();
             this.button15 = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -53,6 +54,7 @@ namespace Miara
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.panel2.Controls.Add(this.panel1);
             this.panel2.Controls.Add(this.pictureBox1);
             this.panel2.Controls.Add(this.button9);
             this.panel2.Controls.Add(this.lblUser);
@@ -291,6 +293,13 @@ namespace Miara
             this.button15.UseVisualStyleBackColor = true;
             this.button15.Click += new System.EventHandler(this.button15_Click);
             // 
+            // panel1
+            // 
+            this.panel1.Location = new System.Drawing.Point(341, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1404, 696);
+            this.panel1.TabIndex = 41;
+            // 
             // frmMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -326,5 +335,6 @@ namespace Miara
         public System.Windows.Forms.Label lblName;
         private System.Windows.Forms.Button btnProduct;
         private System.Windows.Forms.Button button15;
+        private System.Windows.Forms.Panel panel1;
     }
 }
