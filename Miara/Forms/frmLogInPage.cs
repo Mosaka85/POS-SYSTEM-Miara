@@ -211,7 +211,6 @@ namespace Miara
             {
                 byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 StringBuilder hashBuilder = new StringBuilder();
-
                 foreach (byte b in hashBytes)
                 {
                     hashBuilder.Append(b.ToString("x2"));
