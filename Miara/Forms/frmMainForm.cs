@@ -234,6 +234,18 @@ namespace Miara
             MessageBox.Show("Store settings functionality is not yet implemented.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         #endregion
+
+        private void lblRole_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+
     }
 
 

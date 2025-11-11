@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
@@ -12,26 +12,6 @@ namespace Miara
     {
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
-        
-
-        public frmCategory(string firstName, string surname, int EMID, string mcaddress )
-        {
-            InitializeComponent();
-            try
-            {
-                LoadSQLConnectionInfo();
-                ActiveUser = $"User: {firstName} {surname}, EMID: {EMID}";
-                NameUser = firstName;
-                SurnameUser = surname;
-                EmployeeID = EMID;
-                _ = LogAuditEntryAsync(currentDevice, ActiveUser, "Category form initialized");
-            }
-            catch (Exception ex)
-            {
-                _ = LogAuditEntryAsync(currentDevice, "System", "Category form initialization failed", ex.Message);
-                MessageBox.Show($"Initialization error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         public string ActiveUser { get; private set; }
         public string NameUser { get; private set; }
@@ -39,77 +19,86 @@ namespace Miara
         public int EmployeeID { get; private set; }
         public string currentDevice { get; private set; }
 
-        private async void frmCategory_Load(object sender, EventArgs e)
+        public frmCategory(string firstName, string surname, int EMID, string mcaddress)
         {
+            InitializeComponent();
+
+            ActiveUser = $"User: {firstName} {surname}, EMID: {EMID}";
+            NameUser = firstName;
+            SurnameUser = surname;
+            EmployeeID = EMID;
+            currentDevice = mcaddress;
+
             try
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Loading categories form");
-                lblUserActive.Text = ActiveUser;
-                await LoadCategoriesAsync();
-                dataGridView2.SelectionChanged += dataGridView2_SelectionChanged;
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Categories form loaded successfully");
+                LoadSQLConnectionInfo();
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Category form initialized");
             }
             catch (Exception ex)
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Failed to load categories form", ex.Message);
+                _ = SafeLogAsync(currentDevice, "System", "Category form initialization failed", ex.Message);
+                MessageBox.Show($"Initialization error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void frmCategory_Load(object sender, EventArgs e)
+        {
+            lblUserActive.Text = ActiveUser;
+            _ = SafeLogAsync(currentDevice, ActiveUser, "Loading categories form");
+
+            try
+            {
+                await LoadCategoriesAsync();
+                dataGridView2.SelectionChanged += dataGridView2_SelectionChanged;
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Categories form loaded successfully");
+            }
+            catch (Exception ex)
+            {
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Failed to load categories form", ex.Message);
                 MessageBox.Show($"Error loading form: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void LoadSQLConnectionInfo()
         {
+            if (!File.Exists(configFile))
+                throw new FileNotFoundException("Config.xml not found in application directory.");
+
             try
             {
-                if (!File.Exists(configFile))
-                {
-                    _ = LogAuditEntryAsync(currentDevice, "System", "Config file not found", "Configuration file missing");
-                    throw new FileNotFoundException("Connection configuration file not found.");
-                }
-
                 XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
                 using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
                 {
                     LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
                     connectionString = $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
-                    _ = LogAuditEntryAsync(currentDevice, "System", "Database connection info loaded");
                 }
+
+                _ = SafeLogAsync(currentDevice, "System", "Database connection info loaded");
             }
             catch (Exception ex)
             {
-                _ = LogAuditEntryAsync(currentDevice, "System", "Failed to load connection info", ex.Message);
-                MessageBox.Show("Failed to load connection information: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = SafeLogAsync(currentDevice, "System", "Failed to load connection info", ex.Message);
                 throw;
             }
         }
 
         private async Task LoadCategoriesAsync()
         {
-            string query = "SELECT CategoryID, CategoryName, Description, IsActive FROM Categories";
+            const string query = "SELECT CategoryID, CategoryName, Description, IsActive FROM Categories";
 
-            try
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Starting to load categories");
+                await conn.OpenAsync();
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    await conn.OpenAsync();
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
-                    {
-                        System.Data.DataTable dt = new System.Data.DataTable();
-                        adapter.Fill(dt);
+                SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
 
-                        dataGridView2.DataSource = dt;
-                        dataGridView2.Columns["CategoryID"].Visible = false;
+                dataGridView2.DataSource = dt;
+                if (dataGridView2.Columns.Contains("CategoryID"))
+                    dataGridView2.Columns["CategoryID"].Visible = false;
 
-                        await LogAuditEntryAsync(currentDevice, ActiveUser,
-                            $"Successfully loaded {dt.Rows.Count} categories");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Failed to load categories", ex.Message);
-                MessageBox.Show($"Error loading categories: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = SafeLogAsync(currentDevice, ActiveUser, $"Loaded {dt.Rows.Count} categories");
             }
         }
 
@@ -117,9 +106,8 @@ namespace Miara
         {
             if (!ValidateCategoryInputs())
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Add category validation failed", "Missing required fields");
-                MessageBox.Show("Please fill in all category details.", "Validation Error",
-                              MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please fill in all category details.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Add category validation failed");
                 return;
             }
 
@@ -129,70 +117,42 @@ namespace Miara
 
             try
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Starting category addition process");
-
-                string checkQuery = @"SELECT COUNT(*) FROM [Categories] 
-                            WHERE [CategoryName] = @CategoryName";
-
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     await conn.OpenAsync();
 
-                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
-                    {
-                        checkCmd.Parameters.AddWithValue("@CategoryName", categoryName);
-                        int existingCount = (int)await checkCmd.ExecuteScalarAsync();
+                    string checkQuery = "SELECT COUNT(*) FROM [Categories] WHERE [CategoryName] = @CategoryName";
+                    SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
+                    checkCmd.Parameters.AddWithValue("@CategoryName", categoryName);
 
-                        if (existingCount > 0)
-                        {
-                            await LogAuditEntryAsync(currentDevice, ActiveUser, "Add category failed", "Category already exists");
-                            MessageBox.Show("Category already exists. Please use a different name.",
-                                          "Duplicate Category",
-                                          MessageBoxButtons.OK,
-                                          MessageBoxIcon.Warning);
-                            return;
-                        }
+                    int existingCount = (int)await checkCmd.ExecuteScalarAsync();
+                    if (existingCount > 0)
+                    {
+                        MessageBox.Show("Category already exists.", "Duplicate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        _ = SafeLogAsync(currentDevice, ActiveUser, "Duplicate category attempted", categoryName);
+                        return;
                     }
 
-                    string insertQuery = @"INSERT INTO [Categories] 
-                                 ([CategoryName], [Description], [IsActive]) 
-                                 VALUES (@CategoryName, @Description, @IsActive)";
+                    string insertQuery = @"INSERT INTO [Categories] (CategoryName, Description, IsActive) 
+                                           VALUES (@CategoryName, @Description, @IsActive)";
+                    SqlCommand insertCmd = new SqlCommand(insertQuery, conn);
+                    insertCmd.Parameters.AddWithValue("@CategoryName", categoryName);
+                    insertCmd.Parameters.AddWithValue("@Description", description);
+                    insertCmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
 
-                    using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
-                    {
-                        insertCmd.Parameters.AddWithValue("@CategoryName", categoryName);
-                        insertCmd.Parameters.AddWithValue("@Description", description);
-                        insertCmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
+                    await insertCmd.ExecuteNonQueryAsync();
 
-                        await insertCmd.ExecuteNonQueryAsync();
-                        await LogAuditEntryAsync(currentDevice, ActiveUser,
-                            $"Category added successfully: {categoryName}");
+                    MessageBox.Show("Category added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _ = SafeLogAsync(currentDevice, ActiveUser, $"Category added: {categoryName}");
 
-                        MessageBox.Show("Category added successfully!",
-                                      "Success",
-                                      MessageBoxButtons.OK,
-                                      MessageBoxIcon.Information);
-
-                        ClearCategoryFields();
-                        await LoadCategoriesAsync();
-                    }
+                    ClearCategoryFields();
+                    await LoadCategoriesAsync();
                 }
-            }
-            catch (SqlException sqlEx)
-            {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Database error adding category", sqlEx.Message);
-                MessageBox.Show($"Database error: {sqlEx.Message}",
-                              "Database Error",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Error adding category", ex.Message);
-                MessageBox.Show($"Error adding category: {ex.Message}",
-                              "Error",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Error);
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Error adding category", ex.Message);
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -200,17 +160,7 @@ namespace Miara
         {
             if (dataGridView2.SelectedRows.Count == 0)
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Update failed", "No category selected");
-                MessageBox.Show("Please select a category to update.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (!ValidateCategoryInputs())
-            {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Update validation failed", "Missing required fields");
-                MessageBox.Show("Please fill in all category details.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Select a category to update.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -220,52 +170,31 @@ namespace Miara
             string description = txtCategoryDescription.Text.Trim();
             bool isActive = chkCategoryIsActive.Checked;
 
+            string query = @"UPDATE [Categories] SET [CategoryName] = @CategoryName, [Description] = @Description, [IsActive] = @IsActive
+                             WHERE [CategoryID] = @CategoryID";
+
             try
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser,
-                    $"Starting update for category ID: {categoryId}");
-
-                string query = @"UPDATE [Categories] 
-                                 SET [CategoryName] = @CategoryName, 
-                                     [Description] = @Description, 
-                                     [IsActive] = @IsActive
-                                 WHERE [CategoryID] = @CategoryID";
-
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     await conn.OpenAsync();
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryName", categoryName);
-                        cmd.Parameters.AddWithValue("@Description", description);
-                        cmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
-                        cmd.Parameters.AddWithValue("@CategoryID", categoryId);
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@CategoryName", categoryName);
+                    cmd.Parameters.AddWithValue("@Description", description);
+                    cmd.Parameters.AddWithValue("@IsActive", isActive ? 1 : 0);
+                    cmd.Parameters.AddWithValue("@CategoryID", categoryId);
 
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                        if (rowsAffected > 0)
-                        {
-                            await LogAuditEntryAsync(currentDevice, ActiveUser,
-                                $"Successfully updated category ID: {categoryId}");
-                            MessageBox.Show("Category updated successfully!", "Success",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            await LoadCategoriesAsync();
-                        }
-                        else
-                        {
-                            await LogAuditEntryAsync(currentDevice, ActiveUser,
-                                $"No changes made to category ID: {categoryId}");
-                            MessageBox.Show("No changes were made.", "Update Failed",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                    }
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    MessageBox.Show(rows > 0 ? "Category updated successfully!" : "No changes were made.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _ = SafeLogAsync(currentDevice, ActiveUser, $"Category updated: {categoryId}");
+
+                    await LoadCategoriesAsync();
                 }
             }
             catch (Exception ex)
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser,
-                    $"Error updating category ID: {categoryId}", ex.Message);
-                MessageBox.Show($"Error updating category: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Error updating category", ex.Message);
+                MessageBox.Show($"Error updating: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -273,73 +202,42 @@ namespace Miara
         {
             if (dataGridView2.SelectedRows.Count == 0)
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser, "Delete failed", "No category selected");
-                MessageBox.Show("Please select a category to delete.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a category to delete.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var selectedRow = dataGridView2.SelectedRows[0];
             int categoryId = Convert.ToInt32(selectedRow.Cells["CategoryID"].Value);
 
-            DialogResult result = MessageBox.Show(
-                "Are you sure you want to delete this category? This action cannot be undone.",
-                "Confirm Deletion",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
+            if (MessageBox.Show("Are you sure you want to delete this category?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 await DeleteCategoryAsync(categoryId);
-            }
-            else
-            {
-                await LogAuditEntryAsync(currentDevice, ActiveUser,
-                    $"Delete canceled for category ID: {categoryId}");
             }
         }
 
         private async Task DeleteCategoryAsync(int categoryId)
         {
-            string query = @"DELETE FROM [Categories] WHERE [CategoryID] = @CategoryID";
+            string query = "DELETE FROM [Categories] WHERE [CategoryID] = @CategoryID";
 
             try
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser,
-                    $"Attempting to delete category ID: {categoryId}");
-
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     await conn.OpenAsync();
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@CategoryID", categoryId);
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@CategoryID", categoryId);
 
-                        if (rowsAffected > 0)
-                        {
-                            await LogAuditEntryAsync(currentDevice, ActiveUser,
-                                $"Successfully deleted category ID: {categoryId}");
-                            MessageBox.Show("Category deleted successfully!", "Success",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            await LoadCategoriesAsync();
-                        }
-                        else
-                        {
-                            await LogAuditEntryAsync(currentDevice, ActiveUser,
-                                $"No category found with ID: {categoryId}");
-                            MessageBox.Show("No category found with the specified ID.", "Deletion Failed",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                    }
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    MessageBox.Show(rows > 0 ? "Category deleted successfully!" : "No category found.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    _ = SafeLogAsync(currentDevice, ActiveUser, $"Category deleted: {categoryId}");
+
+                    await LoadCategoriesAsync();
                 }
             }
             catch (Exception ex)
             {
-                await LogAuditEntryAsync(currentDevice, ActiveUser,
-                    $"Error deleting category ID: {categoryId}", ex.Message);
-                MessageBox.Show($"Error deleting category: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = SafeLogAsync(currentDevice, ActiveUser, "Error deleting category", ex.Message);
+                MessageBox.Show($"Error deleting: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -347,94 +245,77 @@ namespace Miara
         {
             if (dataGridView2.SelectedRows.Count > 0)
             {
-                var selectedRow = dataGridView2.SelectedRows[0];
-                txtCategoryName.Text = selectedRow.Cells["CategoryName"].Value?.ToString() ?? "";
-                txtCategoryDescription.Text = selectedRow.Cells["Description"].Value?.ToString() ?? "";
-                chkCategoryIsActive.Checked = Convert.ToBoolean(selectedRow.Cells["IsActive"].Value);
+                var row = dataGridView2.SelectedRows[0];
+                txtCategoryName.Text = row.Cells["CategoryName"].Value?.ToString() ?? "";
+                txtCategoryDescription.Text = row.Cells["Description"].Value?.ToString() ?? "";
+                chkCategoryIsActive.Checked = Convert.ToBoolean(row.Cells["IsActive"].Value);
             }
-            SetFormFieldsEnabled(false);
         }
 
-        private void EditCategory_Click(object sender, EventArgs e)
-        {
-            SetFormFieldsEnabled(true);
-        }
-
-        private void SetFormFieldsEnabled(bool enabled)
-        {
-            txtCategoryName.Enabled = enabled;
-            txtCategoryDescription.Enabled = enabled;
-            chkCategoryIsActive.Enabled = enabled;
-        }
-
-        private bool ValidateCategoryInputs()
-        {
-            return !string.IsNullOrEmpty(txtCategoryName.Text) &&
-                   !string.IsNullOrEmpty(txtCategoryDescription.Text);
-        }
+        private bool ValidateCategoryInputs() =>
+            !string.IsNullOrWhiteSpace(txtCategoryName.Text) &&
+            !string.IsNullOrWhiteSpace(txtCategoryDescription.Text);
 
         private void ClearCategoryFields()
         {
-            txtCategoryName.Text = "";
-            txtCategoryDescription.Text = "";
+            txtCategoryName.Clear();
+            txtCategoryDescription.Clear();
             chkCategoryIsActive.Checked = true;
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btnBack_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btnNewCate_Click(object sender, EventArgs e)
-        {
-            ClearCategoryFields();
-        }
+        private void btnExit_Click(object sender, EventArgs e) => Close();
+        private void btnBack_Click(object sender, EventArgs e) => Close();
+        private void btnNewCate_Click(object sender, EventArgs e) => ClearCategoryFields();
 
         private async void frmCategory_FormClosing(object sender, FormClosingEventArgs e)
         {
-            await LogAuditEntryAsync(currentDevice, ActiveUser, "Category form closing");
+            _ = SafeLogAsync(currentDevice, ActiveUser, "Category form closing");
         }
 
-        public async Task LogAuditEntryAsync(string device, string employee, string stepDescription, string errorMessage = null)
+        // ✅ Safe Logging Helper (never crashes UI)
+        private async Task SafeLogAsync(string device, string employee, string stepDescription, string errorMessage = null)
         {
-            string query = @"
-                INSERT INTO DeviceAudit (Device, Employee, AuditDate, StepDescription, ErrorMessage)
-                VALUES (@Device, @Employee, @AuditDate, @StepDescription, @ErrorMessage);";
+            if (string.IsNullOrEmpty(connectionString)) return;
+
+            const string query = @"INSERT INTO DeviceAudit (Device, Employee, AuditDate, StepDescription, ErrorMessage)
+                                   VALUES (@Device, @Employee, GETDATE(), @StepDescription, @ErrorMessage)";
 
             try
             {
-                using (var connection = new SqlConnection(connectionString))
-                using (var command = new SqlCommand(query, connection))
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    command.Parameters.AddWithValue("@Device", device);
-                    command.Parameters.AddWithValue("@Employee", employee);
-                    command.Parameters.AddWithValue("@AuditDate", DateTime.Now);
-                    command.Parameters.AddWithValue("@StepDescription", stepDescription);
-                    command.Parameters.AddWithValue("@ErrorMessage",
-                        string.IsNullOrEmpty(errorMessage) ? DBNull.Value : (object)errorMessage);
+                    cmd.Parameters.AddWithValue("@Device", device ?? "Unknown");
+                    cmd.Parameters.AddWithValue("@Employee", employee ?? "Unknown");
+                    cmd.Parameters.AddWithValue("@StepDescription", stepDescription ?? "N/A");
+                    cmd.Parameters.AddWithValue("@ErrorMessage", errorMessage ?? "");
 
-                    await connection.OpenAsync();
-                    await command.ExecuteNonQueryAsync();
+                    await conn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                // If logging fails, we can't log that it failed, so we'll just show a message
-                MessageBox.Show($"Failed to log audit entry: {ex.Message}", "Logging Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // fallback: write to local text file if logging DB fails
+                try
+                {
+                    string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogErrors.txt");
+                    await Task.Run(() =>
+                    {
+                        File.AppendAllText(logPath,
+                            $"{DateTime.Now}: {employee} - {stepDescription} - {errorMessage}{Environment.NewLine}");
+                    });
+                }
+                catch { /* ignored */ }
             }
+
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
+        private void EditCategory_Click(object sender, EventArgs e)
+        { 
+
 
         }
     }
 
-  
 }

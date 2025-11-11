@@ -150,7 +150,6 @@
             this.btnVendor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnVendor.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnVendor.UseVisualStyleBackColor = false;
-
             // 
             // btnStock
             // 
@@ -171,7 +170,6 @@
             this.btnStock.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnStock.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnStock.UseVisualStyleBackColor = false;
-
             // 
             // manageCategory
             // 
@@ -351,6 +349,7 @@
             this.lblRole.TabIndex = 2;
             this.lblRole.Text = "Administrator";
             this.lblRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblRole.Click += new System.EventHandler(this.lblRole_Click);
             // 
             // lblUser
             // 
@@ -374,6 +373,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1620, 864);
             this.panel1.TabIndex = 41;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // frmMainForm
             // 

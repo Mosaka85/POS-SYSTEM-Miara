@@ -66,6 +66,7 @@ namespace Miara
         {
             InitializeComponent();
             _currentDevice = GetMacAddress();
+
         }
 
 
@@ -204,7 +205,12 @@ namespace Miara
                 if (await AuthenticateUserAsync(employeeUsername, employeePassword, _cts.Token))
                 {
                     this.Hide();
+                    NameUser = _employeeFirstName;
+                    SurnameUser = _employeeSurname;
+                    EmployeeID = _emid;
+                    ActiveUser = $"User: {_employeeFirstName} {_employeeSurname}, EMID: {_emid}";
                     await WriteToLogFileAsync($"Login successful for user: {employeeUsername} on device {_currentDevice}");
+
                     new frmMainForm(_employeeFirstName, _employeeSurname, _emid, _currentDevice).Show();
                 }
             }
@@ -395,7 +401,14 @@ namespace Miara
             formApplicationSettings.Show();
 
         }
+
+        public string ActiveUser { get; private set; }
+        public string NameUser { get; private set; }
+        public string SurnameUser { get; private set; }
+        public int EmployeeID { get; private set; } 
+        public string currentDevice { get; private set; } = GetMacAddress();
     }
+
 
     [Serializable]
     public class LoginInfo
@@ -404,5 +417,11 @@ namespace Miara
         public string SelectedDatabase { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+
+
+
     }
+
+
+
 }
