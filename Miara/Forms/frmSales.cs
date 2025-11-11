@@ -1,18 +1,23 @@
 ﻿using Miara.Forms;
+using MiaraPOS.Services;
 using Microsoft.Reporting.WebForms;
 using Microsoft.Reporting.WinForms;
 using Microsoft.VisualBasic;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Drawing.Printing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,65 +32,59 @@ namespace Miara
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
         private int nextSaleIdn;
-        private decimal TaxTotal;
-        decimal Discount = 0;
+
+ 
 
 
-        public frmSales(string firstName, string surname, int EMID)
+        public frmSales(string firstName, string surname, int EMID, string macaddress)
         {
             InitializeComponent();
+
+            this.KeyPreview = true;
+            btnCompleteSale.Enabled = false;
+            EmployeeNumber = EMID;
+            employeeFirstName = firstName;
+            employeeSurname = surname;
+            DeviceinternetID = macaddress;
+
             LoadSQLConnectionInfo();
             LoadProducts();
             LoadCategories();
             LoadPaymentMethods();
             int nextSaleId = GetNextSaleId();
             ScrapOldLogCashback(nextSaleId);
-            EnsureRequiredColumns();
-            this.KeyPreview = true;
-            txtRecipientEmail.Visible = checkEmail.Checked;
+
             nextSaleIdn = nextSaleId;
             lblNextSalesNumber.Text = $"SALES ORDER NO: {nextSaleId}";
+            label2.Text = $"WELCOME {firstName} {surname} ";
+            txtRecipientEmail.Visible = checkEmail.Checked;
+            EnsureRequiredColumns();
+
             txtBarcodeLabel.KeyDown += txtBarcodeLabel_KeyDown;
             txtQuantity.KeyDown += Control_KeyDown;
             comboBoxProducts.KeyDown += Control_KeyDown;
+            this.MouseDown += frmSales_MouseDown;
+            this.KeyDown += frmSales_KeyDown;
+            toolStripChangeBackColour.Click += toolStripChangeBackColour_Click;
             timer1.Start();
             this.FormClosed += (sender, e) => Application.Exit();
-            label2.Text = $"WELCOME {firstName} {surname} ";
-            employeeFirstName = firstName;
-            employeeSurname = surname;
-            EMployeeNumber = EMID;
-            btnCompleteSale.Enabled = false;
-            this.MouseDown += frmSales_MouseDown;
-            toolStripChangeBackColour.Click += toolStripChangeBackColour_Click;
-            RoundButtonCorners(btnCalculatechange, 30);
-
-
-            this.KeyPreview = true;
-            this.KeyDown += frmSales_KeyDown;
-
         }
 
-        private void MakeButtonRound(Button btn)
-        {
-            int radius = btn.Height;
-            GraphicsPath circle = new GraphicsPath();
-            circle.AddEllipse(0, 0, radius, radius);
-            btn.Region = new Region(circle);
-        }
-
-
+     
         private void frmSales_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F2 && btnCompleteSale.Enabled)
             {
                 btnCompleteSale.PerformClick();
                 e.Handled = true; // Optional: stops further processing
+                logTrace(" pressed F2 to complete sale"); 
             }
         }
 
         string employeeFirstName;
         string employeeSurname;
-        int EMployeeNumber;
+        int EmployeeNumber;
+        string DeviceinternetID;
         private void LoadSQLConnectionInfo()
         {
             if (File.Exists(configFile))
@@ -101,11 +100,15 @@ namespace Miara
                 }
                 catch (Exception ex)
                 {
+                    LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Failed to load connection information", ex.Message);
+                    logTrace($"Failed to load connection information: {ex.Message}");
                     MessageBox.Show("Failed to load connection information: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Connection configuration file not found", "File: " + configFile);
+                logTrace("Connection configuration file not found: " + configFile);
                 MessageBox.Show("Connection configuration file not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -128,6 +131,8 @@ namespace Miara
             }
             catch (Exception ex)
             {
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error loading products", ex.Message);
+                logTrace($"Error loading products: {ex.Message}");
                 MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -137,8 +142,13 @@ namespace Miara
             foreach (DataGridViewRow row in dataGridViewSaleDetails.SelectedRows)
             {
                 dataGridViewSaleDetails.Rows.Remove(row);
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Removed product from sale: {row.Cells["ProductName"].Value}");
+                logTrace($"Product removed from sale: {row.Cells["ProductName"].Value}");
             }
             UpdateTotalAmount();
+            LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Updated total amount after removing product(s)");
+            logTrace("Product(s) removed from sale and total amount updated");
+
         }
         private void UpdateTotalAmount()
         {
@@ -178,10 +188,10 @@ namespace Miara
                 // Fetch cashback amount using saleID
                 decimal cashbackAmount = MVTransactionAmountBySaleID(nextSaleIdn);
 
-                // Final total = subtotal after discount + cashback
+              
                 decimal finalTotal = subtotalAfterDiscount + cashbackAmount;
 
-                // Update labels
+           
                 lbldiscountvalue.Text = $"Discount: R {discountValue:F2}";
                 lblSubtotalorder.Text = $"Subtotal: R {FinalSubtotal:F2}";
                 lblTax.Text = $"TAX (15%): R {tax:F2}";
@@ -190,327 +200,332 @@ namespace Miara
             }
             catch (Exception ex)
             {
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error updating total amount", ex.Message);
+                logTrace($"Error updating total amount: {ex.Message}");
                 MessageBox.Show($"An error occurred while calculating the total: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
 
+        private int GetNextSaleId()
+        {
+            int nextSaleId = 0;
 
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    string query = "SELECT ISNULL(MAX(SaleID), 0) + 1 FROM Sale WITH(NOLOCK)"; // Get the next SaleID
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        connection.Open();
+                        var result = command.ExecuteScalar();
+                        if (result != DBNull.Value)
+                        {
+                            nextSaleId = Convert.ToInt32(result);
+                        }
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "SQL Error retrieving next SaleID", sqlEx.Message);
+                logtrace($"SQL Error retrieving next SaleID: {sqlEx.Message}");
+                MessageBox.Show($"SQL Error retrieving next SaleID: {sqlEx.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error retrieving next SaleID", ex.Message);
+                logTrace($"Error retrieving next SaleID: {ex.Message}");
+                MessageBox.Show($"Error retrieving next SaleID: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            LogAuditEntry(ReceivedValue, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Next SaleID retrieved: {nextSaleId}");
+            return nextSaleId;
+        }
+
+        private void logtrace(string v)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static readonly string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
+        //
+        //private static readonly string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
         private void btnCompleteSale_Click(object sender, EventArgs e)
         {
             btnCompleteSale.Enabled = false;
+            LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Started sale processing");
+            logTrace("Sale processing started");
 
-            decimal subtotal = 0;
-
-            // Calculate subtotal from DataGridView
-            foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
+            try
             {
-                if (!row.IsNewRow && row.Cells["Subtotal"].Value != null)
-                {
-                    subtotal += Convert.ToDecimal(row.Cells["Subtotal"].Value);
-                }
-            }
+                logTrace("Validating required columns in DataGridView");
+                var processor = new SaleProcessor(connectionString, DeviceInternetID, EmployeeNumber.ToString());
+                logTrace("SaleProcessor initialized successfully");
 
-            // Calculate discount
-            decimal discountValue = 0;
-            decimal discountPercentage = 0;
-            if (checkdiscount.Checked && !string.IsNullOrWhiteSpace(txtdiscount.Text) &&
-                decimal.TryParse(txtdiscount.Text, out decimal parsedDiscount) && parsedDiscount >= 0 && parsedDiscount <= 100)
-            {
-                discountPercentage = parsedDiscount / 100;
-                discountValue = subtotal * discountPercentage;
-            }
-
-            decimal subtotalAfterDiscount = subtotal - discountValue;
-            if (subtotalAfterDiscount < 0) subtotalAfterDiscount = 0;
-
-            // Calculate tax (15%)
-            decimal tax = subtotalAfterDiscount * 0.15m;
-
-            // Cashback
-            decimal cashbackAmount = decimal.Parse(lblCashBack.Text.Replace("Cashback:", "").Replace("R", "").Trim()); ;
-
-
-            // Final total
-            decimal finalTotal = subtotalAfterDiscount + cashbackAmount;
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                SqlTransaction transaction = connection.BeginTransaction();
-
-                try
-                {
-                    // Insert Sale
-                    string saleQuery = @"
-                INSERT INTO Sale (SaleDate, TotalAmount, PaymentMethod, EmployeeID) 
-                VALUES (@SaleDate, @TotalAmount, @PaymentMethod, @EmployeeID);
-                SELECT SCOPE_IDENTITY();";
-
-                    SqlCommand saleCommand = new SqlCommand(saleQuery, connection, transaction);
-                    saleCommand.Parameters.AddWithValue("@SaleDate", DateTime.Now);
-                    saleCommand.Parameters.AddWithValue("@TotalAmount", finalTotal);
-                    saleCommand.Parameters.AddWithValue("@PaymentMethod", combopaymentmentod.SelectedValue?.ToString() ?? "N/A");
-                    saleCommand.Parameters.AddWithValue("@EmployeeID", EMployeeNumber);
-
-                    int saleId = Convert.ToInt32(saleCommand.ExecuteScalar());
-
-                    // Insert Sale Details
-                    foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
+                logTrace("Preparing sale details for processing");
+                processor.CompleteSale(
+                    saleDetails: dataGridViewSaleDetails,
+                    discountText: txtdiscount.Text?.Trim() ?? "0",
+                    discountChecked: checkdiscount.Checked,
+                    paymentMethod: combopaymentmentod.SelectedValue?.ToString() ?? "N/A",
+                    cashbackText: lblCashBack.Text?.Trim() ?? "Cashback: R 0.00",
+                    renderedAmountText: txtrenderedamount.Text?.Trim() ?? "0",
+                    sendEmail: checkEmail.Checked && !string.IsNullOrWhiteSpace(txtRecipientEmail.Text),
+                    logAudit: msg =>
                     {
-                        if (row.IsNewRow || row.Cells["ProductID"].Value == null) continue;
-
-                        var productId = (int)row.Cells["ProductID"].Value;
-                        var quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
-                        var unitPrice = Convert.ToDecimal(row.Cells["Price"].Value);
-                        var rowSubtotal = Convert.ToDecimal(row.Cells["Subtotal"].Value);
-                        var rowTax = rowSubtotal * 0.15m;
-
-                        string detailsQuery = @"
-                    INSERT INTO SalesDetails (SaleID, ProductID, Quantity, UnitPrice, Subtotal, Tax) 
-                    VALUES (@SaleID, @ProductID, @Quantity, @UnitPrice, @Subtotal, @Tax)";
-
-                        SqlCommand detailsCommand = new SqlCommand(detailsQuery, connection, transaction);
-                        detailsCommand.Parameters.AddWithValue("@SaleID", saleId);
-                        detailsCommand.Parameters.AddWithValue("@ProductID", productId);
-                        detailsCommand.Parameters.AddWithValue("@Quantity", quantity);
-                        detailsCommand.Parameters.AddWithValue("@UnitPrice", unitPrice);
-                        detailsCommand.Parameters.AddWithValue("@Subtotal", rowSubtotal);
-                        detailsCommand.Parameters.AddWithValue("@Tax", rowTax);
-                        detailsCommand.ExecuteNonQuery();
-                    }
-
-                    // Insert Discount if any
-                    if (checkdiscount.Checked && discountValue > 0)
+                        LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", msg);
+                        logTrace($"Audit log: {msg}");
+                    },
+                    resetForm: () =>
                     {
-                        string discountQuery = @"
-                    INSERT INTO Discounts (SaleID, DiscountPercentage, DiscountValue, DiscountDate) 
-                    VALUES (@SaleID, @DiscountPercentage, @DiscountValue, @DiscountDate)";
+                        logTrace("Resetting form data");
+                        dataGridViewSaleDetails.Rows.Clear();
+                        UpdateTotalAmount();
+                        nextSaleIdn = GetNextSaleId();
+                        lblNextSalesNumber.Text = $"SALES ORDER NO: {nextSaleIdn}";
+                        txtQuantity.Text = "1";
+                        comboBoxProducts.SelectedItem = null;
+                        combopaymentmentod.SelectedIndex = -1;
+                        txtrenderedamount.Text = string.Empty;
+                        lblChange.Text = "Change: R 0.00";
+                        lblTotalAmount.Text = "Total: R 0.00";
+                        lblCashBack.Text = "Cashback: R 0.00";
+                        txtdiscount.Text = string.Empty;
+                        logTrace("Form reset completed");
+                    },
+                    generateReceipt: () =>
+                    {
+                        logTrace("Generating receipt content");
+                        var emailItems = dataGridViewSaleDetails.Rows
+                            .Cast<DataGridViewRow>()
+                            .Where(r => !r.IsNewRow && r.Cells["ProductName"].Value != null)
+                            .Select(r => new ReceiptEmailBuilder.ReceiptItem
+                            {
+                                ProductName = r.Cells["ProductName"].Value?.ToString() ?? string.Empty,
+                                Quantity = Convert.ToInt32(r.Cells["Quantity"].Value ?? 0),
+                                Price = Convert.ToDecimal(r.Cells["Price"].Value ?? 0),
+                                Subtotal = Convert.ToDecimal(r.Cells["Subtotal"].Value ?? 0)
+                            }).ToList();
+                        logTrace($"Generated {emailItems.Count} receipt items");
 
-                        SqlCommand discountCommand = new SqlCommand(discountQuery, connection, transaction);
-                        discountCommand.Parameters.AddWithValue("@SaleID", saleId);
-                        discountCommand.Parameters.AddWithValue("@DiscountPercentage", discountPercentage * 100);
-                        discountCommand.Parameters.AddWithValue("@DiscountValue", discountValue);
-                        discountCommand.Parameters.AddWithValue("@DiscountDate", DateTime.Now);
-                        discountCommand.ExecuteNonQuery();
-                    }
-
-                    // Insert Payment
-                    string paymentQuery = @"
-                INSERT INTO Payments (SaleID, AmountPaid, PaymentDate, PaymentMethod, Cashback) 
-                VALUES (@SaleID, @AmountPaid, @PaymentDate, @PaymentMethod,@Cashback)";
-
-                    SqlCommand paymentCommand = new SqlCommand(paymentQuery, connection, transaction);
-                    paymentCommand.Parameters.AddWithValue("@SaleID", saleId);
-                    paymentCommand.Parameters.AddWithValue("@AmountPaid", finalTotal);
-                    paymentCommand.Parameters.AddWithValue("@PaymentDate", DateTime.Now);
-                    paymentCommand.Parameters.AddWithValue("@PaymentMethod", combopaymentmentod.SelectedValue?.ToString() ?? "N/A");
-                    paymentCommand.Parameters.AddWithValue("@Cashback", cashbackAmount);
-                    paymentCommand.ExecuteNonQuery();
-
-                    PrintReceipt();
-                    LogReceiptData();
-
-                    if (checkEmail.Checked)
+                        var builder = new ReceiptEmailBuilder();
+                        var receiptContent = builder.GenerateReceiptContent(
+                            saleId: nextSaleIdn,
+                            employeeFirstName: employeeFirstName ?? string.Empty,
+                            employeeSurname: employeeSurname ?? string.Empty,
+                            paymentMethod: combopaymentmentod.SelectedValue?.ToString() ?? "N/A",
+                            items: emailItems,
+                            discountPercentage: checkdiscount.Checked && decimal.TryParse(txtdiscount.Text?.Trim(), out var disc) ? disc : 0,
+                            cashbackAmount: decimal.TryParse(lblCashBack.Text?.Replace("Cashback:", "").Replace("R", "").Trim(), out var cb) ? cb : 0,
+                            renderedAmount: combopaymentmentod.SelectedValue?.ToString() == "CASH" && decimal.TryParse(txtrenderedamount.Text?.Trim(), out var rend) ? rend : (decimal?)null
+                        );
+                        logTrace("Receipt content generated successfully");
+                        return receiptContent;
+                    },
+                    sendEmailAction: receiptHtml =>
+                    {
+                        logTrace("Initiating email sending process");
+                        SendReceiptEmail(receiptHtml);
+                        logTrace("Email sent successfully");
+                    },
+                    printReceipt: () =>
                     {
                         try
                         {
-                            string receiptContent = GenerateReceiptContent();
-                            SendReceiptEmail(receiptContent);
+                            logTrace("Preparing to print receipt");
+
+                            var items = dataGridViewSaleDetails.Rows
+                                .Cast<DataGridViewRow>()
+                                .Where(r => !r.IsNewRow && r.Cells["ProductName"].Value != null)
+                                .Select(r => new SaleItem
+                                {
+                                    ProductName = r.Cells["ProductName"].Value?.ToString() ?? string.Empty,
+                                    Quantity = Convert.ToInt32(r.Cells["Quantity"].Value ?? 0),
+                                    Price = Convert.ToDecimal(r.Cells["Price"].Value ?? 0),
+                                    Subtotal = Convert.ToDecimal(r.Cells["Subtotal"].Value ?? 0)
+                                }).ToList();
+                            logTrace($"Prepared {items.Count} items for printing");
+
+                            // Initialize ReceiptPrinter
+                            var printer = new ReceiptPrinter(
+                                deviceInternetId: DeviceInternetID,
+                                employeeFirstName: employeeFirstName ?? string.Empty,
+                                employeeSurname: employeeSurname ?? string.Empty,
+                                employeeNumber: EmployeeNumber.ToString(),
+                                receiptNo: nextSaleIdn.ToString(),
+                                paymentMethod: combopaymentmentod.SelectedValue?.ToString() ?? "N/A",
+                                saleItems: items,
+                                discountPercentage: checkdiscount.Checked && decimal.TryParse(txtdiscount.Text?.Trim(), out var disc) ? disc : 0,
+                                cashbackAmount: decimal.TryParse(lblCashBack.Text?.Replace("Cashback:", "").Replace("R", "").Trim(), out var cb) ? cb : 0,
+                                renderedAmount: combopaymentmentod.SelectedValue?.ToString() == "CASH" && decimal.TryParse(txtrenderedamount.Text?.Trim(), out var rend) ? rend : (decimal?)null
+                            );
+                            logTrace("ReceiptPrinter initialized");
+
+                            // Show PrintDialog
+                            using (PrintDialog printDialog = new PrintDialog())
+                            {
+                                printDialog.AllowSomePages = false;
+                                printDialog.AllowSelection = false;
+
+                                if (printDialog.ShowDialog() == DialogResult.OK)
+                                {
+                                    string printerName = GetPrinterByDeviceMac();
+                                    logTrace($"User selected printer: {printerName}");
+
+                                    // Always show preview before print
+                                    printer.Print(printerName, showPrintPreview: true);
+                                    logTrace("Print preview shown. User may continue to print.");
+                                }
+                                else
+                                {
+                                    logTrace("User cancelled printing.");
+                                }
+                            }
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Failed to send email: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            logTrace($"Error during receipt printing: {ex.Message}");
+                            MessageBox.Show($"Error printing receipt: {ex.Message}", "Print Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
-                    }
-
-                    CompleteCashback(nextSaleIdn);
-                    transaction.Commit();
-
-                    MessageBox.Show("Sale completed successfully!");
-                    dataGridViewSaleDetails.Rows.Clear();
-                    UpdateTotalAmount();
-                    int nextSaleId = GetNextSaleId();
-                    nextSaleIdn = nextSaleId;
-                    lblNextSalesNumber.Text = $"SALES ORDER NO: {nextSaleId}";
-                    txtQuantity.Text = "1";
-                    comboBoxProducts.SelectedItem = null;
-                    combopaymentmentod.SelectedIndex = -1;
-                    txtrenderedamount.Clear();
-                    lblChange.Text = "Change: R 0.00";
-                    lblTotalAmount.Text = "Total: R 0.00";
-                    lblCashBack.Text = "Total: R 0.00";
-                    txtdiscount.Text = "";
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    MessageBox.Show($"Error completing sale: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                    },
+                    completeCashback: saleId =>
+                    {
+                        logTrace($"Initiating cashback completion for sale ID: {saleId}");
+                        CompleteCashback(saleId);
+                        logTrace("Cashback completed successfully");
+                    },
+                    getNextSaleId: () =>
+                    {
+                        var saleId = GetNextSaleId();
+                        logTrace($"Generated next sale ID: {saleId}");
+                        return saleId;
+                    },
+                    out nextSaleIdn
+                );
+                logTrace("Sale completed successfully");
             }
-
+            catch (Exception ex)
+            {
+                LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Sale failed", ex.Message);
+                logTrace($"Error completing sale: {ex.Message}");
+                MessageBox.Show($"Error completing sale: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                logTrace("Re-enabling Complete Sale button");
+                btnCompleteSale.Enabled = true;
+            }
         }
 
-        private void PrintReceipt()
+        public void logTrace(string message)
         {
             try
             {
-                PrintDocument printDocument = new PrintDocument();
-                printDocument.PrintPage += (sender, e) =>
+                using (StreamWriter writer = new StreamWriter(logFile, true))
                 {
-                    Graphics graphics = e.Graphics;
-                    Font font = new Font("Courier New", 10);
-                    int y = 20;
-
-                    // Header
-                    graphics.DrawString("********* MIARA TRADING PTY LTD *********", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("Address: 123 Mosaka St.", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("Phone: 012-345-6789 | Email: info@miaratrading.com", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-
-                    // Receipt Info
-                    graphics.DrawString($"Receipt No: {nextSaleIdn}", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString($"Date: {DateTime.Now:dd/MM/yyyy HH:mm:ss}", font, Brushes.Black, 10, y); y += 20;
-
-                    // Add Employee Name
-                    graphics.DrawString($"Employee: {employeeFirstName} {employeeSurname}", font, Brushes.Black, 10, y); y += 20;
-
-                    // Payment Method
-                    string paymentMethod = combopaymentmentod.SelectedValue?.ToString() ?? "N/A";
-                    graphics.DrawString($"Payment Method: {paymentMethod}", font, Brushes.Black, 10, y); y += 20;
-
-                    // Items Header
-                    graphics.DrawString("Item              Qty   Price     Total", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-
-                    // Items List
-                    decimal total = 0;
-                    if (dataGridViewSaleDetails != null)
-                    {
-                        foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
-                        {
-                            if (row.Cells["ProductName"].Value != null)
-                            {
-                                string productName = row.Cells["ProductName"].Value.ToString();
-                                int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
-                                decimal price = Convert.ToDecimal(row.Cells["Price"].Value);
-                                decimal subtotal = Convert.ToDecimal(row.Cells["Subtotal"].Value);
-
-                                graphics.DrawString($"{productName,-15} {quantity,3} {price,9:C} {subtotal,10:C}", font, Brushes.Black, 10, y);
-                                y += 20;
-
-                                total += subtotal;
-                            }
-                        }
-                    }
-
-                    // Calculate discount
-                    decimal discountValue = 0;
-                    decimal discountPercentage = 0;
-
-                    if (checkdiscount.Checked && !string.IsNullOrWhiteSpace(txtdiscount.Text) &&
-                        decimal.TryParse(txtdiscount.Text, out decimal parsedDiscount) && parsedDiscount >= 0 && parsedDiscount <= 100)
-                    {
-                        discountPercentage = parsedDiscount / 100;
-                        discountValue = total * discountPercentage;
-                    }
-
-                    // Subtotal after applying discount
-                    decimal subtotalAfterDiscount = total - discountValue;
-                    if (subtotalAfterDiscount < 0) subtotalAfterDiscount = 0;
-
-                    // Calculate tax (15% of subtotal after discount)
-                    decimal tax = subtotalAfterDiscount * 0.15m;
-
-                    // Get cashback amount using the correct sale ID
-                    decimal cashbackAmount = decimal.Parse(lblCashBack.Text.Replace("Cashback:", "").Replace("R", "").Trim());
-
-                    // Final total: Subtotal after discount plus tax minus cashback
-                    decimal finalTotal = subtotalAfterDiscount + cashbackAmount;
-
-                    // Print totals and discount
-                    graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString($"Subtotal: {total,25:C}", font, Brushes.Black, 10, y); y += 20;
-
-                    if (checkdiscount.Checked)
-                    {
-                        graphics.DrawString($"Discount ({discountPercentage * 100:F0}%): {discountValue,17:C}", font, Brushes.Black, 10, y); y += 20;
-                    }
-
-                    graphics.DrawString($"Subtotal After Discount: {subtotalAfterDiscount,12:C}", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString($"Tax (15%): {tax,26:C}", font, Brushes.Black, 10, y); y += 20;
-
-                    // Add cashback line if there is any cashback
-                    if (cashbackAmount > 0)
-                    {
-                        graphics.DrawString($"Cashback Applied: {cashbackAmount,19:C}", font, Brushes.Black, 10, y); y += 20;
-                    }
-
-                    graphics.DrawString($"Total: {finalTotal,29:C}", new Font("Courier New", 10, FontStyle.Bold), Brushes.Black, 10, y); y += 20;
-
-                    if (paymentMethod == "CASH")
-                    {
-                        // Payment Details for CASH
-                        decimal renderedAmount = decimal.Parse(txtrenderedamount.Text);
-                        decimal change = renderedAmount - finalTotal;
-
-                        graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-                        graphics.DrawString($"Amount Rendered: {renderedAmount,19:C}", font, Brushes.Black, 10, y); y += 20;
-                        graphics.DrawString($"Change: {change,30:C}", font, Brushes.Black, 10, y); y += 40;
-                    }
-
-                    // Footer
-                    graphics.DrawString("Thank you for shopping with us!", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("Visit us again!", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-                    graphics.DrawString("---------- MOSAKA SYSTEM ----------", font, Brushes.Black, 10, y); y += 20;
-                };
-
-                // Create and display the print preview dialog
-                PrintPreviewDialog printPreviewDialog = new PrintPreviewDialog
-                {
-                    Document = printDocument,
-                    WindowState = FormWindowState.Maximized
-                };
-
-                if (printPreviewDialog.ShowDialog() == DialogResult.OK)
-                {
-                    printDocument.Print();
+                    writer.WriteLine($"{DateTime.Now} :  {EmployeeNumber},{employeeFirstName},{employeeSurname}, {DeviceinternetID} ,  {message}");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred while printing the receipt: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Failed to log trace: {ex.Message}", "Logging Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
 
-
-        private void DrawLineSeparator(Graphics graphics, Font font, ref int y)
+        public void LogAuditEntry(string device, string employee, string stepDescription, string errorMessage = null)
         {
-            graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
+            string query = @"
+        INSERT INTO DeviceAudit (Device, Employee, AuditDate, StepDescription, ErrorMessage)
+        VALUES (@Device, @Employee, @AuditDate, @StepDescription, @ErrorMessage);";
+
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Device", device ?? string.Empty);
+                    command.Parameters.AddWithValue("@Employee", employee ?? string.Empty);
+                    command.Parameters.AddWithValue("@AuditDate", DateTime.Now);
+                    command.Parameters.AddWithValue("@StepDescription", stepDescription ?? string.Empty);
+                    command.Parameters.AddWithValue("@ErrorMessage",
+                        string.IsNullOrEmpty(errorMessage) ? DBNull.Value : (object)errorMessage);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to log audit entry: {ex.Message}", "Logging Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void DrawStringCentered(Graphics graphics, string text, Font font, ref int y)
+
+        public string GetPrinterByDeviceMac()
         {
-            int centerX = (int)(graphics.VisibleClipBounds.Width / 2 - graphics.MeasureString(text, font).Width / 2);
-            graphics.DrawString(text, font, Brushes.Black, centerX, y); y += 20;
+            string deviceMac = DeviceinternetID;
+
+            if (string.IsNullOrWhiteSpace(deviceMac) || deviceMac == "MAC Address Not Found")
+            {
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Failed to get printer by device MAC", "MAC Address is empty or invalid");
+                return null;
+            }
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string query = "SELECT PrinterName FROM Printers WHERE Device = @Device";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Device", DeviceinternetID);
+
+                    connection.Open();
+
+                    var result = command.ExecuteScalar(); // Use ExecuteReader if expecting multiple rows
+
+                    if (result != null)
+                    {
+                        return result.ToString();
+                    }
+                    else
+                    {
+                        LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Failed to get printer by device MAC", "No printer found for the given MAC address");
+                        return null;
+                    }
+                }
+            }
         }
 
+     
 
 
-        private bool IsValidEmail(string email)
+        private string GetPrinterNameByMac(string macAddress)
         {
             try
             {
-                var addr = new MailAddress(email);
-                return addr.Address == email;
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    string query = "SELECT PrinterName FROM Printers WHERE Device = @Device";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Device", macAddress);
+                        connection.Open();
+                        object result = command.ExecuteScalar();
+                        return result?.ToString();
+                    }
+                }
             }
             catch
             {
-                return false;
+                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error getting printer name by MAC", $"MAC Address: {macAddress}");
+                return null;
             }
         }
+
 
         private void LoadCategories()
         {
@@ -536,6 +551,7 @@ namespace Miara
                 }
                 else
                 {
+                    LogAuditEntry(query, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "No active categories found");
                     comboProductCategory.DataSource = null;
                 }
             }
@@ -543,190 +559,6 @@ namespace Miara
 
 
 
-
-
-        private DataTable GetData(string query)
-        {
-
-            DataTable dt = new DataTable();
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                da.Fill(dt);
-            }
-            return dt;
-        }
-
-        private void SendReceiptViaEmail(string recipientEmail, string receiptContent)
-        {
-            try
-            {
-                // Configure SMTP client for Outlook
-                SmtpClient smtpClient = new SmtpClient("smtp.office365.com")
-                {
-                    Port = 587,
-                    Credentials = new NetworkCredential("your-emai@outlook.com", "your-password"),
-                    EnableSsl = true
-                };
-
-                // Create the email message
-                MailMessage mailMessage = new MailMessage
-                {
-                    From = new MailAddress("your-email@outlook.com"),
-                    Subject = "Your Receipt from MIARA TRADING PTY LTD",
-                    Body = receiptContent,
-                    IsBodyHtml = false // Set to true if you want to use HTML formatting
-                };
-
-                // Add the recipient's email address
-                mailMessage.To.Add(recipientEmail);
-
-                // Send the email
-                smtpClient.Send(mailMessage);
-
-                MessageBox.Show("Receipt sent successfully via email.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (SmtpException smtpEx)
-            {
-                MessageBox.Show($"SMTP Error: {smtpEx.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error sending email: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        private string GenerateReceiptContent()
-        {
-            // Get cashback amount for this sale
-            decimal cashbackAmount = decimal.Parse(lblCashBack.Text.Replace("Cashback:", "").Replace("R", "").Trim());
-
-            StringBuilder receiptContent = new StringBuilder();
-            receiptContent.AppendLine("<!DOCTYPE html>");
-            receiptContent.AppendLine("<html lang='en'>");
-            receiptContent.AppendLine("<head>");
-            receiptContent.AppendLine("<meta charset='UTF-8'>");
-            receiptContent.AppendLine("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
-            receiptContent.AppendLine("<title>Receipt</title>");
-            receiptContent.AppendLine("<style>");
-            receiptContent.AppendLine("body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; }");
-            receiptContent.AppendLine(".receipt { max-width: 350px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); padding: 20px; }");
-            receiptContent.AppendLine(".header { text-align: center; margin-bottom: 20px; }");
-            receiptContent.AppendLine(".header h2 { margin: 0; font-size: 1.5em; color: #333; }");
-            receiptContent.AppendLine(".header p { margin: 5px 0; font-size: 0.9em; color: #666; }");
-            receiptContent.AppendLine(".divider { border-top: 1px dashed #ddd; margin: 15px 0; }");
-            receiptContent.AppendLine(".text-right { text-align: right; }");
-            receiptContent.AppendLine(".text-center { text-align: center; }");
-            receiptContent.AppendLine(".receipt-info p { margin: 5px 0; font-size: 0.9em; color: #444; }");
-            receiptContent.AppendLine(".items-header { font-weight: bold; margin-bottom: 10px; font-size: 0.9em; color: #333; }");
-            receiptContent.AppendLine(".items-list p { margin: 5px 0; font-size: 0.9em; color: #555; }");
-            receiptContent.AppendLine(".totals p { margin: 5px 0; font-size: 0.9em; color: #333; }");
-            receiptContent.AppendLine(".footer { margin-top: 20px; font-size: 0.9em; color: #666; }");
-            receiptContent.AppendLine("</style>");
-            receiptContent.AppendLine("</head>");
-            receiptContent.AppendLine("<body>");
-
-            receiptContent.AppendLine("<div class='receipt'>");
-            receiptContent.AppendLine("<div class='header'>");
-            receiptContent.AppendLine("<h2>MIARA TRADING PTY LTD</h2>");
-            receiptContent.AppendLine("<p>123 Mosaka St.</p>");
-            receiptContent.AppendLine("<p>Phone: 012-345-6789 | Email: info@miaratrading.com</p>");
-            receiptContent.AppendLine("</div>");
-            receiptContent.AppendLine("<div class='divider'></div>");
-            receiptContent.AppendLine("<div class='receipt-info'>");
-            receiptContent.AppendLine($"<p><strong>Receipt No:</strong> {nextSaleIdn}</p>");
-            receiptContent.AppendLine($"<p><strong>Date:</strong> {DateTime.Now:dd/MM/yyyy HH:mm:ss}</p>");
-            receiptContent.AppendLine($"<p><strong>Employee:</strong> {employeeFirstName} {employeeSurname}</p>");
-            string paymentMethod = combopaymentmentod.SelectedValue?.ToString() ?? "N/A";
-            receiptContent.AppendLine($"<p><strong>Payment Method:</strong> {paymentMethod}</p>");
-            receiptContent.AppendLine("</div>");
-            receiptContent.AppendLine("<div class='divider'></div>");
-            receiptContent.AppendLine("<div class='items-header'>");
-            receiptContent.AppendLine("<p><strong>Item              Qty   Price     Total</strong></p>");
-            receiptContent.AppendLine("</div>");
-            receiptContent.AppendLine("<div class='divider'></div>");
-
-            // Items List
-            decimal total = 0;
-            if (dataGridViewSaleDetails != null)
-            {
-                foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
-                {
-                    if (row.Cells["ProductName"].Value != null)
-                    {
-                        string productName = row.Cells["ProductName"].Value.ToString();
-                        int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
-                        decimal price = Convert.ToDecimal(row.Cells["Price"].Value);
-                        decimal subtotal = Convert.ToDecimal(row.Cells["Subtotal"].Value);
-
-                        receiptContent.AppendLine($"<p>{productName,-15} {quantity,3} {price,9:C} {subtotal,10:C}</p>");
-                        total += subtotal;
-                    }
-                }
-            }
-
-            // Calculate discount
-            decimal discountValue = 0;
-            decimal discountPercentage = 0;
-
-            if (checkdiscount.Checked && !string.IsNullOrWhiteSpace(txtdiscount.Text) &&
-                decimal.TryParse(txtdiscount.Text, out decimal parsedDiscount) && parsedDiscount >= 0 && parsedDiscount <= 100)
-            {
-                discountPercentage = parsedDiscount / 100;
-                discountValue = total * discountPercentage;
-            }
-
-            // Calculate totals
-            decimal subtotalAfterDiscount = total - discountValue;
-            if (subtotalAfterDiscount < 0) subtotalAfterDiscount = 0;
-
-            decimal tax = subtotalAfterDiscount * 0.15m;
-            decimal finalTotal = subtotalAfterDiscount + cashbackAmount;
-
-            receiptContent.AppendLine("<div class='divider'></div>");
-            receiptContent.AppendLine("<div class='totals'>");
-            receiptContent.AppendLine($"<p class='text-right'><strong>Subtotal:</strong> {total,25:C}</p>");
-
-            if (checkdiscount.Checked)
-            {
-                receiptContent.AppendLine($"<p class='text-right'><strong>Discount ({discountPercentage * 100:F0}%):</strong> {discountValue,17:C}</p>");
-            }
-
-            receiptContent.AppendLine($"<p class='text-right'><strong>Subtotal After Discount:</strong> {subtotalAfterDiscount,12:C}</p>");
-            receiptContent.AppendLine($"<p class='text-right'><strong>VAT (15%):</strong> {tax,26:C}</p>");
-
-            // Add cashback line if applicable
-            if (cashbackAmount > 0)
-            {
-                receiptContent.AppendLine($"<p class='text-right'><strong>Cashback Applied:</strong> {cashbackAmount,19:C}</p>");
-            }
-
-            receiptContent.AppendLine($"<p class='text-right'><strong>Total:</strong> {finalTotal,29:C}</p>");
-            receiptContent.AppendLine("</div>");
-
-            if (paymentMethod == "CASH")
-            {
-                decimal renderedAmount = decimal.Parse(txtrenderedamount.Text);
-                decimal change = renderedAmount - finalTotal;
-
-                receiptContent.AppendLine("<div class='divider'></div>");
-                receiptContent.AppendLine("<div class='totals'>");
-                receiptContent.AppendLine($"<p class='text-right'><strong>Amount Rendered:</strong> {renderedAmount,19:C}</p>");
-                receiptContent.AppendLine($"<p class='text-right'><strong>Change:</strong> {change,30:C}</p>");
-                receiptContent.AppendLine("</div>");
-            }
-
-            receiptContent.AppendLine("<div class='divider'></div>");
-            receiptContent.AppendLine("<div class='footer text-center'>");
-            receiptContent.AppendLine("<p>Thank you for shopping with us!</p>");
-            receiptContent.AppendLine("<p>Visit us again!</p>");
-            receiptContent.AppendLine("<p>---------- MOSAKA SYSTEM ----------</p>");
-            receiptContent.AppendLine("</div>");
-            receiptContent.AppendLine("</div>");
-            receiptContent.AppendLine("</body>");
-            receiptContent.AppendLine("</html>");
-
-            return receiptContent.ToString();
-        }
 
 
         private void SendReceiptEmail(string receiptContent)
@@ -752,52 +584,23 @@ namespace Miara
             {
                 if (!dataGridViewSaleDetails.Columns.Contains(column))
                 {
+                    LogAuditEntry(column, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Missing required column: {column}");
                     return false;
                 }
             }
             return true;
         }
 
-        private int GetNextSaleId()
-        {
-            int nextSaleId = 0;
-
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    string query = "SELECT ISNULL(MAX(SaleID), 0) + 1 FROM Sale WITH(NOLOCK)"; // Get the next SaleID
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        connection.Open();
-                        var result = command.ExecuteScalar();
-                        if (result != DBNull.Value)
-                        {
-                            nextSaleId = Convert.ToInt32(result);
-                        }
-                    }
-                }
-            }
-            catch (SqlException sqlEx)
-            {
-                MessageBox.Show($"SQL Error retrieving next SaleID: {sqlEx.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error retrieving next SaleID: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return nextSaleId;
-        }
-
+      
         public string ReceivedValue { get; set; }
+        public string DeviceInternetID { get; private set; }
 
         private async void frmSales_Load(object sender, EventArgs e)
         {
             DeleteCouponRedemptionBySaleId(nextSaleIdn);
 
        
-            await LoadEmployeeImageAsync(EMployeeNumber);
+            await LoadEmployeeImageAsync(EmployeeNumber);
 
           
             foreach (Control control in this.Controls)
@@ -809,77 +612,7 @@ namespace Miara
             }
         }
 
-        private void LogReceiptData()
-        {
-            try
-            {
-                decimal total = 0;
-                foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
-                {
-                    if (row.Cells["ProductName"].Value != null)
-                    {
-                        decimal subtotal = Convert.ToDecimal(row.Cells["Subtotal"].Value);
-                        total += subtotal;
-                    }
-                }
-
-                decimal discountValue = 0;
-                decimal discountPercentage = 0;
-
-                if (checkdiscount.Checked && !string.IsNullOrWhiteSpace(txtdiscount.Text) &&
-                    decimal.TryParse(txtdiscount.Text, out decimal parsedDiscount) && parsedDiscount >= 0 && parsedDiscount <= 100)
-                {
-                    discountPercentage = parsedDiscount / 100;
-                    discountValue = total * discountPercentage;
-                }
-
-                decimal subtotalAfterDiscount = total - discountValue;
-                if (subtotalAfterDiscount < 0)
-                    subtotalAfterDiscount = 0;
-
-                decimal tax = subtotalAfterDiscount * 0.15m;
-                decimal finalTotal = subtotalAfterDiscount;
-
-                decimal renderedAmount = 0;
-                decimal change = 0;
-                string paymentMethod = combopaymentmentod.SelectedValue?.ToString() ?? "N/A";
-
-                if (paymentMethod == "CASH")
-                {
-                    renderedAmount = decimal.Parse(txtrenderedamount.Text);
-                    change = renderedAmount - finalTotal;
-                }
-
-                // Insert receipt data into the database
-                string query = @"
-            INSERT INTO Receipts (ReceiptNumber, Date, EmployeeName, PaymentMethod, Subtotal, Discount, Tax, Total, AmountRendered, Change)
-            VALUES (@ReceiptNumber, @Date, @EmployeeName, @PaymentMethod, @Subtotal, @Discount, @Tax, @Total, @AmountRendered, @Change)";
-
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@ReceiptNumber", nextSaleIdn);
-                        command.Parameters.AddWithValue("@Date", DateTime.Now);
-                        command.Parameters.AddWithValue("@EmployeeName", $"{employeeFirstName} {employeeSurname}");
-                        command.Parameters.AddWithValue("@PaymentMethod", paymentMethod);
-                        command.Parameters.AddWithValue("@Subtotal", total);
-                        command.Parameters.AddWithValue("@Discount", discountValue);
-                        command.Parameters.AddWithValue("@Tax", tax);
-                        command.Parameters.AddWithValue("@Total", finalTotal);
-                        command.Parameters.AddWithValue("@AmountRendered", renderedAmount);
-                        command.Parameters.AddWithValue("@Change", change);
-
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while logging receipt data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+      
         private TextBox activeTextBox;
         private void TextBox_Enter(object sender, EventArgs e)
         {
@@ -903,6 +636,7 @@ namespace Miara
                 activeTextBox.Text = activeTextBox.Text.Substring(0, activeTextBox.Text.Length - 1);
             }
         }
+
 
         private string HashPassword(string password)
         {
@@ -1002,12 +736,13 @@ namespace Miara
         private void timer1_Tick(object sender, EventArgs e)
         {
             lblDateTime.Text = DateTime.Now.ToString("dddd, dd MMMM yyyy h:mm:ss tt");
+            CheckConnectionButton_Click();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber).ShowDialog();
+            new frmMainForm(employeeFirstName, employeeSurname, EmployeeNumber,DeviceinternetID).ShowDialog();
         }
 
 
@@ -1043,18 +778,7 @@ namespace Miara
         }
 
 
-        private DataTable GetDataWithParameters(string query, params SqlParameter[] parameters)
-        {
-            DataTable dt = new DataTable();
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddRange(parameters);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dt);
-            }
-            return dt;
-        }
+ 
 
 
 
@@ -1097,7 +821,7 @@ namespace Miara
 
                 PopulateReceiptData(receiptData, saleDetails);
 
-                PrintReceipt();
+               // PrintReceipt();
             }
             catch (Exception ex)
             {
@@ -1429,7 +1153,7 @@ namespace Miara
         private void button2_Click(object sender, EventArgs e)
         {
             nextSaleIdn = GetNextSaleId();
-            new frmCashback(employeeFirstName, employeeSurname, EMployeeNumber, nextSaleIdn).ShowDialog();
+            new frmCashback(employeeFirstName, employeeSurname, EmployeeNumber, nextSaleIdn).ShowDialog();
             UpdateTotalAmount();
             combopaymentmentod.SelectedItem = 2;
             combopaymentmentod.SelectedItem = "Debit/Credit Card";
@@ -1491,31 +1215,6 @@ namespace Miara
                 throw;
             }
         }
-
-
-        [System.Runtime.InteropServices.DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn(
-      int nLeftRect,
-      int nTopRect,
-      int nRightRect,
-      int nBottomRect,
-      int nWidthEllipse,
-      int nHeightEllipse
-  );
-
-
-
-        private void RoundButtonCorners(Button button, int radius)
-        {
-            button.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, button.Width, button.Height, radius, radius));
-        }
-
-
-
-
-
-
-
 
 
         private void CompleteCashback(int saleId)
@@ -1591,7 +1290,7 @@ namespace Miara
                 decimal subtotal = (decimal)selectedRow.Cells["Subtotal"].Value;
 
 
-                string voidedBy = $"{employeeFirstName} {employeeSurname} ({EMployeeNumber})";
+                string voidedBy = $"{employeeFirstName} {employeeSurname} ({EmployeeNumber})";
 
                 LogVoidOperation(nextSaleIdn, productId, productName, quantity, price, subtotal,
                                  "LineItem", "Employee/Customer agreement", voidedBy);
@@ -1708,25 +1407,37 @@ namespace Miara
 
         private void LoadPaymentMethods()
         {
-            string query = "SELECT MethodName FROM PaymentMethods WHERE IsActive = 1";
+            // The query should ideally select both the ID and the name.
+            string query = "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = 1";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                try
+                // Use a using statement for the connection to ensure it's always closed.
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
+                    conn.Open(); // Explicitly open the connection
 
-                    combopaymentmentod.DataSource = dt;
-                    combopaymentmentod.DisplayMember = "MethodName";
-                    combopaymentmentod.ValueMember = "MethodName"; // same as DisplayMember if you only want the name
-                    combopaymentmentod.SelectedIndex = -1; // no default selection
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
+                    {
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
+
+                        // Add a default "Select an option" row for better user experience.
+                        DataRow defaultRow = dt.NewRow();
+                        defaultRow["PaymentMethodID"] = DBNull.Value;
+                        defaultRow["MethodName"] = "-- Select Payment Method --";
+                        dt.Rows.InsertAt(defaultRow, 0);
+                        combopaymentmentod.DataSource = dt;
+                        combopaymentmentod.DisplayMember = "MethodName";
+                        combopaymentmentod.ValueMember = "PaymentMethodID";
+                        combopaymentmentod.SelectedIndex = 0;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error loading payment methods: " + ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                logTrace($"Error loading payment methods: {ex.Message}");
+                MessageBox.Show("An error occurred while loading payment methods. Please try again or contact support.", "Loading Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1769,7 +1480,6 @@ namespace Miara
                 MessageBox.Show("Invalid product selection or quantity.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-
         private void combopaymentmentod_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (combopaymentmentod.SelectedItem?.ToString() == "Cash")
@@ -1790,9 +1500,10 @@ namespace Miara
                 btnCompleteSale.Enabled = true;
             }
 
+            btnCompleteSale.Enabled = true;
+
 
         }
-
 
         private void find_product_using_barcode(object sender, EventArgs e)
         {
@@ -1863,7 +1574,6 @@ namespace Miara
         }
 
 
-
         private void txtBarcodeLabel_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -1874,84 +1584,9 @@ namespace Miara
             }
         }
 
-
         private void txtrenderedamount_TextChanged(object sender, EventArgs e)
         {
             btnCalculatechange.Enabled = true;
-        }
-
-        private void btn1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btn2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-    
-
-        private void pictureBox3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnReportSales_Click(object sender, EventArgs e)
-        {
-           
-        }
-
-
-
-
-        private void PrintReport(LocalReport localReport)
-        {
-            try
-            {
-   
-                PrintDocument printDocument = new PrintDocument();
-
-                printDocument.PrintPage += (sender, e) =>
-                {
-                    // Render the report to a byte array
-                    Warning[] warnings;
-                    string[] streamIds;
-                    string mimeType, encoding, extension;
-                    byte[] bytes = localReport.Render("Image", null, out mimeType, out encoding, out extension, out streamIds, out warnings);
-
-                
-                    using (MemoryStream stream = new MemoryStream(bytes))
-                    {
-                       
-                        Image image = Image.FromStream(stream);
-
-               
-                        e.Graphics.DrawImage(image, e.PageBounds);
-                    }
-                };
-
- 
-                PrintDialog printDialog = new PrintDialog
-                {
-                    Document = printDocument
-                };
-
-                if (printDialog.ShowDialog() == DialogResult.OK)
-                {
-
-                    printDocument.Print();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while printing the report: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void comboBoxProducts_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void comboProductCategory_SelectedIndexChanged(object sender, EventArgs e)
@@ -2007,13 +1642,233 @@ namespace Miara
             }
             catch (Exception ex)
             {
+               
                 MessageBox.Show("Error loading image: " + ex.Message);
             }
         }
 
+
+        private async void CheckConnectionButton_Click()
+        {
+            lblinternet.Text = "Checking...";
+            lblinternet.ForeColor = Color.Orange;
+            bool isConnected = await IsInternetAvailableAsync();
+
+          
+            if (isConnected)
+            {
+                lblinternet.Text = "";
+                lblinternet.ForeColor = Color.Green;
+            }
+            else
+            {
+                lblinternet.Text = "No Internet Connection";
+                lblinternet.ForeColor = Color.Red;
+            }
+        }
+
+        
+        public async Task<bool> IsInternetAvailableAsync()
+        {
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    
+                    var reply = await ping.SendPingAsync("8.8.8.8", 2000); // 2-second timeout
+
+                   
+                    return reply.Status == IPStatus.Success;
+                }
+            }
+            catch (PingException)
+            {
+                
+                return false;
+            }
+            catch (Exception)
+            {
+    
+                return false;
+            }
+        }
+
+
+     
+
+        private void txtRecipientEmail_TextChanged(object sender, EventArgs e)
+        {
+            VerifyEmailAddress();
+        }
+
+        private void VerifyEmailAddress()
+        {
+            string email = txtRecipientEmail.Text.Trim();
+
+            // Reset label color
+            txtRecipientEmail.ForeColor = Color.Black;
+            lblemailvalid.Visible = false;
+            // Check if email is empty
+            if (string.IsNullOrEmpty(email))
+            {
+                txtRecipientEmail.ForeColor = Color.Red;
+                lblemailvalid.Visible = true;
+                return;
+            }
+
+            try
+            {
+                // Check email format using MailAddress
+                var addr = new System.Net.Mail.MailAddress(email);
+
+                // Additional checks for common email validation
+                if (!email.Contains("@") || !email.Contains("."))
+                {
+                    txtRecipientEmail.ForeColor = Color.Red;
+                    lblemailvalid.Visible = true;
+                    return;
+                }
+
+                // Check for valid domain (basic check)
+                string[] domainParts = email.Split('@');
+                if (domainParts.Length != 2 || string.IsNullOrEmpty(domainParts[1]))
+                {
+                    txtRecipientEmail.ForeColor = Color.Red;
+                    lblemailvalid.Visible = true;
+                    return;
+                }
+            }
+            catch (FormatException)
+            {
+                txtRecipientEmail.ForeColor = Color.Red;
+                lblemailvalid.Visible = true;
+            }
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            UploadImageForEmployee(EmployeeNumber);
+            _ = LoadEmployeeImageAsync(EmployeeNumber);
+        }
+
+        private void UploadImageForEmployee(int employeeId)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    // Create thumbnail (e.g., max 300px width/height)
+                    Image originalImage = Image.FromFile(ofd.FileName);
+                    Image thumbnail = CreateThumbnail(originalImage, 300);
+
+                    // Convert thumbnail to byte array
+                    byte[] imageData;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // Save in JPEG format with 80% quality (adjust as needed)
+                        var encoderParams = new EncoderParameters(1);
+                        encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
+
+                        ImageCodecInfo jpegCodec = GetEncoderInfo("image/jpeg");
+                        thumbnail.Save(ms, jpegCodec, encoderParams);
+                        imageData = ms.ToArray();
+                    }
+
+                    string fileName = Path.GetFileName(ofd.FileName);
+
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        SqlTransaction transaction = conn.BeginTransaction();
+
+                        try
+                        {
+                            // Step 1: Deactivate old images
+                            string deactivateQuery = @"
+                        UPDATE ImageStore 
+                        SET IsActive = 0 
+                        WHERE EmployeeID = @empId AND IsActive = 1";
+
+                            SqlCommand deactivateCmd = new SqlCommand(deactivateQuery, conn, transaction);
+                            deactivateCmd.Parameters.AddWithValue("@empId", employeeId);
+                            deactivateCmd.ExecuteNonQuery();
+
+                            // Step 2: Insert new image
+                            string insertQuery = @"
+                        INSERT INTO ImageStore (ImageName, ImageData, EmployeeID, IsActive, [Date]) 
+                        VALUES (@name, @data, @empId, 1, GETDATE())";
+
+                            SqlCommand insertCmd = new SqlCommand(insertQuery, conn, transaction);
+                            insertCmd.Parameters.AddWithValue("@name", fileName);
+                            insertCmd.Parameters.AddWithValue("@data", imageData);
+                            insertCmd.Parameters.AddWithValue("@empId", employeeId);
+
+                            insertCmd.ExecuteNonQuery();
+
+                            transaction.Commit();
+                            MessageBox.Show("Image uploaded successfully as thumbnail!");
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            MessageBox.Show("Error: " + ex.Message);
+                        }
+                        finally
+                        {
+                            originalImage.Dispose();
+                            thumbnail.Dispose();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error processing image: " + ex.Message);
+                }
+            }
+        }
+
+        private Image CreateThumbnail(Image original, int maxSize)
+        {
+            // Calculate new dimensions
+            int newWidth, newHeight;
+            if (original.Width > original.Height)
+            {
+                newWidth = maxSize;
+                newHeight = (int)(original.Height * ((float)maxSize / original.Width));
+            }
+            else
+            {
+                newHeight = maxSize;
+                newWidth = (int)(original.Width * ((float)maxSize / original.Height));
+            }
+
+            // Create thumbnail
+            Bitmap thumbnail = new Bitmap(newWidth, newHeight);
+            using (Graphics g = Graphics.FromImage(thumbnail))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(original, 0, 0, newWidth, newHeight);
+            }
+
+            return thumbnail;
+        }
+
+        private ImageCodecInfo GetEncoderInfo(string mimeType)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.MimeType == mimeType)
+                    return codec;
+            }
+            return null;
+        }
     }
 }
-
 
 
 

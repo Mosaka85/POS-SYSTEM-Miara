@@ -16,8 +16,9 @@ namespace Miara
         string employeeFirstName;
         string employeeSurname;
         int EMployeeNumber;
+        string DeviceinternetID;
 
-        public frmReports(string firstName, string surname, int EMID)
+        public frmReports(string firstName, string surname, int EMID, string Macaddress)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
@@ -25,6 +26,7 @@ namespace Miara
             employeeFirstName = firstName;
             employeeSurname = surname;
             EMployeeNumber = EMID;
+            DeviceinternetID = Macaddress;
         }
 
         private void LoadSQLConnectionInfo()
@@ -319,7 +321,7 @@ namespace Miara
         private void button1_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber).ShowDialog();
+            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber, DeviceinternetID).ShowDialog();
         }
     }
 }

@@ -13,26 +13,28 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
+    <UpdateUrl>http://localhost/Miara POS/</UpdateUrl>
+    <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
@@ -42,7 +44,8 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <DocumentationFile>..\..\..\..\..\..\Program Files %28x86%29\Miara POS\Miara POS.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,6 +55,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Miara POS.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>miara_pos_2PE_1.ico</ApplicationIcon>
@@ -75,6 +80,10 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Config\Miara_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="Accessibility" />
     <Reference Include="Eco.WPF, Version=7.2.0.0, Culture=neutral, PublicKeyToken=46a833be9e90de8c, processorArchitecture=MSIL">
@@ -162,6 +171,34 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormApplicationSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormApplicationSettings.Designer.cs">
+      <DependentUpon>FormApplicationSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormUserPermissions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormUserPermissions.Designer.cs">
+      <DependentUpon>FormUserPermissions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Processor Class\ApplicationSettings.cs" />
+    <Compile Include="Processor Class\SettingsManager.cs" />
+    <Compile Include="Processor Class\IReceiptService.cs" />
+    <Compile Include="Processor Class\ISaleRepository.cs" />
+    <Compile Include="Processor Class\ReceiptEmailBuilder.cs" />
+    <Compile Include="Processor Class\ReceiptPrinter.cs" />
+    <Compile Include="Processor Class\SaleProcessor.cs" />
+    <Compile Include="Processor Class\PrinterRepository.cs" />
+    <Compile Include="Processor Class\PrinterService.cs" />
+    <Compile Include="Processor Class\Printer.cs" />
+    <Compile Include="Forms\frmPrinter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmPrinter.Designer.cs">
+      <DependentUpon>frmPrinter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmTableDefinition.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -260,6 +297,12 @@
       <DependentUpon>Settings1.settings</DependentUpon>
     </Compile>
     <Compile Include="SqlServerTypes\Loader.cs" />
+    <EmbeddedResource Include="FormApplicationSettings.resx">
+      <DependentUpon>FormApplicationSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmPrinter.resx">
+      <DependentUpon>frmPrinter.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmTableDefinition.resx">
       <DependentUpon>frmTableDefinition.cs</DependentUpon>
     </EmbeddedResource>
@@ -302,6 +345,9 @@
     <EmbeddedResource Include="Forms\frmCategory.resx">
       <DependentUpon>frmCategory.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormUserPermissions.resx">
+      <DependentUpon>FormUserPermissions.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmConfirmDialogCoupons.resx">
       <DependentUpon>frmConfirmDialogCoupons.cs</DependentUpon>
     </EmbeddedResource>
@@ -319,6 +365,7 @@
       <Link>Config\.editorconfig</Link>
     </None>
     <None Include="app.config" />
+    <None Include="App1.config" />
     <None Include="Config\Miara_TemporaryKey.pfx" />
     <None Include="Config\packages.config" />
     <None Include="packages.config" />
@@ -343,6 +390,8 @@
   <ItemGroup>
     <Content Include="Config\Untitled-design.ico" />
     <Content Include="miara_pos_2PE_1.ico" />
+    <Content Include="XMLFile1.xml" />
+    <None Include="Resources\user.png" />
     <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

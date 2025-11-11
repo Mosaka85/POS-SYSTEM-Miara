@@ -10,16 +10,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "MY Report Project", "MY Report Project\MY Report Project.rptproj", "{894BD4EC-0962-3499-38EA-CF9CBF53798B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		DebugLocal|Any CPU = DebugLocal|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D4948745-8EA0-40DF-9DB0-A9E8CB588FB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D4948745-8EA0-40DF-9DB0-A9E8CB588FB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4948745-8EA0-40DF-9DB0-A9E8CB588FB2}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4948745-8EA0-40DF-9DB0-A9E8CB588FB2}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{D4948745-8EA0-40DF-9DB0-A9E8CB588FB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4948745-8EA0-40DF-9DB0-A9E8CB588FB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.Debug|Any CPU.ActiveCfg = Debug
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.Debug|Any CPU.Build.0 = Debug
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.Debug|Any CPU.Deploy.0 = Debug
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.DebugLocal|Any CPU.ActiveCfg = DebugLocal
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.DebugLocal|Any CPU.Build.0 = DebugLocal
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.Release|Any CPU.ActiveCfg = Release
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.Release|Any CPU.Build.0 = Release
+		{894BD4EC-0962-3499-38EA-CF9CBF53798B}.Release|Any CPU.Deploy.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

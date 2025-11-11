@@ -19,6 +19,9 @@ namespace Miara
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
+            btnSendOtp.Enabled = false; // Disable button until username is entered
+            txtUsername.TextChanged += txtUsername_TextChanged;
+            this.FormClosing += frmResetPassword_FormClosing;
         }
 
         private void LoadSQLConnectionInfo()
@@ -91,7 +94,7 @@ namespace Miara
             .otp {{
                 font-size: 24px;
                 font-weight: bold;
-                color: #007bff;
+                color: #2874A6; /* Using our primary color */
             }}
             .disclaimer {{
                 font-size: 12px;
@@ -128,50 +131,88 @@ namespace Miara
         private string GenerateOTP()
         {
             Random rand = new Random();
-            return rand.Next(100000000, 199999999).ToString();
+            return rand.Next(100000, 999999).ToString(); // 6-digit OTP
         }
 
         private void btnSendOtp_Click(object sender, EventArgs e)
         {
-            SendPasswordResetOTP(txtUsername.Text);
-            MessageBox.Show("Reset Password email sent Email  Sent");
-            lblEmailsent.Text = $"Email sent to {userEmail}";
-            btnSendOtp.Enabled = false;
-            flowLayoutPanel1.Visible = true;
+            if (string.IsNullOrEmpty(txtUsername.Text))
+            {
+                MessageBox.Show("Please enter your username first.");
+                return;
+            }
 
+            try
+            {
+                SendPasswordResetOTP(txtUsername.Text);
+                lblEmailsent.Text = $"OTP sent to {userEmail}";
+                lblEmailsent.Visible = true;
+                btnSendOtp.Enabled = false;
+                btnSendOtp.Enabled= false; // Disable button after sending OTP
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error sending OTP: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnSaveupdate_Click(object sender, EventArgs e)
         {
-            if (txtOTPEmail.Text == generatedOTP)
+            if (string.IsNullOrEmpty(txtOTPEmail.Text))
             {
-                if (txtPassword.Text == txtConfirmPassword.Text && !string.IsNullOrEmpty(txtPassword.Text))
-                {
-                    string hashedPassword = HashPassword(txtPassword.Text);
-                    string query = "UPDATE Employees SET PasswordHash = @password WHERE Username = @username";
-
-                    using (SqlConnection conn = new SqlConnection(connectionString))
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@password", hashedPassword);
-                        cmd.Parameters.AddWithValue("@username", txtUsername.Text);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    MessageBox.Show("Password successfully changed.");
-                    flowLayoutPanel1.Visible = false;
-                }
-                else
-                {
-                    MessageBox.Show("Passwords do not match or are empty.");
-                }
+                MessageBox.Show("Please enter the OTP first.");
+                return;
             }
-            else
+
+            if (txtOTPEmail.Text != generatedOTP)
             {
                 MessageBox.Show("Invalid OTP. Please try again.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(txtPassword.Text))
+            {
+                MessageBox.Show("Please enter a new password.");
+                return;
+            }
+
+            if (txtPassword.Text != txtConfirmPassword.Text)
+            {
+                MessageBox.Show("Passwords do not match.");
+                return;
+            }
+
+            try
+            {
+                string hashedPassword = HashPassword(txtPassword.Text);
+                string query = "UPDATE Employees SET PasswordHash = @password WHERE Username = @username";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@password", hashedPassword);
+                    cmd.Parameters.AddWithValue("@username", txtUsername.Text);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show("Password successfully changed.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
+                        Application.Restart(); // Restart the application to apply changes
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to update password. User not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating password: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private string HashPassword(string password)
         {
@@ -190,17 +231,24 @@ namespace Miara
 
         private void txtUsername_TextChanged(object sender, EventArgs e)
         {
-            btnSendOtp.Enabled = true;
-        }
-
-        private void frmResetPassword_Load(object sender, EventArgs e)
-        {
-            flowLayoutPanel1.Visible = false;
+            lblEmailsent.Visible = false;
+            btnSendOtp.Enabled = !string.IsNullOrEmpty(txtUsername.Text);
+            btnSendOtp.Enabled = true; // Enable button when username is entered
         }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
+            this.Close();
             Application.Restart();
+        }
+
+        private void frmResetPassword_Load(object sender, EventArgs e)
+        {
+            lblEmailsent.Visible = false;
+        }
+        private void frmResetPassword_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Application.Exit(); // Ensure the application exits when the form is closed
         }
     }
 }

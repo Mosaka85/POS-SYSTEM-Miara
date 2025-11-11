@@ -45,9 +45,10 @@
             this.btnExit = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
             this.btnBack = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
             this.btnNewCate = new System.Windows.Forms.Button();
+            this.btnDeleteCategory = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -117,7 +118,7 @@
             this.dataGridView2.RowTemplate.DefaultCellStyle.Padding = new System.Windows.Forms.Padding(5);
             this.dataGridView2.RowTemplate.Height = 35;
             this.dataGridView2.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView2.Size = new System.Drawing.Size(793, 350);
+            this.dataGridView2.Size = new System.Drawing.Size(793, 279);
             this.dataGridView2.TabIndex = 27;
             // 
             // btnaddCategory
@@ -127,9 +128,9 @@
             this.btnaddCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnaddCategory.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnaddCategory.ForeColor = System.Drawing.Color.White;
-            this.btnaddCategory.Location = new System.Drawing.Point(0, 191);
+            this.btnaddCategory.Location = new System.Drawing.Point(664, 191);
             this.btnaddCategory.Name = "btnaddCategory";
-            this.btnaddCategory.Size = new System.Drawing.Size(182, 50);
+            this.btnaddCategory.Size = new System.Drawing.Size(125, 38);
             this.btnaddCategory.TabIndex = 26;
             this.btnaddCategory.Text = "Add Category";
             this.btnaddCategory.UseVisualStyleBackColor = false;
@@ -172,9 +173,9 @@
             this.EditCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.EditCategory.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.EditCategory.ForeColor = System.Drawing.Color.White;
-            this.EditCategory.Location = new System.Drawing.Point(188, 191);
+            this.EditCategory.Location = new System.Drawing.Point(489, 556);
             this.EditCategory.Name = "EditCategory";
-            this.EditCategory.Size = new System.Drawing.Size(182, 50);
+            this.EditCategory.Size = new System.Drawing.Size(145, 44);
             this.EditCategory.TabIndex = 31;
             this.EditCategory.Text = "Edit Category";
             this.EditCategory.UseVisualStyleBackColor = false;
@@ -187,9 +188,9 @@
             this.btnCategoryUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCategoryUpdate.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCategoryUpdate.ForeColor = System.Drawing.Color.White;
-            this.btnCategoryUpdate.Location = new System.Drawing.Point(382, 191);
+            this.btnCategoryUpdate.Location = new System.Drawing.Point(650, 556);
             this.btnCategoryUpdate.Name = "btnCategoryUpdate";
-            this.btnCategoryUpdate.Size = new System.Drawing.Size(182, 50);
+            this.btnCategoryUpdate.Size = new System.Drawing.Size(153, 44);
             this.btnCategoryUpdate.TabIndex = 32;
             this.btnCategoryUpdate.Text = "Update Category";
             this.btnCategoryUpdate.UseVisualStyleBackColor = false;
@@ -253,19 +254,8 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(803, 54);
+            this.panel2.Size = new System.Drawing.Size(832, 54);
             this.panel2.TabIndex = 37;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(12, 15);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(161, 28);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Category Details";
             // 
             // btnBack
             // 
@@ -283,6 +273,18 @@
             this.btnBack.UseVisualStyleBackColor = true;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.White;
+            this.label2.Location = new System.Drawing.Point(12, 15);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(161, 28);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Category Details";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
+            // 
             // btnNewCate
             // 
             this.btnNewCate.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
@@ -290,20 +292,36 @@
             this.btnNewCate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnNewCate.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnNewCate.ForeColor = System.Drawing.Color.White;
-            this.btnNewCate.Location = new System.Drawing.Point(588, 191);
+            this.btnNewCate.Location = new System.Drawing.Point(460, 191);
             this.btnNewCate.Name = "btnNewCate";
-            this.btnNewCate.Size = new System.Drawing.Size(182, 50);
+            this.btnNewCate.Size = new System.Drawing.Size(156, 38);
             this.btnNewCate.TabIndex = 38;
             this.btnNewCate.Text = "New Category";
             this.btnNewCate.UseVisualStyleBackColor = false;
             this.btnNewCate.Click += new System.EventHandler(this.btnNewCate_Click);
+            // 
+            // btnDeleteCategory
+            // 
+            this.btnDeleteCategory.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.btnDeleteCategory.FlatAppearance.BorderSize = 0;
+            this.btnDeleteCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDeleteCategory.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDeleteCategory.ForeColor = System.Drawing.Color.White;
+            this.btnDeleteCategory.Location = new System.Drawing.Point(336, 556);
+            this.btnDeleteCategory.Name = "btnDeleteCategory";
+            this.btnDeleteCategory.Size = new System.Drawing.Size(125, 44);
+            this.btnDeleteCategory.TabIndex = 39;
+            this.btnDeleteCategory.Text = "Delete";
+            this.btnDeleteCategory.UseVisualStyleBackColor = false;
+            this.btnDeleteCategory.Click += new System.EventHandler(this.btnDeleteCategory_Click);
             // 
             // frmCategory
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
-            this.ClientSize = new System.Drawing.Size(803, 627);
+            this.ClientSize = new System.Drawing.Size(832, 626);
+            this.Controls.Add(this.btnDeleteCategory);
             this.Controls.Add(this.btnNewCate);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
@@ -347,5 +365,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Button btnNewCate;
+        private System.Windows.Forms.Button btnDeleteCategory;
     }
 }

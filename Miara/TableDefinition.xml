@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Tables>
 	<Table name="Employees" schema="dbo">
-		<Column name="EmployeeID" type="bigint" isIdentity="true" isNullable="false" />
+		<Column name="EmployeeID" type=" " isIdentity="true" isNullable="false" />
 		<Column name="EmployeeFirstName" type="varchar" length="255" isNullable="false" />
 		<Column name="EmployeeSurname" type="varchar" length="255" isNullable="false" />
 		<Column name="Department" type="varchar" length="255" isNullable="false" />
@@ -237,6 +237,26 @@
 		<PrimaryKey name="PK__SalesDet__70DB141E8E909FC7">
 			<Column name="SaleDetailID" order="ASC" />
 		</PrimaryKey>
+	</Table>
+	<Table name="Printers" schema="dbo">
+		<Column name="PrinterID" type="int" isIdentity="true" isNullable="false" />
+		<Column name="PrinterName" type="nvarchar" length="255" isNullable="false" />
+		<Column name="MACAddress" type="nvarchar" length="50" isNullable="false" />
+		<Column name="IPAddress" type="nvarchar" length="50" isNullable="true" />
+		<Column name="PortName" type="nvarchar" length="100" isNullable="true" />
+		<Column name="IsNetworkPrinter" type="bit" isNullable="true" />
+		<Column name="DateAdded" type="datetime" isNullable="false" />
+		<Column name="LastUpdated" type="datetime" isNullable="true" />
+		<Column name="DEVICE" type="varchar" length="1000" isNullable="true" />
+
+		<PrimaryKey name="PK__Printers__6C7E154E1A14E395">
+			<Column name="PrinterID" order="ASC" />
+		</PrimaryKey>
+
+		<AddDefaultConstraint>
+			<Column name="IsNetworkPrinter" />
+			<DefaultValue>0</DefaultValue>
+		</AddDefaultConstraint>
 	</Table>
 
 

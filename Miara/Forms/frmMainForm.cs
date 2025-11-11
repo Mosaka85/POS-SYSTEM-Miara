@@ -10,196 +10,231 @@ namespace Miara
 {
     public partial class frmMainForm : Form
     {
-        public frmMainForm(string firstName, string surname, int EMID)
+        private const string ConfigFile = "Config.xml";
+        private readonly string _connectionString;
+        private readonly string _employeeFirstName;
+        private readonly string _employeeSurname;
+        private readonly int _employeeNumber;
+        private readonly string _deviceInternetId;
+
+        public frmMainForm(string firstName, string surname, int employeeId, string deviceInternetId)
         {
+            ValidateConstructorParameters(firstName, surname, employeeId, deviceInternetId);
+
             InitializeComponent();
+            _employeeFirstName = firstName;
+            _employeeSurname = surname;
+            _employeeNumber = employeeId;
+            _deviceInternetId = deviceInternetId;
 
             lblName.Text = $"WELCOME {firstName} {surname}";
-
-            employeeFirstName = firstName;
-            employeeSurname = surname;
-            EmployeeNumber = EMID;
             this.FormClosed += (sender, e) => Application.Exit();
 
-
-        }
-        private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            new frmEmployeeDetails(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
+            _connectionString = LoadSqlConnectionInfo();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void frmMainForm_Load(object sender, EventArgs e)
         {
-
+            LoadEmployeeImageAsync().ConfigureAwait(false);
         }
 
-        private string employeeFirstName;
-        private string employeeSurname;
-        private int EmployeeNumber;
+     
 
-        private string connectionString;
-
-        private void button3_Click_1(object sender, EventArgs e)
+        #region Helper Methods
+        private void ValidateConstructorParameters(string firstName, string surname, int employeeId, string deviceInternetId)
         {
-
+            if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("First name cannot be empty.", nameof(firstName));
+            if (string.IsNullOrWhiteSpace(surname)) throw new ArgumentException("Surname cannot be empty.", nameof(surname));
+            if (employeeId <= 0) throw new ArgumentException("Employee ID must be a positive integer.", nameof(employeeId));
+            if (string.IsNullOrWhiteSpace(deviceInternetId)) throw new ArgumentException("Device Internet ID cannot be empty.", nameof(deviceInternetId));
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Opens a form of type T in a dialog, logging the action.
+        /// </summary>
+        private async void OpenForm<T>(Func<Form> formFactory) where T : Form
         {
-            frmProducts newForm = new frmProducts(employeeFirstName, employeeSurname, EmployeeNumber);
-            newForm.ShowDialog();
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-
-            new frmSales(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void button6_Click(object sender, EventArgs e)
-        {
-            new frmEmployeeDetails(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-            Application.Restart();
-        }
-        private async void frmMainForm_Load(object sender, EventArgs e)
-        {
-            LoadSQLConnectionInfo();
-            await LoadEmployeeImageAsync(EmployeeNumber);
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            new frmReports(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void btnCategoryCatalog_Click(object sender, EventArgs e)
-        {
-            new frmCategory(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void panelLeft_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void lblName_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lblUser_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button9_Click(object sender, EventArgs e)
-        {
-            Application.Restart();
-        }
-
-        private void button13_Click(object sender, EventArgs e)
-        {
-            new frmReports(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void btnSalesHistory_Click(object sender, EventArgs e)
-        {
-            new frmReports(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void button15_Click(object sender, EventArgs e)
-        {
-            frmSales newForm = new frmSales(employeeFirstName, employeeSurname, EmployeeNumber);
-            newForm.ShowDialog();
-        }
-
-        private void btnProduct_Click(object sender, EventArgs e)
-        {
-            frmProducts newForm = new frmProducts(employeeFirstName, employeeSurname, EmployeeNumber);
-            newForm.ShowDialog();
-        }
-
-        private void button11_Click(object sender, EventArgs e)
-        {
-            new frmEmployeeDetails(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void button14_Click(object sender, EventArgs e)
-        {
-            new frmCategory(employeeFirstName, employeeSurname, EmployeeNumber).ShowDialog();
-        }
-
-        private void LoadSQLConnectionInfo()
-        {
-            if (File.Exists(configFile))
+            try
             {
-                try
+                using (var form = formFactory())
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
-                    using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
-                    {
-                        LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
-                        connectionString = $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to load connection information: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    await LogAuditEntryAsync(_deviceInternetId, $"{_employeeFirstName} {_employeeSurname}",
+                        $"Opened {typeof(T).Name}");
+                    form.ShowDialog();
                 }
             }
-            else
+            catch (Exception ex)
+            {
+                await LogAuditEntryAsync(_deviceInternetId, $"{_employeeFirstName} {_employeeSurname}",
+                    $"Failed to open {typeof(T).Name}", ex.Message);
+                MessageBox.Show($"Error opening form: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Loads SQL connection string from the configuration file.
+        /// </summary>
+        private string LoadSqlConnectionInfo()
+        {
+            string configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigFile);
+            if (!File.Exists(configPath))
             {
                 MessageBox.Show("Connection configuration file not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
             }
-        }
-
-        private async Task LoadEmployeeImageAsync(int employeeId)
-        {
-            pictureBox1.Image = null;
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (var fileStream = new FileStream(configPath, FileMode.Open, FileAccess.Read))
                 {
-                    string query = @"
-                SELECT TOP 1 ImageData 
-                FROM ImageStore 
-                WHERE EmployeeID = @empId AND IsActive = 1";
+                    var serializer = new XmlSerializer(typeof(LoginInfo));
+                    var loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
+                    return $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load connection information: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return string.Empty;
+            }
+        }
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+        /// <summary>
+        /// Loads the employee's image from the database asynchronously.
+        /// </summary>
+        private async Task LoadEmployeeImageAsync()
+        {
+            if (string.IsNullOrEmpty(_connectionString))
+            {
+                MessageBox.Show("Invalid database connection configuration.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    const string query = @"
+                        SELECT TOP 1 ImageData 
+                        FROM ImageStore 
+                        WHERE EmployeeID = @empId AND IsActive = 1";
+
+                    using (var cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@empId", employeeId);
+                        cmd.Parameters.AddWithValue("@empId", _employeeNumber);
                         await conn.OpenAsync();
-
                         var result = await cmd.ExecuteScalarAsync();
 
                         if (result != null && result != DBNull.Value)
                         {
                             byte[] imgData = (byte[])result;
-                            using (MemoryStream ms = new MemoryStream(imgData))
+                            using (var ms = new MemoryStream(imgData))
                             {
                                 pictureBox1.Image = Image.FromStream(ms);
                             }
                         }
                         else
                         {
-                            MessageBox.Show("No active image found for this employee.");
+                            MessageBox.Show("No active image found for this employee.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                 }
             }
+            catch (SqlException ex)
+            {
+                await LogAuditEntryAsync(_deviceInternetId, $"{_employeeFirstName} {_employeeSurname}",
+                    "Failed to load employee image", ex.Message);
+                MessageBox.Show($"Database error loading image: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading image: " + ex.Message);
+                await LogAuditEntryAsync(_deviceInternetId, $"{_employeeFirstName} {_employeeSurname}",
+                    "Failed to load employee image", ex.Message);
+                MessageBox.Show($"Error loading image: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Logs an audit entry to the database asynchronously.
+        /// </summary>
+        public async Task LogAuditEntryAsync(string device, string employee, string stepDescription, string errorMessage = null)
+        {
+            if (string.IsNullOrEmpty(_connectionString)) return;
 
+            const string query = @"
+                INSERT INTO DeviceAudit (Device, Employee, AuditDate, StepDescription, ErrorMessage)
+                VALUES (@Device, @Employee, @AuditDate, @StepDescription, @ErrorMessage);";
+
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Device", device ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Employee", employee ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@AuditDate", DateTime.Now);
+                    command.Parameters.AddWithValue("@StepDescription", stepDescription ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@ErrorMessage", string.IsNullOrEmpty(errorMessage) ? (object)DBNull.Value : errorMessage);
+
+                    await connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show($"Failed to log audit entry: {ex.Message}", "Logging Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        #endregion
+        #region Button Click Handlers
+        private void btnOpenPOS_Click(object sender, EventArgs e)
+        {
+            OpenForm<frmSales>(() => new frmSales(_employeeFirstName, _employeeSurname, _employeeNumber, _deviceInternetId));
+        }
+
+        private void btnManageProduct_Click(object sender, EventArgs e)
+        {
+            OpenForm<frmProducts>(() => new frmProducts(_employeeFirstName, _employeeSurname, _employeeNumber, _deviceInternetId));
+        }
+
+       
+
+  
+
+        private void manageCategory_Click(object sender, EventArgs e)
+        {
+            OpenForm<frmCategory>(() => new frmCategory(_employeeFirstName, _employeeSurname, _employeeNumber, _deviceInternetId));
+        }
+
+     
+
+        private void btnRecords_Click(object sender, EventArgs e)
+        {
+            OpenForm<frmReports>(() => new frmReports(_employeeFirstName, _employeeSurname, _employeeNumber, _deviceInternetId));
+        }
+
+        private void btnSalesHistory_Click(object sender, EventArgs e)
+        {
+            OpenForm<frmReports>(() => new frmReports(_employeeFirstName, _employeeSurname, _employeeNumber, _deviceInternetId));
+        }
+
+        private void btnUserSetting_Click(object sender, EventArgs e)
+        {
+            OpenForm<FormUserPermissions>(() => new FormUserPermissions(_employeeFirstName, _employeeSurname, _employeeNumber, _deviceInternetId));
+        }
+
+        private void btnLogOut_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
+
+        private void btnsettings_Click(object sender, EventArgs e)
+        {
+            // TODO: Implement store settings form if needed
+            MessageBox.Show("Store settings functionality is not yet implemented.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        #endregion
     }
+
+
 }

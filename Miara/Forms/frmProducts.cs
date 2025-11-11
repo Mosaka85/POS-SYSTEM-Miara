@@ -12,7 +12,7 @@ namespace Miara
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
 
-        public frmProducts(string firstName, string surname, int EMID)
+        public frmProducts(string firstName, string surname, int EMID, string MacAddress)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
@@ -20,6 +20,7 @@ namespace Miara
             NameUser = firstName;
             SurnameUSer = surname;
             EmployeeID = EMID;
+            DeviceinternetID = MacAddress;
             this.FormClosed += (sender, e) => Application.Exit();
 
         }
@@ -28,6 +29,7 @@ namespace Miara
         public string NameUser = "";
         public string SurnameUSer = "";
         public int EmployeeID = 0;
+        private string DeviceinternetID = "";
 
         private void frmProducts_Load(object sender, EventArgs e)
         {
@@ -329,7 +331,7 @@ namespace Miara
         private void btnExit_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(NameUser, SurnameUSer, EmployeeID).ShowDialog();
+            new frmMainForm(NameUser, SurnameUSer, EmployeeID, DeviceinternetID).ShowDialog();
         }
 
         private void btnDeactivate_Click(object sender, EventArgs e)
