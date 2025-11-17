@@ -68,7 +68,14 @@ namespace Miara
             toolStripChangeBackColour.Click += toolStripChangeBackColour_Click;
             timer1.Start();
             this.FormClosed += (sender, e) => Application.Exit();
+            // Load role (async) and display it
+            _ = GetEmployeeRoleAsync(EMID).ContinueWith(t =>
+            {
+                if (!t.IsFaulted && t.Result != null)
+                    this.Invoke((MethodInvoker)(() => lblUserRole.Text = t.Result));
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
+       
 
      
         private void frmSales_KeyDown(object sender, KeyEventArgs e)
@@ -1866,6 +1873,50 @@ namespace Miara
                     return codec;
             }
             return null;
+        }
+
+        private async Task<string> GetEmployeeRoleAsync(int employeeId)
+        {
+            const string query = @"
+                SELECT
+                    u.id AS EmployeeID,
+                    u.first_name AS EmployeeFirstName,
+                    u.last_name  AS EmployeeSurname,
+                    r.name       AS Role
+                FROM [users] u
+                LEFT JOIN [user_groups] ug ON u.user_group_id = ug.id
+                LEFT JOIN [group_roles] gr ON ug.id = gr.group_id
+                LEFT JOIN [roles] r ON gr.role_id = r.id
+                WHERE u.id = @EmployeeID;";
+
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@EmployeeID", employeeId);
+                    await conn.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            return reader["Role"]?.ToString() ?? "No role assigned";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logTrace($"Error retrieving employee role: {ex.Message}");
+            }
+
+            return "Unknown";
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

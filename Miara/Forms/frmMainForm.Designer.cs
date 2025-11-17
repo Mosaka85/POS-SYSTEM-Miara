@@ -67,6 +67,7 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(300, 864);
             this.panel2.TabIndex = 40;
+            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
             // 
             // flowMenuitems
             // 
@@ -150,6 +151,7 @@
             this.btnVendor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnVendor.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnVendor.UseVisualStyleBackColor = false;
+            this.btnVendor.Click += new System.EventHandler(this.btnVendor_Click);
             // 
             // btnStock
             // 
@@ -326,10 +328,11 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 15;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // lblName
             // 
-            this.lblName.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblName.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
             this.lblName.ForeColor = System.Drawing.Color.White;
             this.lblName.Location = new System.Drawing.Point(0, 122);
             this.lblName.Name = "lblName";
@@ -337,6 +340,7 @@
             this.lblName.TabIndex = 1;
             this.lblName.Text = "User Name";
             this.lblName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblName.Click += new System.EventHandler(this.lblName_Click);
             // 
             // lblRole
             // 
@@ -349,7 +353,6 @@
             this.lblRole.TabIndex = 2;
             this.lblRole.Text = "Administrator";
             this.lblRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.lblRole.Click += new System.EventHandler(this.lblRole_Click);
             // 
             // lblUser
             // 

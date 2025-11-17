@@ -92,6 +92,7 @@ namespace Miara
             this.lblinternet = new System.Windows.Forms.Label();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.lblemailvalid = new System.Windows.Forms.Label();
+            this.lblUserRole = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSaleDetails)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -815,6 +816,7 @@ namespace Miara
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            this.panel2.Controls.Add(this.lblUserRole);
             this.panel2.Controls.Add(this.btnBack);
             this.panel2.Controls.Add(this.lblBusineess);
             this.panel2.Controls.Add(this.pictureBox1);
@@ -825,6 +827,7 @@ namespace Miara
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1908, 110);
             this.panel2.TabIndex = 69;
+            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
             // 
             // btnBack
             // 
@@ -887,6 +890,18 @@ namespace Miara
             this.lblemailvalid.TabIndex = 73;
             this.lblemailvalid.Text = "Email Not Valid!!";
             this.lblemailvalid.Visible = false;
+            // 
+            // lblUserRole
+            // 
+            this.lblUserRole.AutoSize = true;
+            this.lblUserRole.BackColor = System.Drawing.Color.Transparent;
+            this.lblUserRole.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold);
+            this.lblUserRole.ForeColor = System.Drawing.Color.White;
+            this.lblUserRole.Location = new System.Drawing.Point(180, 30);
+            this.lblUserRole.Name = "lblUserRole";
+            this.lblUserRole.Size = new System.Drawing.Size(87, 20);
+            this.lblUserRole.TabIndex = 68;
+            this.lblUserRole.Text = "UserRole";
             // 
             // frmSales
             // 
@@ -1009,5 +1024,6 @@ namespace Miara
         private System.Windows.Forms.Label lblinternet;
         private FlowLayoutPanel flowLayoutPanel2;
         private Label lblemailvalid;
+        public Label lblUserRole;
     }
 }

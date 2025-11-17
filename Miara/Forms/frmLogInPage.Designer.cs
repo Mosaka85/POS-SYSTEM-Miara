@@ -127,12 +127,12 @@ namespace Miara
             // 
             // button1
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
+            this.button1.BackColor = System.Drawing.Color.Yellow;
             this.button1.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
             this.button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
             this.button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button1.Location = new System.Drawing.Point(355, 296);
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Location = new System.Drawing.Point(355, 294);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(112, 31);
             this.button1.TabIndex = 1;
@@ -166,16 +166,17 @@ namespace Miara
             this.txtEmployeeUsername.Size = new System.Drawing.Size(377, 31);
             this.txtEmployeeUsername.TabIndex = 3;
             this.txtEmployeeUsername.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.toolTip1.SetToolTip(this.txtEmployeeUsername, "Username");
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("HP Simplified", 16.2F, System.Drawing.FontStyle.Bold);
+            this.label1.Font = new System.Drawing.Font("Segoe UI Variable Display", 10.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
-            this.label1.Location = new System.Drawing.Point(25, 79);
+            this.label1.Location = new System.Drawing.Point(22, 87);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 32);
+            this.label1.Size = new System.Drawing.Size(98, 24);
             this.label1.TabIndex = 4;
             this.label1.Text = "UserName";
             // 
@@ -183,11 +184,11 @@ namespace Miara
             // 
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Font = new System.Drawing.Font("HP Simplified", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Font = new System.Drawing.Font("Segoe UI Variable Display", 10.8F, System.Drawing.FontStyle.Bold);
             this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
-            this.label2.Location = new System.Drawing.Point(25, 157);
+            this.label2.Location = new System.Drawing.Point(25, 168);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(132, 32);
+            this.label2.Size = new System.Drawing.Size(89, 24);
             this.label2.TabIndex = 5;
             this.label2.Text = "Password";
             // 
@@ -195,7 +196,7 @@ namespace Miara
             // 
             this.btnExit.BackColor = System.Drawing.Color.LightCoral;
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExit.Location = new System.Drawing.Point(454, 3);
+            this.btnExit.Location = new System.Drawing.Point(950, 3);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(41, 28);
             this.btnExit.TabIndex = 7;
@@ -223,11 +224,11 @@ namespace Miara
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Font = new System.Drawing.Font("HP Simplified", 28.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Font = new System.Drawing.Font("Segoe UI Variable Display", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.LightCoral;
-            this.label3.Location = new System.Drawing.Point(179, 13);
+            this.label3.Location = new System.Drawing.Point(168, 13);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(159, 55);
+            this.label3.Size = new System.Drawing.Size(141, 49);
             this.label3.TabIndex = 9;
             this.label3.Text = "Sign In";
             this.toolTip1.SetToolTip(this.label3, "Sign in page");
@@ -278,7 +279,7 @@ namespace Miara
             this.btnFogortPassword.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFogortPassword.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnFogortPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(116)))), ((int)(((byte)(166)))));
-            this.btnFogortPassword.Location = new System.Drawing.Point(207, 252);
+            this.btnFogortPassword.Location = new System.Drawing.Point(194, 298);
             this.btnFogortPassword.Name = "btnFogortPassword";
             this.btnFogortPassword.Size = new System.Drawing.Size(131, 27);
             this.btnFogortPassword.TabIndex = 12;
@@ -327,7 +328,6 @@ namespace Miara
             this.panel1.Controls.Add(this.flowLayoutPanel2);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.btnFogortPassword);
-            this.panel1.Controls.Add(this.btnExit);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.button2);
             this.panel1.Location = new System.Drawing.Point(425, 12);
@@ -350,11 +350,12 @@ namespace Miara
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Gainsboro;
-            this.ClientSize = new System.Drawing.Size(946, 398);
+            this.ClientSize = new System.Drawing.Size(992, 397);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.lblPrinter);
             this.Controls.Add(this.lblDevice);
+            this.Controls.Add(this.btnExit);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmLogInPage";

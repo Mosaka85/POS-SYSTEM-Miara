@@ -1,4 +1,5 @@
 ﻿using Miara.Forms;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System;
 using System.ComponentModel;
 using System.Data.SqlClient;
@@ -45,6 +46,12 @@ namespace Miara
         AND u.password_hash = @PasswordHash 
         AND u.active = 1;";
 
+        private const string UpdateSessionWithEmployeeQuery = @"
+    UPDATE UserSessions
+    SET EmployeeID = @EmployeeID
+    WHERE SessionID = @SessionID;";
+
+
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private static readonly string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
 
@@ -55,6 +62,7 @@ namespace Miara
         private string _connectionString;
         private string _employeeFirstName;
         private string _employeeSurname;
+        private string _session;
         private int _emid = 0;
         private readonly string _currentDevice;
         private string _sessionID = Guid.Empty.ToString();
@@ -90,6 +98,8 @@ namespace Miara
                 MouseUp += frmLogInPage_MouseUp;
                 txtEmployeeUsername.KeyDown += Textbox_KeyDown;
                 txtEmployeePassword.KeyDown += Textbox_KeyDown;
+                txtEmployeeUsername.Focus();
+               // txtEmployeeUsername.Text= logFile;
             }
             catch (OperationCanceledException)
             {
@@ -155,6 +165,7 @@ namespace Miara
                     object result = await command.ExecuteScalarAsync(token);
                     _sessionID = result?.ToString() ?? Guid.Empty.ToString();
                     lblSessionID.Text = $"Session ID: {_sessionID}";
+                    _session = _sessionID;
                 }
             }
             catch (Exception ex)
@@ -191,7 +202,7 @@ namespace Miara
         {
             string employeeUsername = txtEmployeeUsername.Text.Trim();
             string employeePassword = txtEmployeePassword.Text.Trim();
-
+            
             if (string.IsNullOrEmpty(employeeUsername) || string.IsNullOrEmpty(employeePassword))
             {
                 MessageBox.Show("Please enter both username and password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -210,7 +221,7 @@ namespace Miara
                     EmployeeID = _emid;
                     ActiveUser = $"User: {_employeeFirstName} {_employeeSurname}, EMID: {_emid}";
                     await WriteToLogFileAsync($"Login successful for user: {employeeUsername} on device {_currentDevice}");
-
+                    await UpdateSessionWithEmployeeAsync();
                     new frmMainForm(_employeeFirstName, _employeeSurname, _emid, _currentDevice).Show();
                 }
             }
@@ -394,6 +405,70 @@ namespace Miara
         {
 
         }
+        private async Task UpdateSessionWithEmployeeAsync(int employeeId,string SessionVar, CancellationToken token)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(UpdateSessionWithEmployeeQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", employeeId);
+                    command.Parameters.AddWithValue("@SessionID", SessionVar ?? (object)DBNull.Value);
+
+                    await connection.OpenAsync(token);
+                    int rows = await command.ExecuteNonQueryAsync(token);
+
+                    if (rows <= 0)
+                    {
+                        await WriteToLogFileAsync($"Warning: no session row was updated for SessionID={SessionVar} (EmployeeID={employeeId}).");
+                    }
+                    else
+                    {
+                        await WriteToLogFileAsync($"Session updated: SessionID={SessionVar} set to EmployeeID={employeeId}.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await WriteToLogFileAsync($"Failed to update session {SessionVar} with EmployeeID {employeeId}: {ex.Message}");
+                // Do not throw — allow login to proceed even if session update fails.
+            }
+        }
+
+
+        private async Task UpdateSessionWithEmployeeAsync()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                using (var command = new SqlCommand(UpdateSessionWithEmployeeQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", _emid);
+                    command.Parameters.AddWithValue("@SessionID", _session ?? (object)DBNull.Value);
+
+                    await connection.OpenAsync();
+                    int rows = await command.ExecuteNonQueryAsync();
+
+                    if (rows <= 0)
+                    {
+                        await WriteToLogFileAsync($"Warning: no session row was updated for SessionID={_session} (EmployeeID={_emid}).");
+                    }
+                    else
+                    {
+                        await WriteToLogFileAsync($"Session updated: SessionID={_session} set to EmployeeID={_emid}.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            { 
+               
+                await WriteToLogFileAsync($"Failed to update session {_session} with EmployeeID {_emid}: {ex.Message}");
+            
+            }
+        }
+
+
+
 
         private void generalSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
