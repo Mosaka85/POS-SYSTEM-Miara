@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Miara.Models;
+using OfficeOpenXml;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -18,7 +19,7 @@ namespace Miara
         int EMployeeNumber;
         string DeviceinternetID;
 
-        public frmReports(string firstName, string surname, int EMID, string Macaddress)
+        public frmReports(string firstName, string surname, int EMID, string Macaddress,string SessionID)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
@@ -28,7 +29,7 @@ namespace Miara
             EMployeeNumber = EMID;
             DeviceinternetID = Macaddress;
         }
-
+        private readonly string _SessionID;
         private void LoadSQLConnectionInfo()
         {
             if (!File.Exists(configFile))
@@ -321,7 +322,7 @@ namespace Miara
         private void button1_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber, DeviceinternetID).ShowDialog();
+            new frmMainForm(employeeFirstName, employeeSurname, EMployeeNumber, DeviceinternetID,_SessionID).ShowDialog();
         }
     }
 }

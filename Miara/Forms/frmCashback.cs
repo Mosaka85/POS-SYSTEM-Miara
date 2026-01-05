@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using static Miara.Forms.frmPrinter;
 
 namespace Miara.Forms
 {

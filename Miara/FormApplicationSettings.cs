@@ -65,5 +65,10 @@ namespace Miara
             settings.FooterMessage2 = txtFooterMassage2.Text.Trim();
             settings.FooterMessage3 = txtFooterMassage3.Text.Trim();
         }
+
+        private void chkDatabaseLogs_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

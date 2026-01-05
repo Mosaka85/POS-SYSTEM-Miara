@@ -1,29 +1,22 @@
 ﻿using Miara.Forms;
+using Miara.Models;
+using Miara.POS.Services;
+using Miara.Processor_Class;
 using MiaraPOS.Services;
-using Microsoft.Reporting.WebForms;
-using Microsoft.Reporting.WinForms;
 using Microsoft.VisualBasic;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Drawing.Printing;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using WECPOFLogic;
 
 namespace Miara
 {
@@ -33,27 +26,22 @@ namespace Miara
         private string connectionString;
         private int nextSaleIdn;
 
- 
-
-
-        public frmSales(string firstName, string surname, int EMID, string macaddress)
+        public frmSales(string firstName, string surname, int EMID, string macaddress,string SessionID)
         {
             InitializeComponent();
-
+            LoadSQLConnectionInfo();
             this.KeyPreview = true;
             btnCompleteSale.Enabled = false;
             EmployeeNumber = EMID;
             employeeFirstName = firstName;
             employeeSurname = surname;
             DeviceinternetID = macaddress;
-
-            LoadSQLConnectionInfo();
+            productRepo = new ProductRepository(connectionString);
             LoadProducts();
             LoadCategories();
             LoadPaymentMethods();
             int nextSaleId = GetNextSaleId();
             ScrapOldLogCashback(nextSaleId);
-
             nextSaleIdn = nextSaleId;
             lblNextSalesNumber.Text = $"SALES ORDER NO: {nextSaleId}";
             label2.Text = $"WELCOME {firstName} {surname} ";
@@ -68,23 +56,48 @@ namespace Miara
             toolStripChangeBackColour.Click += toolStripChangeBackColour_Click;
             timer1.Start();
             this.FormClosed += (sender, e) => Application.Exit();
-            // Load role (async) and display it
-            _ = GetEmployeeRoleAsync(EMID).ContinueWith(t =>
-            {
-                if (!t.IsFaulted && t.Result != null)
-                    this.Invoke((MethodInvoker)(() => lblUserRole.Text = t.Result));
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
-       
+          
+            _ = LoadEmployeeRoleAsync(EMID);
+            _productService = new ProductService(connectionString);
+            _sessionId = SessionID;
+            lblSessionID.Text = $"Session ID: {_sessionId}";
 
-     
+
+        }
+        private readonly string _sessionId;
+        public string CouponCode { get; set; }
+
+        private async Task LoadEmployeeRoleAsync(int employeeId)
+        {
+            try
+            {
+                var roleService = new Miara.Processor_Class.EmployeeRoleService(connectionString, logTrace);
+                string role = await roleService.GetEmployeeRoleAsync(employeeId);
+
+                // Safely update UI on main thread
+                if (lblUserRole.InvokeRequired)
+                {
+                    lblUserRole.Invoke((MethodInvoker)(() => lblUserRole.Text = role));
+                }
+                else
+                {
+                    lblUserRole.Text = role;
+                }
+            }
+            catch (Exception ex)
+            {
+                logTrace($"Error loading employee role: {ex.Message}");
+            }
+        }
+
+
         private void frmSales_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F2 && btnCompleteSale.Enabled)
             {
                 btnCompleteSale.PerformClick();
-                e.Handled = true; // Optional: stops further processing
-                logTrace(" pressed F2 to complete sale"); 
+                e.Handled = true; 
+                logTrace("pressed F2 to complete sale"); 
             }
         }
 
@@ -94,69 +107,138 @@ namespace Miara
         string DeviceinternetID;
         private void LoadSQLConnectionInfo()
         {
-            if (File.Exists(configFile))
+            try
             {
-                try
+                if (!File.Exists(configFile))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
-                    using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
-                    {
-                        LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
-                        connectionString = $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
-                    }
+                    LogMissingConfigFile();
+                    return;
                 }
-                catch (Exception ex)
+
+                XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
+
+                using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
                 {
-                    LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Failed to load connection information", ex.Message);
-                    logTrace($"Failed to load connection information: {ex.Message}");
-                    MessageBox.Show("Failed to load connection information: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
+
+                    connectionString =
+                        $"Data Source={loginInfo.DataSource};" +
+                        $"Initial Catalog={loginInfo.SelectedDatabase};" +
+                        $"User ID={loginInfo.Username};" +
+                        $"Password={loginInfo.Password};" +
+                        $"TrustServerCertificate=True";
                 }
             }
-            else
+            catch (Exception ex)
             {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Connection configuration file not found", "File: " + configFile);
-                logTrace("Connection configuration file not found: " + configFile);
-                MessageBox.Show("Connection configuration file not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogConnectionError(ex);
+                MessageBox.Show(
+                    "Failed to load connection information: " + ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
+        }
+
+        private void LogMissingConfigFile()
+        {
+            var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+
+            auditService.LogAuditEntry(
+                DeviceinternetID,
+                $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}",
+                "Connection configuration file not found"
+            );
+
+            logTrace("Connection configuration file not found: " + configFile);
+
+            MessageBox.Show(
+                "Connection configuration file not found.",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
+
+
+        private void LogConnectionError(Exception ex)
+        {
+            var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+
+            auditService.LogAuditEntry(
+                DeviceinternetID,
+                $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}",
+                "Failed to load connection information",
+                ex.Message
+            );
+
+            logTrace($"Failed to load connection information: {ex.Message}");
         }
 
         private void LoadProducts()
         {
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    string query = "SELECT ProductID, ProductName, Price, StockQuantity FROM Products WITH(NOLOCK) WHERE IsActive = 1";
-                    SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-                    DataTable products = new DataTable();
-                    adapter.Fill(products);
+                string employeeFullName = $"{employeeSurname}, {employeeFirstName} ; {EmployeeNumber}";
+                DataTable products = productRepo.GetActiveProducts(DeviceinternetID, employeeFullName);
 
-                    comboBoxProducts.DataSource = products;
-                    comboBoxProducts.DisplayMember = "ProductName";
-                    comboBoxProducts.ValueMember = "ProductID";
-                }
+                comboBoxProducts.DataSource = products;
+                comboBoxProducts.DisplayMember = "ProductName";
+                comboBoxProducts.ValueMember = "ProductID";
             }
             catch (Exception ex)
             {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error loading products", ex.Message);
                 logTrace($"Error loading products: {ex.Message}");
-                MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error loading products: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
+        private void LoadCategories()
+        {
+            try
+            {
+                string employeeFullName = $"{employeeSurname}, {employeeFirstName} ; {EmployeeNumber}";
+                DataTable categories = productRepo.GetActiveCategories(DeviceinternetID, employeeFullName);
+
+                comboProductCategory.DataSource = categories;
+                comboProductCategory.DisplayMember = "CategoryName";
+                comboProductCategory.ValueMember = "CategoryID";
+            }
+            catch (Exception ex)
+            {
+                logTrace($"Error loading categories: {ex.Message}");
+                comboProductCategory.DataSource = null;
+            }
+        }
+
 
         private void BtnRemoveProduct_Click(object sender, EventArgs e)
         {
+            if (dataGridViewSaleDetails.SelectedRows.Count == 0)
+                return;
+
+            string employeeInfo = $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}";
+
+            var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+
             foreach (DataGridViewRow row in dataGridViewSaleDetails.SelectedRows)
             {
-                dataGridViewSaleDetails.Rows.Remove(row);
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Removed product from sale: {row.Cells["ProductName"].Value}");
-                logTrace($"Product removed from sale: {row.Cells["ProductName"].Value}");
-            }
-            UpdateTotalAmount();
-            LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Updated total amount after removing product(s)");
-            logTrace("Product(s) removed from sale and total amount updated");
+                string productName = row.Cells["ProductName"].Value?.ToString() ?? "Unknown Product";
 
+                dataGridViewSaleDetails.Rows.Remove(row);
+                auditService.LogAuditEntry(DeviceinternetID, employeeInfo, $"Product removed from sale: {productName}");
+                logTrace($"Product removed from sale: {productName}");
+            }
+
+            UpdateTotalAmount();
+            auditService.LogAuditEntry(DeviceinternetID, employeeInfo, "Product(s) removed from sale and total amount updated");
+            logTrace("Product(s) removed from sale and total amount updated");
         }
+
         private void UpdateTotalAmount()
         {
             try
@@ -192,7 +274,6 @@ namespace Miara
                 decimal tax = subtotalAfterDiscount * 0.15m;
                 decimal FinalSubtotal = total - tax;
 
-                // Fetch cashback amount using saleID
                 decimal cashbackAmount = MVTransactionAmountBySaleID(nextSaleIdn);
 
               
@@ -201,13 +282,14 @@ namespace Miara
            
                 lbldiscountvalue.Text = $"Discount: R {discountValue:F2}";
                 lblSubtotalorder.Text = $"Subtotal: R {FinalSubtotal:F2}";
-                lblTax.Text = $"TAX (15%): R {tax:F2}";
+                lblTax.Text = $"VAT (15%): R {tax:F2}";
                 lblCashBack.Text = $"Cashback: R {cashbackAmount:F2}";
                 lblTotalAmount.Text = $"Total: R {finalTotal:F2}";
             }
             catch (Exception ex)
             {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error updating total amount", ex.Message);
+                var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                auditService.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error updating total amount", ex.Message);
                 logTrace($"Error updating total amount: {ex.Message}");
                 MessageBox.Show($"An error occurred while calculating the total: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -236,18 +318,20 @@ namespace Miara
             }
             catch (SqlException sqlEx)
             {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "SQL Error retrieving next SaleID", sqlEx.Message);
+                var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                auditService.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "SQL Error retrieving next SaleID", sqlEx.Message);
                 logtrace($"SQL Error retrieving next SaleID: {sqlEx.Message}");
                 MessageBox.Show($"SQL Error retrieving next SaleID: {sqlEx.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error retrieving next SaleID", ex.Message);
+                var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                auditService.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error retrieving next SaleID", ex.Message);
                 logTrace($"Error retrieving next SaleID: {ex.Message}");
                 MessageBox.Show($"Error retrieving next SaleID: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            LogAuditEntry(ReceivedValue, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Next SaleID retrieved: {nextSaleId}");
+            var auditService1 = new Miara.Processor_Class.DeviceAuditService(connectionString);
+            auditService1.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Next SaleID retrieved: {nextSaleId}");
             return nextSaleId;
         }
 
@@ -261,8 +345,19 @@ namespace Miara
         //private static readonly string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
         private void btnCompleteSale_Click(object sender, EventArgs e)
         {
+            if (dataGridViewSaleDetails.RowCount <= 0)
+            {
+                MessageBox.Show(
+                    "No items in the sale. Please add products before completing the sale.",
+                    "No Items",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
             btnCompleteSale.Enabled = false;
-            LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Started sale processing");
+            var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+            auditService.LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Complete Sale button clicked");
             logTrace("Sale processing started");
 
             try
@@ -282,9 +377,11 @@ namespace Miara
                     sendEmail: checkEmail.Checked && !string.IsNullOrWhiteSpace(txtRecipientEmail.Text),
                     logAudit: msg =>
                     {
-                        LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", msg);
+                        var auditService2 = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                        auditService2.LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Sale Process", msg);
                         logTrace($"Audit log: {msg}");
                     },
+
                     resetForm: () =>
                     {
                         logTrace("Resetting form data");
@@ -355,6 +452,9 @@ namespace Miara
                                 }).ToList();
                             logTrace($"Prepared {items.Count} items for printing");
 
+
+              
+
                             // Initialize ReceiptPrinter
                             var printer = new ReceiptPrinter(
                                 deviceInternetId: DeviceInternetID,
@@ -362,7 +462,7 @@ namespace Miara
                                 employeeSurname: employeeSurname ?? string.Empty,
                                 employeeNumber: EmployeeNumber.ToString(),
                                 receiptNo: nextSaleIdn.ToString(),
-                                paymentMethod: combopaymentmentod.SelectedValue?.ToString() ?? "N/A",
+                                paymentMethod: combopaymentmentod.Text?.ToString() ?? "N/A",
                                 saleItems: items,
                                 discountPercentage: checkdiscount.Checked && decimal.TryParse(txtdiscount.Text?.Trim(), out var disc) ? disc : 0,
                                 cashbackAmount: decimal.TryParse(lblCashBack.Text?.Replace("Cashback:", "").Replace("R", "").Trim(), out var cb) ? cb : 0,
@@ -415,7 +515,8 @@ namespace Miara
             }
             catch (Exception ex)
             {
-                LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Sale failed", ex.Message);
+                var auditService7 = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                auditService7.LogAuditEntry(DeviceInternetID, $"{employeeSurname}, {employeeFirstName}; {EmployeeNumber}", "Error completing sale", ex.Message);
                 logTrace($"Error completing sale: {ex.Message}");
                 MessageBox.Show($"Error completing sale: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -442,35 +543,6 @@ namespace Miara
         }
 
 
-        public void LogAuditEntry(string device, string employee, string stepDescription, string errorMessage = null)
-        {
-            string query = @"
-        INSERT INTO DeviceAudit (Device, Employee, AuditDate, StepDescription, ErrorMessage)
-        VALUES (@Device, @Employee, @AuditDate, @StepDescription, @ErrorMessage);";
-
-            try
-            {
-                using (var connection = new SqlConnection(connectionString))
-                using (var command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Device", device ?? string.Empty);
-                    command.Parameters.AddWithValue("@Employee", employee ?? string.Empty);
-                    command.Parameters.AddWithValue("@AuditDate", DateTime.Now);
-                    command.Parameters.AddWithValue("@StepDescription", stepDescription ?? string.Empty);
-                    command.Parameters.AddWithValue("@ErrorMessage",
-                        string.IsNullOrEmpty(errorMessage) ? DBNull.Value : (object)errorMessage);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to log audit entry: {ex.Message}", "Logging Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
 
         public string GetPrinterByDeviceMac()
         {
@@ -478,7 +550,8 @@ namespace Miara
 
             if (string.IsNullOrWhiteSpace(deviceMac) || deviceMac == "MAC Address Not Found")
             {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Failed to get printer by device MAC", "MAC Address is empty or invalid");
+                var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                auditService.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Invalid device MAC address", "MAC address is empty or not found");
                 return null;
             }
 
@@ -500,7 +573,8 @@ namespace Miara
                     }
                     else
                     {
-                        LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Failed to get printer by device MAC", "No printer found for the given MAC address");
+                        var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                        auditService.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "No printer found for device", $"No printer mapping found for device MAC: {DeviceinternetID}");
                         return null;
                     }
                 }
@@ -510,59 +584,6 @@ namespace Miara
      
 
 
-        private string GetPrinterNameByMac(string macAddress)
-        {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    string query = "SELECT PrinterName FROM Printers WHERE Device = @Device";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Device", macAddress);
-                        connection.Open();
-                        object result = command.ExecuteScalar();
-                        return result?.ToString();
-                    }
-                }
-            }
-            catch
-            {
-                LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Error getting printer name by MAC", $"MAC Address: {macAddress}");
-                return null;
-            }
-        }
-
-
-        private void LoadCategories()
-        {
-            // Clear existing items in the ComboBox
-            comboProductCategory.DataSource = null;
-            comboProductCategory.Items.Clear();
-
-            // SQL query to fetch CategoryID and CategoryName
-            string query = "SELECT CategoryID, CategoryName FROM Categories WITH(NOLOCK) WHERE IsActive = 1";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
-            {
-                DataTable Categories = new DataTable();
-                adapter.Fill(Categories);
-
-                if (Categories.Rows.Count > 0)
-                {
-                    // Set DisplayMember and ValueMember
-                    comboProductCategory.DisplayMember = "CategoryName"; // Show category names
-                    comboProductCategory.ValueMember = "CategoryID";     // Store category IDs
-                    comboProductCategory.DataSource = Categories;
-                }
-                else
-                {
-                    LogAuditEntry(query, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "No active categories found");
-                    comboProductCategory.DataSource = null;
-                }
-            }
-        }
 
 
 
@@ -591,7 +612,8 @@ namespace Miara
             {
                 if (!dataGridViewSaleDetails.Columns.Contains(column))
                 {
-                    LogAuditEntry(column, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, $"Missing required column: {column}");
+                    var auditService = new Miara.Processor_Class.DeviceAuditService(connectionString);
+                    auditService.LogAuditEntry(DeviceinternetID, employeeSurname + " ," + employeeFirstName + " ; " + EmployeeNumber, "Missing required column", $"The required column '{column}' is missing from the DataGridView.");
                     return false;
                 }
             }
@@ -621,6 +643,9 @@ namespace Miara
 
       
         private TextBox activeTextBox;
+        private ProductService _productService;
+        private ProductRepository productRepo;
+
         private void TextBox_Enter(object sender, EventArgs e)
         {
             activeTextBox = sender as TextBox;
@@ -731,6 +756,69 @@ namespace Miara
                 MessageBox.Show("Change calculation is only available for the CASH payment method.", "Invalid Payment Method", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+        private const string CASH_PAYMENT_VALUE = "1";
+
+        private void combopaymentmentod_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (combopaymentmentod.SelectedValue == null)
+                return;
+
+            decimal totalAmount = decimal.Parse(
+                lblTotalAmount.Text.Replace("Total:", "")
+                                   .Replace("R", "")
+                                   .Trim()
+            );
+
+            // NON-CASH PAYMENTS
+            if (combopaymentmentod.SelectedValue.ToString() != CASH_PAYMENT_VALUE)
+            {
+                txtrenderedamount.Text = totalAmount.ToString("F2");
+                lblChange.Text = "Change: R 0.00";
+                btnCompleteSale.Enabled = true;
+                return;
+            }
+
+            // CASH PAYMENT → POP FORM
+            try
+            {
+                using (frmCashChange cashForm = new frmCashChange(
+                    totalAmount,
+                    EmployeeNumber,
+                    $"{employeeFirstName} {employeeSurname}",
+                    DeviceinternetID,
+                    _sessionId))
+                {
+                    if (cashForm.ShowDialog() == DialogResult.OK)
+                    {
+                        txtrenderedamount.Text = cashForm.RenderedAmount.ToString("F2");
+                        lblChange.Text = $"Change: R {cashForm.ChangeAmount:F2}";
+                        btnCompleteSale.Enabled = true;
+                    }
+                    else
+                    {
+                        // Prevent recursive trigger
+                        combopaymentmentod.SelectedIndexChanged -= combopaymentmentod_SelectedIndexChanged;
+                        combopaymentmentod.SelectedIndex = -1;
+                        combopaymentmentod.SelectedIndexChanged += combopaymentmentod_SelectedIndexChanged;
+
+                        txtrenderedamount.Clear();
+                        lblChange.Text = "Change: R 0.00";
+                        btnCompleteSale.Enabled = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error processing cash payment:\n{ex.Message}",
+                    "Cash Payment Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+        }
+
+
 
 
 
@@ -749,7 +837,7 @@ namespace Miara
         private void button1_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(employeeFirstName, employeeSurname, EmployeeNumber,DeviceinternetID).ShowDialog();
+            new frmMainForm(employeeFirstName, employeeSurname, EmployeeNumber,DeviceinternetID,_sessionId).ShowDialog();
         }
 
 
@@ -800,164 +888,11 @@ namespace Miara
 
         private void btnReprint_Click(object sender, EventArgs e)
         {
-            try
-            {
-                string receiptNumber = Interaction.InputBox("Enter Receipt Number:", "Reprint Receipt", "");
-
-                if (string.IsNullOrEmpty(receiptNumber))
-                {
-                    MessageBox.Show("Receipt number cannot be empty.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                DataTable receiptData = GetReceiptData(receiptNumber);
-
-                if (receiptData == null || receiptData.Rows.Count == 0)
-                {
-                    MessageBox.Show("Receipt not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                DataTable saleDetails = GetSaleDetails(receiptData.Rows[0]["ReceiptID"].ToString());
-
-                if (saleDetails == null || saleDetails.Rows.Count == 0)
-                {
-                    MessageBox.Show("No sale details found for this receipt.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                PopulateReceiptData(receiptData, saleDetails);
-
-               // PrintReceipt();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while reprinting the receipt: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+         
         }
 
-        private DataTable GetReceiptData(string receiptNumber)
-        {
-            DataTable receiptData = new DataTable();
+     
 
-            try
-            {
-                string query = @"
-            SELECT TOP 1 [ReceiptID], [ReceiptNumber], [Date], [EmployeeName], [PaymentMethod], 
-                   [Subtotal], [Discount], [Tax], [Total], [AmountRendered], [Change]
-            FROM  [Receipts] WITH(NOLOCK)
-            WHERE [ReceiptNumber] LIKE '%@ReceiptNumber'";
-
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@ReceiptNumber", receiptNumber);
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                        {
-                            adapter.Fill(receiptData);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while fetching receipt data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return receiptData;
-        }
-
-        private DataTable GetSaleDetails(string receiptID)
-        {
-            DataTable saleDetails = new DataTable();
-
-            try
-            {
-                string query = @"
-            SELECT [ProductID], [Quantity], [UnitPrice], [Subtotal], [TAX]
-            FROM [POS_MOSAKA].[dbo].[SalesDetails] WITH(NOLOCK)
-            WHERE [SaleID] = @ReceiptID";
-
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@ReceiptID", receiptID);
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                        {
-                            adapter.Fill(saleDetails);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while fetching sale details: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return saleDetails;
-        }
-
-        private void PopulateReceiptData(DataTable receiptData, DataTable saleDetails)
-        {
-            try
-            {
-                // Populate receipt details
-                lblNextSalesNumber.Text = receiptData.Rows[0]["ReceiptNumber"].ToString();
-                employeeFirstName = receiptData.Rows[0]["EmployeeName"].ToString().Split(' ')[0];
-                employeeSurname = receiptData.Rows[0]["EmployeeName"].ToString().Split(' ')[1];
-                combopaymentmentod.SelectedValue = receiptData.Rows[0]["PaymentMethod"].ToString();
-
-                if (receiptData.Rows[0]["PaymentMethod"].ToString() == "CASH")
-                {
-                    txtrenderedamount.Text = receiptData.Rows[0]["AmountRendered"].ToString();
-                }
-
-                // Populate sale details into the dataGridViewSaleDetails
-                dataGridViewSaleDetails.Rows.Clear();
-                foreach (DataRow row in saleDetails.Rows)
-                {
-                    string productName = GetProductName(row["ProductID"].ToString());
-                    int quantity = Convert.ToInt32(row["Quantity"]);
-                    decimal unitPrice = Convert.ToDecimal(row["UnitPrice"]);
-                    decimal subtotal = Convert.ToDecimal(row["Subtotal"]);
-
-                    dataGridViewSaleDetails.Rows.Add(productName, quantity, unitPrice, subtotal);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while populating receipt data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        private string GetProductName(string productID)
-        {
-            string productName = "";
-
-            try
-            {
-                string query = "SELECT [ProductName] FROM [Products]  WITH(NOLOCK) WHERE [ProductID] = @ProductID";
-
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@ProductID", productID);
-                        productName = command.ExecuteScalar()?.ToString() ?? "Unknown Product";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred while fetching product name: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return productName;
-        }
 
         private void btnOpenCashDrawer_Click(object sender, EventArgs e)
         {
@@ -1010,68 +945,19 @@ namespace Miara
 
         private void btnCupons_Click(object sender, EventArgs e)
         {
-            new frmCupons(nextSaleIdn).ShowDialog();
+            new frmCupons(nextSaleIdn, _sessionId,EmployeeNumber,DeviceinternetID).ShowDialog();
+           
+            var couponService = new CouponService(connectionString);
+            decimal discount = couponService.GetDiscountBySaleId(nextSaleIdn);
 
-            // Get the discount applied for the sale
-            decimal discount = GetDiscountBySaleId(nextSaleIdn);
+            var discountManager = new SaleDiscountManager(
+                dataGridViewSaleDetails,
+                checkdiscount,
+                txtdiscount, 
+                UpdateTotalAmount
+            );
+            discountManager.ApplyDiscount(discount);
 
-            if (discount < 1)
-            {
-                try
-                {
-                    checkdiscount.Checked = true;
-                    txtdiscount.Text = (discount * 100).ToString("0.00"); // For percentage
-                    MessageBox.Show($"Percentage discount applied: {discount * 100:0.##}%");
-                    UpdateTotalAmount();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error handling percentage discount: " + ex.Message);
-                }
-            }
-            else
-            {
-                try
-                {
-                    // Check if voucher is already added
-                    bool voucherAlreadyApplied = dataGridViewSaleDetails.Rows
-                        .Cast<DataGridViewRow>()
-                        .Any(r => r.Cells["ProductName"] != null && r.Cells["ProductName"].Value?.ToString() == "VOUCHER_APPLIED");
-
-                    if (voucherAlreadyApplied)
-                    {
-                        MessageBox.Show("A voucher has already been applied to this sale.");
-                        return;
-                    }
-
-                    // Calculate current total
-                    decimal total = 0;
-                    foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
-                    {
-                        if (row != null && row.Cells["Subtotal"] != null && row.Cells["Subtotal"].Value != null &&
-                            decimal.TryParse(row.Cells["Subtotal"].Value.ToString(), out decimal subtotal))
-                        {
-                            total += subtotal;
-                        }
-                    }
-
-                    // Ensure voucher doesn't exceed total
-                    if (discount > total)
-                    {
-                        MessageBox.Show("Voucher value exceeds the total. Please add more items to use the voucher.");
-                        return;
-                    }
-
-                    // Add the voucher as a negative line
-                    dataGridViewSaleDetails.Rows.Add(0, "VOUCHER_APPLIED", 0, -1 * discount, -1 * discount);
-                    MessageBox.Show($"Voucher discount applied: R{discount:0.00}");
-                    UpdateTotalAmount();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error applying voucher: " + ex.Message);
-                }
-            }
         }
 
 
@@ -1093,43 +979,10 @@ namespace Miara
             }
             catch
             {
-                // Silently ignore errors
+                
             }
         }
 
-
-
-        public decimal GetDiscountBySaleId(int saleId)
-        {
-            decimal discount = 0;
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string query = "SELECT DiscountApplied FROM CouponRedemptions WHERE SaleID = @saleId";
-
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@saleId", saleId);
-
-                        conn.Open();
-                        object result = cmd.ExecuteScalar();
-
-                        if (result != null && result != DBNull.Value)
-                        {
-                            discount = Convert.ToDecimal(result);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error retrieving discount: " + ex.Message);
-            }
-
-            return discount;
-        }
 
 
 
@@ -1286,65 +1139,29 @@ namespace Miara
 
         private void btnVoidLine_Click(object sender, EventArgs e)
         {
-            if (dataGridViewSaleDetails.SelectedRows.Count > 0)
-            {
-                DataGridViewRow selectedRow = dataGridViewSaleDetails.SelectedRows[0];
+            if (dataGridViewSaleDetails.SelectedRows.Count == 0) return;
 
-                int productId = (int)selectedRow.Cells["ProductID"].Value;
-                string productName = selectedRow.Cells["ProductName"].Value.ToString();
-                int quantity = (int)selectedRow.Cells["Quantity"].Value;
-                decimal price = (decimal)selectedRow.Cells["Price"].Value;
-                decimal subtotal = (decimal)selectedRow.Cells["Subtotal"].Value;
+            var selectedRow = dataGridViewSaleDetails.SelectedRows[0];
 
+            int productId = (int)selectedRow.Cells["ProductID"].Value;
+            string productName = selectedRow.Cells["ProductName"].Value.ToString();
+            int quantity = (int)selectedRow.Cells["Quantity"].Value;
+            decimal price = (decimal)selectedRow.Cells["Price"].Value;
+            decimal subtotal = (decimal)selectedRow.Cells["Subtotal"].Value;
 
-                string voidedBy = $"{employeeFirstName} {employeeSurname} ({EmployeeNumber})";
+            string voidedBy = $"{employeeFirstName} {employeeSurname} ({EmployeeNumber})";
 
-                LogVoidOperation(nextSaleIdn, productId, productName, quantity, price, subtotal,
-                                 "LineItem", "Employee/Customer agreement", voidedBy);
-                RemoveSelectedRow();
-                UpdateTotalAmount();
-            }
+            // Log the void in database
+            var voidAuditService = new VoidAuditService(connectionString);
+            voidAuditService.LogVoidOperation(nextSaleIdn, productId, productName, quantity, price, subtotal,
+                                              "LineItem", "Employee/Customer agreement", voidedBy);
+
+            // Keep UI actions in the form
+            RemoveSelectedRow();
+            UpdateTotalAmount();
         }
-        private void LogVoidOperation(int saleId, int productId, string productName, int quantity, decimal price,
-                              decimal subtotal, string voidType, string voidReason,
-                              string voidedBy)
-        {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    string query = @"INSERT INTO VoidAuditLog (
-                                SaleID, ProductID, ProductName, Quantity, Price, Subtotal,
-                                VoidType, VoidReason, VoidedBy, VoidDate , Workstation
-                             ) VALUES (
-                                @SaleID, @ProductID, @ProductName, @Quantity, @Price, @Subtotal,
-                                @VoidType, @VoidReason, @VoidedBy, GETDATE(), @Workstation
-                             )";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@SaleID", saleId);
-                        command.Parameters.AddWithValue("@ProductID", productId);
-                        command.Parameters.AddWithValue("@ProductName", productName);
-                        command.Parameters.AddWithValue("@Quantity", quantity);
-                        command.Parameters.AddWithValue("@Price", price);
-                        command.Parameters.AddWithValue("@Subtotal", subtotal);
-                        command.Parameters.AddWithValue("@VoidType", voidType);
-                        command.Parameters.AddWithValue("@VoidReason", voidReason ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@VoidedBy", voidedBy);
-                        command.Parameters.AddWithValue("@Workstation", Environment.MachineName);
 
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error logging void operation: {ex.Message}", "Error",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         private void btnRefund_Click(object sender, EventArgs e)
         {
@@ -1487,30 +1304,7 @@ namespace Miara
                 MessageBox.Show("Invalid product selection or quantity.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        private void combopaymentmentod_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (combopaymentmentod.SelectedItem?.ToString() == "Cash")
-            {
-                txtrenderedamount.Visible = true;
-                lblChange.Visible = true;
-                lblrendered.Visible = true;
-                btnCalculatechange.Visible = true;
-                btnCalculatechange.Enabled = true;
-                btnCompleteSale.Enabled = true;
-            }
-            else
-            {
-                // Parse the total cost
-                decimal cost = decimal.Parse(lblTotalAmount.Text.Replace("Total: ", "").Replace("R", "").Trim());
-                txtrenderedamount.Text = Convert.ToString(cost);
-                btnCalculatechange.Enabled = false;
-                btnCompleteSale.Enabled = true;
-            }
-
-            btnCompleteSale.Enabled = true;
-
-
-        }
+   
 
         private void find_product_using_barcode(object sender, EventArgs e)
         {
@@ -1524,62 +1318,46 @@ namespace Miara
                 return;
             }
 
-            string query = "SELECT ProductID, ProductName, Price, StockQuantity FROM Products WITH(NOLOCK) WHERE IsActive = 1 AND [BARCODE]= @barcode";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                try
+                var product = _productService.GetProductByBarcode(Productbarcode);
+
+                if (product == null)
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@barcode", Productbarcode);
+                    MessageBox.Show("Product not found for the given barcode.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                int quantity = 1; // Default quantity when scanned
+                bool productExists = false;
+
+                foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
+                {
+                    if (row.Cells["ProductID"].Value != null &&
+                        (int)row.Cells["ProductID"].Value == product.ProductID)
                     {
-                        if (reader.Read())
-                        {
-                            int productId = reader.GetInt32(reader.GetOrdinal("ProductID"));
-                            string productName = reader.GetString(reader.GetOrdinal("ProductName"));
-                            decimal price = reader.GetDecimal(reader.GetOrdinal("Price"));
-
-                            int quantity = 1; // Default quantity when scanned
-
-                            bool productExists = false;
-
-                            foreach (DataGridViewRow row in dataGridViewSaleDetails.Rows)
-                            {
-                                if (row.Cells["ProductID"].Value != null && (int)row.Cells["ProductID"].Value == productId)
-                                {
-                                    int existingQuantity = (int)row.Cells["Quantity"].Value;
-                                    row.Cells["Quantity"].Value = existingQuantity + quantity;
-                                    row.Cells["Subtotal"].Value = (existingQuantity + quantity) * price;
-                                    productExists = true;
-                                    break;
-                                }
-                            }
-
-                            if (!productExists)
-                            {
-                                decimal subtotal = quantity * price;
-                                dataGridViewSaleDetails.Rows.Add(productId, productName, quantity, price, subtotal);
-                            }
-
-                            UpdateTotalAmount();
-                            txtBarcodeLabel.Clear();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Product not found for the given barcode.", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
+                        int existingQuantity = (int)row.Cells["Quantity"].Value;
+                        row.Cells["Quantity"].Value = existingQuantity + quantity;
+                        row.Cells["Subtotal"].Value = (existingQuantity + quantity) * product.Price;
+                        productExists = true;
+                        break;
                     }
                 }
-                catch (Exception ex)
+
+                if (!productExists)
                 {
-                    MessageBox.Show("Error while fetching product: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    decimal subtotal = quantity * product.Price;
+                    dataGridViewSaleDetails.Rows.Add(product.ProductID, product.ProductName, quantity, product.Price, subtotal);
                 }
+
+                UpdateTotalAmount();
+                txtBarcodeLabel.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while fetching product: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void txtBarcodeLabel_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1760,161 +1538,44 @@ namespace Miara
 
         private void UploadImageForEmployee(int employeeId)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp";
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
+            };
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    // Create thumbnail (e.g., max 300px width/height)
-                    Image originalImage = Image.FromFile(ofd.FileName);
-                    Image thumbnail = CreateThumbnail(originalImage, 300);
-
-                    // Convert thumbnail to byte array
-                    byte[] imageData;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        // Save in JPEG format with 80% quality (adjust as needed)
-                        var encoderParams = new EncoderParameters(1);
-                        encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 80L);
-
-                        ImageCodecInfo jpegCodec = GetEncoderInfo("image/jpeg");
-                        thumbnail.Save(ms, jpegCodec, encoderParams);
-                        imageData = ms.ToArray();
-                    }
+                    Image original = Image.FromFile(ofd.FileName);
+                    Image thumbnail = ImageHelper.CreateThumbnail(original, 300);
+                    byte[] imageData = ImageHelper.ImageToByteArray(thumbnail);
 
                     string fileName = Path.GetFileName(ofd.FileName);
 
-                    using (SqlConnection conn = new SqlConnection(connectionString))
-                    {
-                        conn.Open();
-                        SqlTransaction transaction = conn.BeginTransaction();
+                    var service = new EmployeeImageService(connectionString);
+                    service.UploadImage(employeeId, fileName, imageData);
 
-                        try
-                        {
-                            // Step 1: Deactivate old images
-                            string deactivateQuery = @"
-                        UPDATE ImageStore 
-                        SET IsActive = 0 
-                        WHERE EmployeeID = @empId AND IsActive = 1";
-
-                            SqlCommand deactivateCmd = new SqlCommand(deactivateQuery, conn, transaction);
-                            deactivateCmd.Parameters.AddWithValue("@empId", employeeId);
-                            deactivateCmd.ExecuteNonQuery();
-
-                            // Step 2: Insert new image
-                            string insertQuery = @"
-                        INSERT INTO ImageStore (ImageName, ImageData, EmployeeID, IsActive, [Date]) 
-                        VALUES (@name, @data, @empId, 1, GETDATE())";
-
-                            SqlCommand insertCmd = new SqlCommand(insertQuery, conn, transaction);
-                            insertCmd.Parameters.AddWithValue("@name", fileName);
-                            insertCmd.Parameters.AddWithValue("@data", imageData);
-                            insertCmd.Parameters.AddWithValue("@empId", employeeId);
-
-                            insertCmd.ExecuteNonQuery();
-
-                            transaction.Commit();
-                            MessageBox.Show("Image uploaded successfully as thumbnail!");
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            MessageBox.Show("Error: " + ex.Message);
-                        }
-                        finally
-                        {
-                            originalImage.Dispose();
-                            thumbnail.Dispose();
-                            conn.Close();
-                        }
-                    }
+                    MessageBox.Show("Image uploaded successfully as thumbnail!");
+                    original.Dispose();
+                    thumbnail.Dispose();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error processing image: " + ex.Message);
+                    MessageBox.Show("Error: " + ex.Message);
                 }
             }
         }
 
-        private Image CreateThumbnail(Image original, int maxSize)
-        {
-            // Calculate new dimensions
-            int newWidth, newHeight;
-            if (original.Width > original.Height)
-            {
-                newWidth = maxSize;
-                newHeight = (int)(original.Height * ((float)maxSize / original.Width));
-            }
-            else
-            {
-                newHeight = maxSize;
-                newWidth = (int)(original.Width * ((float)maxSize / original.Height));
-            }
 
-            // Create thumbnail
-            Bitmap thumbnail = new Bitmap(newWidth, newHeight);
-            using (Graphics g = Graphics.FromImage(thumbnail))
-            {
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.DrawImage(original, 0, 0, newWidth, newHeight);
-            }
-
-            return thumbnail;
-        }
-
-        private ImageCodecInfo GetEncoderInfo(string mimeType)
-        {
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
-            foreach (ImageCodecInfo codec in codecs)
-            {
-                if (codec.MimeType == mimeType)
-                    return codec;
-            }
-            return null;
-        }
-
-        private async Task<string> GetEmployeeRoleAsync(int employeeId)
-        {
-            const string query = @"
-                SELECT
-                    u.id AS EmployeeID,
-                    u.first_name AS EmployeeFirstName,
-                    u.last_name  AS EmployeeSurname,
-                    r.name       AS Role
-                FROM [users] u
-                LEFT JOIN [user_groups] ug ON u.user_group_id = ug.id
-                LEFT JOIN [group_roles] gr ON ug.id = gr.group_id
-                LEFT JOIN [roles] r ON gr.role_id = r.id
-                WHERE u.id = @EmployeeID;";
-
-            try
-            {
-                using (var conn = new SqlConnection(connectionString))
-                using (var cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@EmployeeID", employeeId);
-                    await conn.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            return reader["Role"]?.ToString() ?? "No role assigned";
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logTrace($"Error retrieving employee role: {ex.Message}");
-            }
-
-            return "Unknown";
-        }
+     
 
         private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void dataGridViewSaleDetails_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }

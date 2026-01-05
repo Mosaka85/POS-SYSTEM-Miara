@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Miara.Models;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -12,7 +13,7 @@ namespace Miara
         private static readonly string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
         private string connectionString;
 
-        public frmProducts(string firstName, string surname, int EMID, string MacAddress)
+        public frmProducts(string firstName, string surname, int EMID, string MacAddress,string SessionID)
         {
             InitializeComponent();
             LoadSQLConnectionInfo();
@@ -30,6 +31,7 @@ namespace Miara
         public string SurnameUSer = "";
         public int EmployeeID = 0;
         private string DeviceinternetID = "";
+        private readonly string _SessionID = "";
 
         private void frmProducts_Load(object sender, EventArgs e)
         {
@@ -331,7 +333,7 @@ namespace Miara
         private void btnExit_Click(object sender, EventArgs e)
         {
             Hide();
-            new frmMainForm(NameUser, SurnameUSer, EmployeeID, DeviceinternetID).ShowDialog();
+            new frmMainForm(NameUser, SurnameUSer, EmployeeID, DeviceinternetID,_SessionID).ShowDialog();
         }
 
         private void btnDeactivate_Click(object sender, EventArgs e)

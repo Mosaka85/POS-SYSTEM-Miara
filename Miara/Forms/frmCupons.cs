@@ -1,5 +1,6 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using Miara.Models;
+using Miara.Services;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -9,140 +10,87 @@ namespace Miara.Forms
 {
     public partial class frmCupons : Form
     {
-        public frmCupons(int saleid)
+        private readonly int _emid;
+        private readonly string _device;
+        private readonly string _sessionID;
+        private readonly int _couponSaleID;
+
+        private readonly CouponProcessor _couponProcessor;
+        private readonly string _configFile = "config.xml";
+        private string _connectionString;
+
+        public object CouponCode { get; private set; }
+
+        public frmCupons(int saleId, string sessionID, int emid, string device)
         {
             InitializeComponent();
-            LoadSQLConnectionInfo();
 
-            CuoponSaleID = saleid;
+            _couponSaleID = saleId;
+            _sessionID = sessionID;
+            _emid = emid;
+            _device = device;
+            lblEMID.Text = $"EMID : {_emid}";
+            lblSessionID.Text = $"SessionID : {_sessionID}";
+      
 
-        }
-        private string configFile = "config.xml";
-        private string connectionString;
-
-        public string RedeemedCode { get; private set; }
-        public int CuoponSaleID;
-
-        private void LoadSQLConnectionInfo()
-        {
-            if (File.Exists(configFile))
-            {
-                try
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(LoginInfo));
-                    using (FileStream fileStream = new FileStream(configFile, FileMode.Open))
-                    {
-                        LoginInfo loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
-                        connectionString = $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to load connection information: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Connection configuration file not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            LoadSqlConnectionString();
+            _couponProcessor = new CouponProcessor(_connectionString);
         }
 
-
-
-
-
-
-
-        public decimal ApplyCoupon(string couponCode, out string message)
+        private void LoadSqlConnectionString()
         {
-            decimal discountToApply = 0;
-            message = "";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            if (!File.Exists(_configFile))
             {
-                string query = @"SELECT DiscountAmount, IsPercentage, IsActive, ExpiryDate, Type
-                         FROM Coupons
-                         WHERE CouponCode = @code";
-
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@code", couponCode);
-
-                conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    decimal discountValue = reader.GetDecimal(0);
-                    bool isPercentage = reader.GetBoolean(1);
-                    bool isActive = reader.GetBoolean(2);
-                    DateTime expiry = reader.GetDateTime(3);
-                    string type = reader.GetString(4);
-
-                    if (!isActive)
-                    {
-                        message = "This coupon is no longer active.";
-                        return 0;
-                    }
-
-                    if (DateTime.Now > expiry)
-                    {
-                        message = "This coupon has expired.";
-                        return 0;
-                    }
-
-                    if (isPercentage)
-                    {
-                        discountToApply = discountValue / 100;
-                        message = $"Coupon applied: {discountValue}% off";
-                    }
-                    else
-                    {
-                        discountToApply = discountValue;
-                        message = type == "Voucher" ?
-                            $"Voucher applied: R{discountValue} deducted." :
-                            $"Coupon applied: R{discountValue} off.";
-                    }
-
-                    reader.Close();
-
-                    // Save to CouponRedemptions table
-                    SqlCommand insertCmd = new SqlCommand(@"
-                INSERT INTO CouponRedemptions (CouponCode, SaleID, DiscountApplied)
-                VALUES (@code, @saleId, @discount)", conn);
-
-                    insertCmd.Parameters.AddWithValue("@code", couponCode);
-                    int cuoponSaleID = CuoponSaleID;
-                    insertCmd.Parameters.AddWithValue("@saleId", cuoponSaleID);
-                    insertCmd.Parameters.AddWithValue("@discount", discountToApply);
-
-                    insertCmd.ExecuteNonQuery();
-                }
-                else
-                {
-                    message = "Invalid coupon code.";
-                }
+  
+                MessageBox.Show("Connection configuration file not found. Please check the configuration.", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            return discountToApply;
+            try
+            {
+                var serializer = new XmlSerializer(typeof(LoginInfo));
+                using (var fileStream = new FileStream(_configFile, FileMode.Open))
+                {
+                    var loginInfo = (LoginInfo)serializer.Deserialize(fileStream);
+                    _connectionString = $"Data Source={loginInfo.DataSource};Initial Catalog={loginInfo.SelectedDatabase};User ID={loginInfo.Username};Password={loginInfo.Password}";
+                }
+            }
+            catch (Exception ex)
+            {
+    
+                MessageBox.Show($"Failed to load connection information: {ex.Message}", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnApply_Click(object sender, EventArgs e)
         {
             string code = txtVoucher.Text.Trim();
+            CouponCode = txtVoucher.Text.Trim();
 
-            string resultMessage;
-            decimal discount = ApplyCoupon(code, out resultMessage);
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                lblResult.Text = "Please enter a coupon code.";
+                lblResult.ForeColor = Color.Red;
+                return;
+            }
+
+            decimal discount = _couponProcessor.RedeemCoupon(
+                code,
+                _couponSaleID,
+                _sessionID,
+                _emid,
+                _device,
+                out string resultMessage
+
+            );
 
             lblResult.Text = resultMessage;
             lblResult.ForeColor = discount > 0 ? Color.Green : Color.Red;
-
-
         }
 
         private void frmCupons_Load(object sender, EventArgs e)
         {
-            lblTotal.Text = $"SaleID : {CuoponSaleID}";
+            lblTotal.Text = $"SaleID : {_couponSaleID}";
         }
     }
 }
-

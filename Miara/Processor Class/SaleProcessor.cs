@@ -62,6 +62,8 @@ namespace Miara
                         // **FIX: The new receipt insertion is now part of the transaction.**
                         InsertReceipt(conn, tran, saleId, paymentMethod, subtotal, discountValue, tax, finalTotal, renderedAmount, change, logAudit);
 
+                        UpdateCouponSale(conn, tran, saleId, "COUPON_CODE_PLACEHOLDER", logAudit); // Replace with actual coupon code if applicable
+
                         tran.Commit();
                         logAudit("Transaction committed");
 
@@ -103,10 +105,7 @@ namespace Miara
             }
         }
 
-        // --- PRIVATE HELPERS ---
-
-        // FIX: This new private helper replaces the old public LogReceiptData method.
-        // It uses data passed to it instead of accessing UI controls and runs inside the transaction.
+        
         private void InsertReceipt(SqlConnection conn, SqlTransaction tran, int saleId, string paymentMethod,
                                    decimal subtotal, decimal discount, decimal tax, decimal total,
                                    decimal amountRendered, decimal change, Action<string> logAudit)
@@ -133,7 +132,7 @@ namespace Miara
             }
         }
 
-        // FIX: Simplified calculation using LINQ. It no longer needs the logAudit parameter.
+       
         private decimal CalculateSubtotal(DataGridView saleDetails)
         {
             return saleDetails.Rows
@@ -142,7 +141,7 @@ namespace Miara
                 .Sum(row => Convert.ToDecimal(row.Cells["Subtotal"].Value));
         }
 
-        // --- Other private helpers remain largely the same ---
+      
         private (decimal, decimal) CalculateDiscount(decimal subtotal, string discountText, bool discountChecked, Action<string> logAudit)
         {
             if (discountChecked && decimal.TryParse(discountText, out decimal parsedDiscount) && parsedDiscount >= 0 && parsedDiscount <= 100)
@@ -165,7 +164,7 @@ namespace Miara
             return 0;
         }
 
-        // (InsertSale, InsertSaleDetails, InsertDiscount, InsertPayment methods are unchanged and can be placed here)
+     
         #region Unchanged Database Methods
         private int InsertSale(SqlConnection conn, SqlTransaction tran, decimal finalTotal, string paymentMethod, Action<string> logAudit)
         {
@@ -239,6 +238,19 @@ namespace Miara
                 cmd.Parameters.AddWithValue("@Cashback", cashbackAmount);
                 cmd.ExecuteNonQuery();
                 logAudit($"Inserted payment for sale {saleId}");
+            }
+        }
+
+
+        private void UpdateCouponSale(SqlConnection conn, SqlTransaction tran, int saleId, string couponCode, Action<string> logAudit)
+        {
+            string query = @"UPDATE Coupons SET SaleID = @SaleID WHERE CouponCode = @CouponCode";
+            using (var cmd = new SqlCommand(query, conn, tran))
+            {
+                cmd.Parameters.AddWithValue("@SaleID", saleId);
+                cmd.Parameters.AddWithValue("@CouponCode", couponCode);
+                int rowsAffected = cmd.ExecuteNonQuery();
+                logAudit($"Updated coupon {couponCode} for sale {saleId}, rows affected: {rowsAffected}");
             }
         }
        

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Windows.Forms; // Required for PrintPreviewDialog
+using System.Windows.Forms;
 
 public class ReceiptPrinter
 {
@@ -15,11 +15,11 @@ public class ReceiptPrinter
     private readonly string receiptNo;
     private readonly string paymentMethod;
     private readonly List<SaleItem> saleItems;
-    private readonly decimal discountPercentage;
+    private readonly decimal discountAmount;
+    private readonly string couponCode;
     private readonly decimal cashbackAmount;
     private readonly decimal? renderedAmount;
 
-    // Load application settings once
     private readonly ApplicationSettings settings;
 
     public ReceiptPrinter(
@@ -30,9 +30,11 @@ public class ReceiptPrinter
         string receiptNo,
         string paymentMethod,
         List<SaleItem> saleItems,
-        decimal discountPercentage = 0,
+        decimal discountAmount = 0,
+        string couponCode = null,
         decimal cashbackAmount = 0,
-        decimal? renderedAmount = null)
+        decimal? renderedAmount = null,
+        decimal discountPercentage = 0)
     {
         this.deviceInternetId = deviceInternetId;
         this.employeeFirstName = employeeFirstName;
@@ -41,11 +43,11 @@ public class ReceiptPrinter
         this.receiptNo = receiptNo;
         this.paymentMethod = paymentMethod;
         this.saleItems = saleItems ?? new List<SaleItem>();
-        this.discountPercentage = discountPercentage;
+        this.discountAmount = discountAmount;
+        this.couponCode = couponCode;
         this.cashbackAmount = cashbackAmount;
         this.renderedAmount = renderedAmount;
 
-        // Load store/application settings
         this.settings = SettingsManager.LoadSettings();
     }
 
@@ -64,83 +66,78 @@ public class ReceiptPrinter
 
         printDocument.PrintPage += (sender, e) =>
         {
-            Graphics graphics = e.Graphics;
+            Graphics g = e.Graphics;
             Font font = new Font("Courier New", 10);
             int y = 20;
 
-            // --- Header (from settings) ---
-            graphics.DrawString($"********* {settings.StoreName} *********", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Address: {settings.StoreAddress}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Phone: {settings.StorePhone} | Email: {settings.StoreEmail}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Website: {settings.StoreWebsite}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Tax No: {settings.TaxNumber}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
+            // --- Header ---
+            g.DrawString($"******** {settings.StoreName} ********", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Address: {settings.StoreAddress}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Tel: {settings.StorePhone} | Email: {settings.StoreEmail}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Website: {settings.StoreWebsite} | Tax: {settings.TaxNumber}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString("-----------------------------------------------", font, Brushes.Black, 10, y); y += 20;
 
             // --- Receipt info ---
-            graphics.DrawString($"Receipt No: {receiptNo}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Date: {DateTime.Now:dd/MM/yyyy HH:mm:ss}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Employee: {employeeFirstName} {employeeSurname}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Payment Method: {paymentMethod}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Receipt No: {receiptNo}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Date: {DateTime.Now:dd/MM/yyyy HH:mm:ss}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Employee: {employeeFirstName} {employeeSurname} ({employeeNumber})", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Payment Method: {paymentMethod}", font, Brushes.Black, 10, y); y += 20;
 
-            // --- Items ---
-            graphics.DrawString("Item               Qty   Price       Total", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
+            // --- Items Header ---
+            g.DrawString("Item                 Qty    Price       Total", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString("-----------------------------------------------", font, Brushes.Black, 10, y); y += 20;
 
             decimal total = 0;
             foreach (var item in saleItems)
             {
                 decimal lineTotal = item.Price * item.Quantity;
                 total += lineTotal;
-                graphics.DrawString($"{item.ProductName,-15} {item.Quantity,3} {item.Price,9:C} {lineTotal,10:C}", font, Brushes.Black, 10, y);
+                g.DrawString($"{item.ProductName,-18} {item.Quantity,3} {item.Price,9:C} {lineTotal,10:C}", font, Brushes.Black, 10, y);
                 y += 20;
             }
 
-            decimal discountValue = total * (discountPercentage / 100);
-            decimal subtotalAfterDiscount = total - discountValue;
-            if (subtotalAfterDiscount < 0) subtotalAfterDiscount = 0;
-
-            decimal tax = subtotalAfterDiscount * 0.15m;
-            decimal finalTotal = subtotalAfterDiscount + tax + cashbackAmount;
-
             // --- Totals ---
-            graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Subtotal: {total,25:C}", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString("-----------------------------------------------", font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Subtotal: {total,33:C}", font, Brushes.Black, 10, y); y += 20;
 
-            if (discountPercentage > 0)
-                graphics.DrawString($"Discount ({discountPercentage:F0}%): {discountValue,17:C}", font, Brushes.Black, 10, y); y += 20;
+            if (discountAmount > 0 && !string.IsNullOrWhiteSpace(couponCode))
+            {
+                g.DrawString($"Coupon ({couponCode}): -{discountAmount,24:C}", font, Brushes.Black, 10, y); y += 20;
+                total -= discountAmount;
+            }
 
-            graphics.DrawString($"Subtotal After Discount: {subtotalAfterDiscount,12:C}", font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString($"Tax (15%): {tax,26:C}", font, Brushes.Black, 10, y); y += 20;
+            decimal tax = total * 0.15m;
+            decimal finalTotal = total + cashbackAmount;
+
+            g.DrawString($"VAT (15%) INCLUDED IN TOTAL: {tax,32:C}", font, Brushes.Black, 10, y); y += 20;
 
             if (cashbackAmount > 0)
             {
-                graphics.DrawString($"Cashback Applied: {cashbackAmount,19:C}", font, Brushes.Black, 10, y); y += 20;
+                g.DrawString($"Cashback: {cashbackAmount,30:C}", font, Brushes.Black, 10, y); y += 20;
             }
 
-            graphics.DrawString($"Total: {finalTotal,29:C}", new Font("Courier New", 10, FontStyle.Bold), Brushes.Black, 10, y); y += 20;
+            g.DrawString($"TOTAL: {finalTotal,32:C}", new Font("Courier New", 10, FontStyle.Bold), Brushes.Black, 10, y); y += 20;
 
             if (paymentMethod == "CASH" && renderedAmount.HasValue)
             {
                 decimal change = renderedAmount.Value - finalTotal;
-                graphics.DrawString("-----------------------------------------", font, Brushes.Black, 10, y); y += 20;
-                graphics.DrawString($"Amount Rendered: {renderedAmount.Value,19:C}", font, Brushes.Black, 10, y); y += 20;
-                graphics.DrawString($"Change: {change,30:C}", font, Brushes.Black, 10, y); y += 40;
+                g.DrawString("-----------------------------------------------", font, Brushes.Black, 10, y); y += 20;
+                g.DrawString($"Amount Rendered: {renderedAmount.Value,23:C}", font, Brushes.Black, 10, y); y += 20;
+                g.DrawString($"Change: {change,31:C}", font, Brushes.Black, 10, y); y += 40;
             }
 
-            // --- Footer (from settings) ---
-            graphics.DrawString(settings.FooterMessage1, font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString(settings.FooterMessage2, font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString(settings.FooterMessage3, font, Brushes.Black, 10, y); y += 20;
-            graphics.DrawString(settings.FooterMessage4, font, Brushes.Black, 10, y); y += 20;
+            // --- Footer ---
+            g.DrawString(settings.FooterMessage1, font, Brushes.Black, 10, y); y += 20;
+            g.DrawString(settings.FooterMessage2, font, Brushes.Black, 10, y); y += 20;
+            g.DrawString(settings.FooterMessage3, font, Brushes.Black, 10, y); y += 20;
+            g.DrawString(settings.FooterMessage4, font, Brushes.Black, 10, y); y += 20;
+            g.DrawString($"Device ID: {deviceInternetId}", font, Brushes.Black, 10, y); y += 20;
         };
 
         if (showPrintPreview)
         {
-            PrintPreviewDialog previewDialog = new PrintPreviewDialog
-            {
-                Document = printDocument
-            };
-            previewDialog.ShowDialog();
+            PrintPreviewDialog preview = new PrintPreviewDialog { Document = printDocument };
+            preview.ShowDialog();
         }
         else
         {

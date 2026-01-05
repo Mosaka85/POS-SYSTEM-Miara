@@ -32,8 +32,8 @@ namespace Miara
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSales));
             this.lblNextSalesNumber = new System.Windows.Forms.Label();
             this.lblTotalAmount = new System.Windows.Forms.Label();
@@ -87,12 +87,13 @@ namespace Miara
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnReportSales = new MaterialSkin.Controls.MaterialButton();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lblUserRole = new System.Windows.Forms.Label();
             this.btnBack = new MaterialSkin.Controls.MaterialButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lblinternet = new System.Windows.Forms.Label();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.lblemailvalid = new System.Windows.Forms.Label();
-            this.lblUserRole = new System.Windows.Forms.Label();
+            this.lblSessionID = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSaleDetails)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
@@ -100,6 +101,7 @@ namespace Miara
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel2.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -362,7 +364,7 @@ namespace Miara
             this.btnVoidLine.Depth = 0;
             this.btnVoidLine.HighEmphasis = true;
             this.btnVoidLine.Icon = null;
-            this.btnVoidLine.Location = new System.Drawing.Point(1689, 320);
+            this.btnVoidLine.Location = new System.Drawing.Point(1723, 779);
             this.btnVoidLine.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnVoidLine.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnVoidLine.Name = "btnVoidLine";
@@ -381,7 +383,7 @@ namespace Miara
             this.btnRefund.Depth = 0;
             this.btnRefund.HighEmphasis = true;
             this.btnRefund.Icon = null;
-            this.btnRefund.Location = new System.Drawing.Point(1689, 210);
+            this.btnRefund.Location = new System.Drawing.Point(1723, 669);
             this.btnRefund.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnRefund.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnRefund.Name = "btnRefund";
@@ -400,7 +402,7 @@ namespace Miara
             this.btnCupons.Depth = 0;
             this.btnCupons.HighEmphasis = true;
             this.btnCupons.Icon = null;
-            this.btnCupons.Location = new System.Drawing.Point(1689, 368);
+            this.btnCupons.Location = new System.Drawing.Point(1723, 827);
             this.btnCupons.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnCupons.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnCupons.Name = "btnCupons";
@@ -419,7 +421,7 @@ namespace Miara
             this.btnPriceCheck.Depth = 0;
             this.btnPriceCheck.HighEmphasis = true;
             this.btnPriceCheck.Icon = null;
-            this.btnPriceCheck.Location = new System.Drawing.Point(1689, 422);
+            this.btnPriceCheck.Location = new System.Drawing.Point(1723, 881);
             this.btnPriceCheck.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnPriceCheck.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnPriceCheck.Name = "btnPriceCheck";
@@ -437,7 +439,7 @@ namespace Miara
             this.btnOpenCashDrawer.Depth = 0;
             this.btnOpenCashDrawer.HighEmphasis = true;
             this.btnOpenCashDrawer.Icon = null;
-            this.btnOpenCashDrawer.Location = new System.Drawing.Point(1689, 156);
+            this.btnOpenCashDrawer.Location = new System.Drawing.Point(1723, 615);
             this.btnOpenCashDrawer.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnOpenCashDrawer.MouseState = MaterialSkin.MouseState.HOVER;
             this.btnOpenCashDrawer.Name = "btnOpenCashDrawer";
@@ -456,7 +458,7 @@ namespace Miara
             this.button2.Depth = 0;
             this.button2.HighEmphasis = true;
             this.button2.Icon = null;
-            this.button2.Location = new System.Drawing.Point(1689, 264);
+            this.button2.Location = new System.Drawing.Point(1723, 723);
             this.button2.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.button2.MouseState = MaterialSkin.MouseState.HOVER;
             this.button2.Name = "button2";
@@ -606,7 +608,7 @@ namespace Miara
             this.combopaymentmentod.Hint = "Select Payment Method";
             this.combopaymentmentod.IntegralHeight = false;
             this.combopaymentmentod.ItemHeight = 43;
-            this.combopaymentmentod.Location = new System.Drawing.Point(10, 409);
+            this.combopaymentmentod.Location = new System.Drawing.Point(15, 399);
             this.combopaymentmentod.MaxDropDownItems = 4;
             this.combopaymentmentod.MouseState = MaterialSkin.MouseState.OUT;
             this.combopaymentmentod.Name = "combopaymentmentod";
@@ -695,10 +697,10 @@ namespace Miara
             this.dataGridViewSaleDetails.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewSaleDetails.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewSaleDetails.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(33)))), ((int)(((byte)(33)))));
-            this.dataGridViewSaleDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(245)))), ((int)(((byte)(245)))));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(33)))), ((int)(((byte)(33)))));
+            this.dataGridViewSaleDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridViewSaleDetails.ColumnHeadersHeight = 40;
             this.dataGridViewSaleDetails.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ProductID,
@@ -711,20 +713,21 @@ namespace Miara
             this.dataGridViewSaleDetails.Location = new System.Drawing.Point(464, 156);
             this.dataGridViewSaleDetails.Name = "dataGridViewSaleDetails";
             this.dataGridViewSaleDetails.ReadOnly = true;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Bold);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewSaleDetails.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Bold);
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewSaleDetails.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridViewSaleDetails.RowHeadersVisible = false;
             this.dataGridViewSaleDetails.RowHeadersWidth = 51;
             this.dataGridViewSaleDetails.RowTemplate.Height = 35;
             this.dataGridViewSaleDetails.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewSaleDetails.Size = new System.Drawing.Size(866, 623);
             this.dataGridViewSaleDetails.TabIndex = 6;
+            this.dataGridViewSaleDetails.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewSaleDetails_CellContentClick);
             // 
             // txtBarcodeLabel
             // 
@@ -766,7 +769,7 @@ namespace Miara
             // pictureBox2
             // 
             this.pictureBox2.Image = global::Miara.Properties.Resources.MIARA_POS;
-            this.pictureBox2.Location = new System.Drawing.Point(0, 900);
+            this.pictureBox2.Location = new System.Drawing.Point(0, 925);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(200, 120);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -815,7 +818,7 @@ namespace Miara
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            this.panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
             this.panel2.Controls.Add(this.lblUserRole);
             this.panel2.Controls.Add(this.btnBack);
             this.panel2.Controls.Add(this.lblBusineess);
@@ -828,6 +831,18 @@ namespace Miara
             this.panel2.Size = new System.Drawing.Size(1908, 110);
             this.panel2.TabIndex = 69;
             this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
+            // 
+            // lblUserRole
+            // 
+            this.lblUserRole.AutoSize = true;
+            this.lblUserRole.BackColor = System.Drawing.Color.Transparent;
+            this.lblUserRole.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold);
+            this.lblUserRole.ForeColor = System.Drawing.Color.White;
+            this.lblUserRole.Location = new System.Drawing.Point(180, 30);
+            this.lblUserRole.Name = "lblUserRole";
+            this.lblUserRole.Size = new System.Drawing.Size(87, 20);
+            this.lblUserRole.TabIndex = 68;
+            this.lblUserRole.Text = "UserRole";
             // 
             // btnBack
             // 
@@ -850,7 +865,9 @@ namespace Miara
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(150)))), ((int)(((byte)(243)))));
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.panel1.Controls.Add(this.lblSessionID);
+            this.panel1.Controls.Add(this.lblinternet);
             this.panel1.Location = new System.Drawing.Point(0, 1040);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1908, 45);
@@ -860,8 +877,8 @@ namespace Miara
             // 
             this.lblinternet.AutoSize = true;
             this.lblinternet.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
-            this.lblinternet.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(33)))), ((int)(((byte)(33)))));
-            this.lblinternet.Location = new System.Drawing.Point(-3, 1020);
+            this.lblinternet.ForeColor = System.Drawing.Color.White;
+            this.lblinternet.Location = new System.Drawing.Point(3, 18);
             this.lblinternet.Name = "lblinternet";
             this.lblinternet.Size = new System.Drawing.Size(56, 17);
             this.lblinternet.TabIndex = 71;
@@ -874,9 +891,9 @@ namespace Miara
             this.flowLayoutPanel2.Controls.Add(this.lblCashBack);
             this.flowLayoutPanel2.Controls.Add(this.lblSubtotalorder);
             this.flowLayoutPanel2.Controls.Add(this.lbldiscountvalue);
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(1388, 156);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(1347, 156);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(277, 302);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(285, 340);
             this.flowLayoutPanel2.TabIndex = 72;
             // 
             // lblemailvalid
@@ -891,17 +908,16 @@ namespace Miara
             this.lblemailvalid.Text = "Email Not Valid!!";
             this.lblemailvalid.Visible = false;
             // 
-            // lblUserRole
+            // lblSessionID
             // 
-            this.lblUserRole.AutoSize = true;
-            this.lblUserRole.BackColor = System.Drawing.Color.Transparent;
-            this.lblUserRole.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold);
-            this.lblUserRole.ForeColor = System.Drawing.Color.White;
-            this.lblUserRole.Location = new System.Drawing.Point(180, 30);
-            this.lblUserRole.Name = "lblUserRole";
-            this.lblUserRole.Size = new System.Drawing.Size(87, 20);
-            this.lblUserRole.TabIndex = 68;
-            this.lblUserRole.Text = "UserRole";
+            this.lblSessionID.AutoSize = true;
+            this.lblSessionID.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
+            this.lblSessionID.ForeColor = System.Drawing.Color.White;
+            this.lblSessionID.Location = new System.Drawing.Point(926, 14);
+            this.lblSessionID.Name = "lblSessionID";
+            this.lblSessionID.Size = new System.Drawing.Size(71, 17);
+            this.lblSessionID.TabIndex = 72;
+            this.lblSessionID.Text = "SessionID";
             // 
             // frmSales
             // 
@@ -912,7 +928,6 @@ namespace Miara
             this.ControlBox = false;
             this.Controls.Add(this.lblemailvalid);
             this.Controls.Add(this.flowLayoutPanel2);
-            this.Controls.Add(this.lblinternet);
             this.Controls.Add(this.btnCompleteSale);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
@@ -959,6 +974,8 @@ namespace Miara
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel2.PerformLayout();
             this.ResumeLayout(false);
@@ -1025,5 +1042,6 @@ namespace Miara
         private FlowLayoutPanel flowLayoutPanel2;
         private Label lblemailvalid;
         public Label lblUserRole;
+        private Label lblSessionID;
     }
 }

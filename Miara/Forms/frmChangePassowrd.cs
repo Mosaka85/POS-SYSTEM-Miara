@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Miara.Models;
+using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Security.Cryptography;
@@ -49,7 +50,7 @@ namespace Miara
 
         public string GetUserEmail(string username)
         {
-            string query = "SELECT TOP 1 Email FROM Employees WHERE Username = @username";
+            string query = "SELECT TOP 1 Email FROM users WHERE Username = @username";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -185,7 +186,7 @@ namespace Miara
             try
             {
                 string hashedPassword = HashPassword(txtPassword.Text);
-                string query = "UPDATE Employees SET PasswordHash = @password WHERE Username = @username";
+                string query = "UPDATE users SET password_hash = @password WHERE username = @username";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 using (SqlCommand cmd = new SqlCommand(query, conn))

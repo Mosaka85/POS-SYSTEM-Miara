@@ -10,7 +10,7 @@
     <AssemblyName>Miara POS</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
@@ -34,7 +34,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
@@ -43,9 +43,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <DocumentationFile>
-    </DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>..\..\..\..\..\..\Program Files %28x86%29\Miara POS\Miara POS.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -83,6 +82,8 @@
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup />
   <PropertyGroup />
   <ItemGroup>
     <Reference Include="Accessibility" />
@@ -177,6 +178,12 @@
     <Compile Include="FormApplicationSettings.Designer.cs">
       <DependentUpon>FormApplicationSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmCashChange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmCashChange.Designer.cs">
+      <DependentUpon>frmCashChange.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormUserPermissions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +191,19 @@
       <DependentUpon>FormUserPermissions.cs</DependentUpon>
     </Compile>
     <Compile Include="Processor Class\ApplicationSettings.cs" />
+    <Compile Include="Processor Class\AppUtilities.cs" />
+    <Compile Include="Processor Class\ConnectionConfigService.cs" />
+    <Compile Include="Processor Class\CouponProcessor.cs" />
+    <Compile Include="Processor Class\CouponService.cs" />
+    <Compile Include="Processor Class\DeviceAuditService.cs" />
+    <Compile Include="Processor Class\EmployeeImageService.cs" />
+    <Compile Include="Processor Class\EmployeePermissionService.cs" />
+    <Compile Include="Processor Class\EmployeeRoleService.cs" />
+    <Compile Include="Processor Class\ImageHelper.cs" />
+    <Compile Include="Processor Class\LoginInfo.cs" />
+    <Compile Include="Processor Class\ProductRepository.cs" />
+    <Compile Include="Processor Class\ProductService.cs" />
+    <Compile Include="Processor Class\SaleDiscountManager.cs" />
     <Compile Include="Processor Class\SettingsManager.cs" />
     <Compile Include="Processor Class\IReceiptService.cs" />
     <Compile Include="Processor Class\ISaleRepository.cs" />
@@ -290,6 +310,8 @@
     <Compile Include="frmConfirmDialogCoupons.Designer.cs">
       <DependentUpon>frmConfirmDialogCoupons.cs</DependentUpon>
     </Compile>
+    <Compile Include="Processor Class\SqlService.cs" />
+    <Compile Include="Processor Class\VoidAuditService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings1.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -299,6 +321,9 @@
     <Compile Include="SqlServerTypes\Loader.cs" />
     <EmbeddedResource Include="FormApplicationSettings.resx">
       <DependentUpon>FormApplicationSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmCashChange.resx">
+      <DependentUpon>frmCashChange.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPrinter.resx">
       <DependentUpon>frmPrinter.cs</DependentUpon>

@@ -72,12 +72,16 @@
             // 
             // tabControl
             // 
+            this.tabControl.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
             this.tabControl.Controls.Add(this.tabGeneral);
             this.tabControl.Controls.Add(this.tabLogging);
             this.tabControl.Controls.Add(this.tabSecurity);
             this.tabControl.Controls.Add(this.tabAppearance);
             this.tabControl.Controls.Add(this.tabAdvanced);
+            this.tabControl.Font = new System.Drawing.Font("Arial", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(20, 20);
+            this.tabControl.Multiline = true;
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(1015, 521);
@@ -85,6 +89,7 @@
             // 
             // tabGeneral
             // 
+            this.tabGeneral.BackColor = System.Drawing.Color.White;
             this.tabGeneral.Controls.Add(this.txtFooterMassage3);
             this.tabGeneral.Controls.Add(this.label3);
             this.tabGeneral.Controls.Add(this.lblReceiptCopies);
@@ -108,9 +113,9 @@
             this.tabGeneral.Controls.Add(this.labelStoreName);
             this.tabGeneral.Controls.Add(this.txtStoreName);
             this.tabGeneral.Controls.Add(this.chkAutoSave);
-            this.tabGeneral.Location = new System.Drawing.Point(4, 25);
+            this.tabGeneral.Location = new System.Drawing.Point(4, 28);
             this.tabGeneral.Name = "tabGeneral";
-            this.tabGeneral.Size = new System.Drawing.Size(1007, 492);
+            this.tabGeneral.Size = new System.Drawing.Size(1007, 489);
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             // 
@@ -344,13 +349,14 @@
             // 
             // tabLogging
             // 
+            this.tabLogging.BackColor = System.Drawing.Color.White;
             this.tabLogging.Controls.Add(this.chkLocalLogs);
             this.tabLogging.Controls.Add(this.chkDatabaseLogs);
             this.tabLogging.Controls.Add(this.cmbLogLevel);
             this.tabLogging.Controls.Add(this.labelLogLevel);
-            this.tabLogging.Location = new System.Drawing.Point(4, 25);
+            this.tabLogging.Location = new System.Drawing.Point(4, 28);
             this.tabLogging.Name = "tabLogging";
-            this.tabLogging.Size = new System.Drawing.Size(1007, 492);
+            this.tabLogging.Size = new System.Drawing.Size(1007, 489);
             this.tabLogging.TabIndex = 1;
             this.tabLogging.Text = "Logging";
             // 
@@ -369,6 +375,7 @@
             this.chkDatabaseLogs.Size = new System.Drawing.Size(175, 24);
             this.chkDatabaseLogs.TabIndex = 1;
             this.chkDatabaseLogs.Text = "Allow Database Logs";
+            this.chkDatabaseLogs.CheckedChanged += new System.EventHandler(this.chkDatabaseLogs_CheckedChanged);
             // 
             // cmbLogLevel
             // 
@@ -392,12 +399,13 @@
             // 
             // tabSecurity
             // 
+            this.tabSecurity.BackColor = System.Drawing.Color.White;
             this.tabSecurity.Controls.Add(this.chkRequireLogin);
             this.tabSecurity.Controls.Add(this.chkEnable2FA);
             this.tabSecurity.Controls.Add(this.chkEncryptFiles);
-            this.tabSecurity.Location = new System.Drawing.Point(4, 25);
+            this.tabSecurity.Location = new System.Drawing.Point(4, 28);
             this.tabSecurity.Name = "tabSecurity";
-            this.tabSecurity.Size = new System.Drawing.Size(1007, 492);
+            this.tabSecurity.Size = new System.Drawing.Size(1007, 489);
             this.tabSecurity.TabIndex = 2;
             this.tabSecurity.Text = "Security";
             // 
@@ -427,12 +435,13 @@
             // 
             // tabAppearance
             // 
+            this.tabAppearance.BackColor = System.Drawing.Color.White;
             this.tabAppearance.Controls.Add(this.chkDarkMode);
             this.tabAppearance.Controls.Add(this.cmbFontSize);
             this.tabAppearance.Controls.Add(this.labelFontSize);
-            this.tabAppearance.Location = new System.Drawing.Point(4, 25);
+            this.tabAppearance.Location = new System.Drawing.Point(4, 28);
             this.tabAppearance.Name = "tabAppearance";
-            this.tabAppearance.Size = new System.Drawing.Size(1007, 492);
+            this.tabAppearance.Size = new System.Drawing.Size(1007, 489);
             this.tabAppearance.TabIndex = 3;
             this.tabAppearance.Text = "Appearance";
             // 
@@ -465,13 +474,14 @@
             // 
             // tabAdvanced
             // 
+            this.tabAdvanced.BackColor = System.Drawing.Color.White;
             this.tabAdvanced.Controls.Add(this.labelApiUrl);
             this.tabAdvanced.Controls.Add(this.txtApiUrl);
             this.tabAdvanced.Controls.Add(this.chkCloudBackup);
             this.tabAdvanced.Controls.Add(this.chkPerformanceMode);
-            this.tabAdvanced.Location = new System.Drawing.Point(4, 25);
+            this.tabAdvanced.Location = new System.Drawing.Point(4, 28);
             this.tabAdvanced.Name = "tabAdvanced";
-            this.tabAdvanced.Size = new System.Drawing.Size(1007, 492);
+            this.tabAdvanced.Size = new System.Drawing.Size(1007, 489);
             this.tabAdvanced.TabIndex = 4;
             this.tabAdvanced.Text = "Advanced";
             // 

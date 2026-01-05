@@ -7,10 +7,10 @@
 AS
 BEGIN
     DECLARE @SaleID INT;
-    DECLARE @Tax DECIMAL(18, 2);
+    DECLARE @VAT DECIMAL(18, 2);
     DECLARE @FinalTotal DECIMAL(18, 2);
 
-    SET @Tax = @TotalAmount * 0.15;
+    SET @VAT = @TotalAmount * 0.15;
 
     SET @FinalTotal = @TotalAmount;
 
